@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>KB</title>
+
+    <link type="image/x-icon" rel="icon" href="https://icons.iconarchive.com/icons/sykonist/popular-sites/32/Wikipedia-globe-icon.png"/>
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
+    <script src="https://unpkg.com/vue@latest/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+    <script src="https://unpkg.com/vue-async-computed"></script>
+    <style>
+      body {
+        background-color: whitesmoke;
+        -webkit-touch-callout: none; /* iOS Safari */
+          -webkit-user-select: none; /* Safari */
+                  user-select: none;
+      }
+      .btn-choice {
+        border-radius: 0%;
+        border-color: gray;
+        border-style: dotted;
+        border-width: 1px;
+        padding: 0.15rem;
+        font-size: 1.5rem;
+        font-family:'Segoe UI', 'Microsoft YaHei', "Hiragino Kaku Gothic Pro", 'MS PGothic', Tahoma, Geneva, Verdana, sans-serif;
+        overflow-wrap: break-word;
+      }
+      a.title-link {
+        color: black;
+        background-color: #f5f5f58f;
+        font-family: 'Microsoft YaHei', "Hiragino Kaku Gothic Pro", 'PingFang TC', 'Hiragino Sans','MS PGothic';
+        text-decoration: none;
+      }
+      .title {
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: top right 0.75rem;
+      }
+      .progress {
+        border-radius: 0%;
+      }
+      @media (max-width: 576px) {
+        body, html {
+          padding:0;
+          overflow-x: hidden;
+        }
+        .container {
+          padding:0;
+          margin:0;
+        }
+        .navbar-fixed-top, .navbar-fixed-bottom, .navbar-static-top {
+          margin-left: 0;
+          margin-right: 0;
+          margin-bottom:0;
+        }
+        .btn-choice {
+          font-size: 1.2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <b-container>
+        <b-jumbotron class="mx-2" header="Knowledge Bomber 💣" lead="Run away little girl. Run Away">
+          <b-form-group
+            v-if="!quizStarted"
+            horizontal
+            :label-cols="4"
+            label="Q&A languages"
+          >
+            <b-form-select v-model="qlang" :options="qlangOptions" label="qlang"></b-form-select>
+            <b-form-select v-model="alang" :options="alangOptions" label="alang"></b-form-select>
+          </b-form-group>
+          <b-btn class="my-1" variant="primary" 
+            v-if="!quizStarted&&!!qlang&&!!alang" 
+            @click="newGame">
+            Start
+          </b-btn>
+        </b-jumbotron>
+
+        <b-row class="flex" v-if="quizStarted">
+          <b-progress class="d-inline-flex col col-9 col-sm-10 col-lg-11" max="63" height="2rem" striped :animated="progressAnimate">
+            <b-progress-bar style="animation-direction: reverse;"
+              :value="lvl+10" 
+              :label="`Lv. ${lvl} (${quizPlayed})`">
+            </b-progress-bar>
+          </b-progress>
+          <b-col class="col-3 col-sm-2 col-lg-1">
+            <b-btn class="w-100" variant="outline-primary"  v-on:click="endGame">End</b-btn>
+          </b-col>
+        </b-row>
+        
+        <div class="justify-content-center">
+          <b-row v-if="quizStarted" >
+            <b-col class="title py-5" 
+              sm="11" md="10" lg="8" xl="6"
+              @touchstart="touchStart($event)"
+              @touchend="touchEnd($event)"
+              :style="`background-image: url(${titleImage});`">
+              <h1 class="display-3 my-4 mx-2">
+                <a class="title-link" target="_blank"
+                  @mouseover="speakTitle"
+                  :href="`https://${qlang}.wikipedia.org/wiki/${q_title}`">
+                  {{ q_title }}
+                </a>
+              </h1>
+            </b-col>
+          </b-row>
+
+          <b-row>
+            <b-col sm="11" md="10" lg="8" xl="6" class="choices">
+              <b-button secondary class="col-4 btn-choice"
+                v-for="(choice,index) in choices" :key="index"
+                :style="`height: ${choiceHeight}px`"
+                :id="`choice-${index}`"
+                @click="selectChoice($event,index)"
+                @touchstart="touchStart($event,index)"
+                @touchend="touchEnd($event)">
+                {{ choice }}
+              </b-button>
+            </b-col>
+          </b-row>
+        </div>
+        
+        <div v-if="showScore">
+          <b-alert variant="success" :show="showScore">Game over ~   score: {{ score }}%</b-alert>
+          <b-progress class="my-1"
+            :max="quizPlayed"
+            :title="Object.values(board).filter(v=>v.length>0).length +' Levels'"
+            v-b-popover.hover.left="`${quizPlayed}❔　${quizCorrect}✔　${quizPlayed-quizCorrect}❌`"
+            v-b-popover.click.left="`${quizPlayed}❔　${quizCorrect}✔　${quizPlayed-quizCorrect}❌`">
+            <b-progress-bar :value="quizCorrect" variant="success"></b-progress-bar>
+            <b-progress-bar :value="quizPlayed-quizCorrect" variant="danger"></b-progress-bar>
+          </b-progress>
+          <b-progress v-for="([k,v], i) in Object.entries(board)" :key="i"
+            :max="Math.max.apply(Math,Object.values(board).map(v => v.length))"
+            :title="'Level '+ k"
+            :animated="k==lvl"
+            v-b-popover.hover.left="`${v.length}❔　${v.filter(u=>u>0).length}✔　${v.filter(u=>u<0).length}❌`"
+            v-if="v.length > 0">
+            <b-progress-bar v-for="(u, index) in scoreBar(v)" :key="index"
+              :value="Math.abs(u)" :variant="u>0?'success':'danger'"></b-progress-bar>
+          </b-progress>
+        </div>
+      </b-container>
+    </div>
+
+    <!-- Start running your app -->
+    <script>
+      window.app = new Vue({
+        el: '#app',
+        data: {
+          name: '',
+          qlang: '',
+          alang: '',
+          qlang_options: [{ value: '', text: '(Question Language)' }],
+          alang_options: [{ value: '', text: '(Answers Language)' }],
+          q_title: '',
+          q_id: 0,
+          lvl: 1,
+          board: {},
+          choices: [],
+          answer: -1,
+          score: -1,
+          windowWidth: window.innerWidth,
+          progressAnimate: false,
+          touchTimer: null,
+          touchTimerLong: null,
+        },
+        mounted: function() {
+          fetch(`${window.location.origin}/language`)
+          .then(resp => resp.json())
+          .then(data => {
+            this.qlang_options = data
+            this.alang_options = data
+            let langs = [...window.navigator.languages.reduce((s,a)=>{s.add(a.slice(0,2));return s},new Set())]
+            this.alang = langs[0] ? langs[0] : ''
+            this.qlang = langs[1] ? langs[1] : ''
+          })
+
+          window.addEventListener('keydown', (e) => {
+            const KEYMAP = {'7':0,'8':1,'9':2,'4':3,'5':4,'6':5,'1':6,'2':7,'3':8,'.':10}
+            const MOVEMAP = {
+              'ArrowUp': i => i-3 >= 0 ? i-3 : i-3+9,
+              'ArrowDown': i => i+3 < 9 ? i+3 : i+3-9,
+              'ArrowLeft': i => [0,3,6].indexOf(i) < 0 ? i-1 : i+2,
+              'ArrowRight': i => [2,5,8].indexOf(i) < 0 ? i+1 : i-2,
+            }
+            if(this.quizStarted) {
+              let c = document.getElementById('choice-'+KEYMAP[e.key])
+              if (c) c.click()
+              else {
+                if (MOVEMAP[e.key] && document.activeElement && document.activeElement.classList.contains('btn-choice')){
+                  i = parseInt(document.activeElement.id.slice(-1));
+                  document.getElementById('choice-'+MOVEMAP[e.key](i)).focus()
+                }
+              }
+              if (e.key == '0') this.speakTitle()
+              if (e.key == '+') document.getElementsByClassName('title-link')[0].click()
+            }
+          })
+
+          window.onresize = () => {
+            this.windowWidth = window.innerWidth
+          }
+          window.onbeforeunload = () => {
+            if (this.quizStarted) return 'Quiz is running. Are you sure to quit?'
+          }
+        },
+        computed: {
+          showScore() {
+            return this.score >= 0
+          },
+          quizStarted() {
+            return this.choices.length > 0
+          },
+          qlangOptions() {
+            return this.qlang_options.filter(l => l.value != this.alang)
+          },
+          alangOptions() {
+            return this.alang_options.filter(l => l.value != this.qlang)
+          },
+          quizPlayed() {
+            return Object.values(this.board).reduce((s,v) => s+v.length, 0)
+          },
+          quizCorrect() {
+            return Object.values(this.board).reduce((s,v) => s+v.filter(u=>u>0).length, 0)
+          },
+          choiceHeight() {
+            this.windowWidth
+            let row = document.getElementsByClassName('choices')[0]
+            let width =  window.getComputedStyle(row).width.slice(0, -2)
+            return width / 3
+          },
+        },
+        asyncComputed: {
+          async titleImage() {
+            let sparqalQuery = `
+SELECT ?item ?pic ?flag ?chem ?logo ?taxnrg ?locator ?dist ?collage ?icon ?trid ?schem ?rimg {
+VALUES (?item) {(wd:Q${this.q_id})}
+OPTIONAL { ?item wdt:P18 ?pic }
+OPTIONAL { ?item wdt:P41 ?flag }
+OPTIONAL { ?item wdt:P117 ?chem }
+OPTIONAL { ?item wdt:P154 ?logo }
+OPTIONAL { ?item wdt:P181 ?taxnrg }
+OPTIONAL { ?item wdt:P242 ?locator }
+OPTIONAL { ?item wdt:P1846 ?dist }
+OPTIONAL { ?item wdt:P2716 ?collage }
+OPTIONAL { ?item wdt:P2910 ?icon }
+OPTIONAL { ?item wdt:P4896 ?trid }
+OPTIONAL { ?item wdt:P5555 ?schem }
+OPTIONAL { ?item wdt:P6802 ?rimg }
+}`
+            let resp = await fetch(`https://query.wikidata.org/sparql?query=${sparqalQuery}`, {
+              headers: {'Accept':'application/json'},
+            })
+            let data = await resp.json()
+            const IMG_TYPE = ['collage','trid','schem','chem','pic','dist','locator','taxnrg','flag','logo','icon','rimg']
+            let imgUrls = IMG_TYPE.map(i => {
+              let t = data.results.bindings.filter(b => b[i])
+              return t.length>0 ? t[Math.floor(t.length*Math.random())][i].value : null
+            })
+            //DEBUG - add wikidata img
+            // if (imgUrls.find(i=>i)){
+            //   setTimeout(() => {
+            //     document.getElementById('choice-'+this.answer).click()
+            //   }, 300);
+            // } else {
+            //   document.getElementsByClassName('title-link')[0].click()
+            //   window.open(data.results.bindings[0].item.value, '_blank')
+            //   // setTimeout(() => {
+            //   //   document.getElementById('choice-'+Math.floor(Math.random()*0+this.answer)%9).click()
+            //   // }, 100);
+            // }
+            // return '#'
+            //END_DEBUG
+            return imgUrls.find(i=>i) || '#'
+          }
+        },
+        methods: {
+          newGame: function() {
+            if (!this.qlang || !this.alang) {
+              return
+            }
+            fetch(`${window.location.origin}/next`, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                lvl: -1,
+                board: {},
+                qlang: this.qlang,
+                alang: this.alang,
+                qid: 0,
+                is_correct: true,
+              })
+            })
+            .then(resp => resp.json())
+            .then(data => {
+              this.lvl = data.lvl
+              this.q_id = data.q_id
+              this.q_title = data.q_title
+              this.choices = data.choices
+              this.answer = data.answer
+              this.board = data.board
+            })
+            this.score = -1
+          },
+
+          endGame: function() {
+            fetch(`${window.location.origin}/next`, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                lvl: 0,
+                board: this.board,
+                qlang: this.qlang,
+                alang: this.alang,
+                qid: 0,
+                is_correct: false,
+              })
+            })
+            .then(resp => resp.json())
+            .then(data => {
+              setTimeout(() => {                
+                this.board = data.board
+                this.gameOver(data.score)
+              }, 200);
+            })
+          },
+
+          selectChoice: function(e, index) {
+            e.target.classList.add('disabled')
+            if (this.answer == index) {
+              e.target.classList.add('btn-success')
+            } else {
+              e.target.classList.add('btn-danger')
+            }
+            this.progressAnimate = true
+            let flag = 0
+            setTimeout(() => {
+              flag = 1
+            }, 100);
+            fetch(`${window.location.origin}/next`, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                lvl: this.lvl,
+                board: this.board,
+                qid: this.q_id,
+                qlang: this.qlang,
+                alang: this.alang,
+                is_correct: this.answer == index,
+              })
+            })
+            .then(resp => resp.json())
+            .then(data => {
+              this.lvl = data.lvl
+              this.board = data.board
+              if (data.score >= 0) {
+                this.gameOver(data.score)
+              } else {
+                let interval = setInterval(() => {
+                  if(flag == 1) {
+                    this.q_id = data.q_id
+                    this.q_title = data.q_title
+                    this.choices = data.choices
+                    this.answer = data.answer
+                    clearInterval(interval)
+                  }
+                }, 5);
+              }
+            })
+            .catch((err) => {
+              fetch(`${window.location.origin}/language`)
+            })
+            .finally(() => {
+              let interval = setInterval(() => {                
+                if(flag == 1) {
+                  e.target.classList.remove('btn-success')
+                  e.target.classList.remove('btn-danger')
+                  e.target.classList.remove('disabled')
+                  e.target.blur()
+                  e.handled = true
+                  this.progressAnimate = false
+                  clearInterval(interval)
+                }
+              }, 5);
+            })
+          },
+
+          gameOver: function (score) {
+            this.score = score
+            this.choices = []
+            this.q_title = ''
+          },
+
+          scoreBar: function (v) {
+            return JSON.parse(JSON.stringify(v)).reduce((a,u) => {
+              let e = a[a.length-1] || 0
+              if (e*u > 0) a[a.length-1] += Math.sign(u)
+              else a.push(Math.sign(u))
+              return a
+            }, [])
+          },
+
+          speakTitle: function (e,i) {
+            let text = i >=0 ? this.choices[i] : this.q_title
+            let lang = i >=0 ? this.alang : this.qlang
+            let langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == lang)
+            if (langVoices.length == 0) {
+              langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == 'en')
+            }
+            let sp = new SpeechSynthesisUtterance(text)
+            sp.voice = langVoices[Math.floor(Math.random()*langVoices.length)]
+            speechSynthesis.cancel()
+            speechSynthesis.speak(sp)
+          },
+
+          // for mobile devices
+          touchStart: function(e, i) {
+            var that = this
+            this.touchTimer = setTimeout(()=> {
+              that.speakTitle(e,i)
+            }, 400)
+            this.touchTimerLong = setTimeout(()=> {
+              let title = this.choices[i] || this.q_title
+              let lang = this.choices[i] ? this.alang : this.qlang
+              window.open(`https://${lang}.wikipedia.org/wiki/${title}`, '_blank')
+            }, 2000)
+          },
+          touchEnd: function(e) {
+            clearTimeout(this.touchTimer)
+            clearTimeout(this.touchTimerLong)
+          },
+        }
+      })
+    </script>
+  </body>
+</html>
