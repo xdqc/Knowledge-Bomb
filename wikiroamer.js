@@ -48,7 +48,7 @@
                           'Living people', 'Year of birth unknown', 'Year of death unknown',
                           'Lists and galleries of flags', 'National coats of arms', 'National emblems', 'Presidents by country', 'Heads of government by country', 'Lists of cities by country',
                           'Lists of administrative divisions', 'Administrative divisions by country', 'First-level administrative divisions by country', 'Second-level administrative divisions by country', 'Third-level administrative divisions by country', 'Fourth-level administrative divisions by country', 'Fifth-level administrative divisions by country',
-                          'Set indices', 'UTC offsets', 'Meridians (geography)', 'Sports event promotion companies', 'Music industry associations', 'Operas',
+                          'Set indices', 'UTC offsets', 'Meridians (geography)', 'Sports event promotion companies', 'Music industry associations', 'Operas', 'Upanishads',
                           'Characters in Greek mythology', 'Kings in Greek mythology', 'Trojans', 'Lines of succession', 'Grammarians of Latin', 'FIFA World Cup squads',
                           'Obsolete animal taxa', 'Obsolete gastropod taxa', 'Torah people', 'Given names', 'Surnames', 'Iranian historians', 'Ancient Greek sculptors', 'Early Greek historians',
                           'Grammy Awards', 'Disproven exoplanets', 'Gregorian calendar', 'Circles of latitude', 'Television festivals', 'Deserts of China', 'Musical quartets',
@@ -62,6 +62,7 @@
                           'Medieval Italian architecture', 'German male writers', 'Historically recognized plant families', 'COVID-19 pandemic by country', 'German opera companies',
                           'Sicilian tyrants', 'American films', 'FIFA World Cup-related lists', 'French Roman Catholics', 'Pulp magazines', 'Russian male poets', 'Ancient Greek women philosophers',
                           'Greek explorers', 'Nazi newspapers', 'Iranian rulers', 'Lists of counts', 'Lists of dukes', 'Ancient Greek biographers', 'National association football supercups+',
+                          'Latin letters with diacritics', 'Latin-script digraphs', 'Persian letters', 'Arabic letters', 'Subdivisions of Japan', 'Comarques of Catalonia',
                           'Historical regions', 'Military trucks', 'Golden Globe Awards', 'European youth orchestras', 'Aphorists'];
                        // 'Domain name stubs', 'Flag stubs', 'Greek mythology stubs', 'Explorer stubs', 'Plant stubs', 'Russia river stubs', 'Greek sportspeople stubs', 'Africa river stubs', 'European royalty stubs', 'Pelagonia Region geography stubs', 'Byzantine people stubs', 'Ancient Roman people stubs', 'Theatrical people stubs', 'Philosopher stubs', 'Greek deity stubs', 'Solomon Islands geography stubs',
         const titleStop = ['Wikipedia:', 'List of', 'Lists of', 'Communes of', 'Districts of', 'Provinces of', 'Prefectures of ', 'Regional units of', 'Municipalities of ',
@@ -74,7 +75,7 @@
             Array.from(document.querySelectorAll('span.toctext')).some(toc => tocStop.find(t => t == toc.textContent)) ||
             cateStop.some(c => document.querySelector('a[title="Category:'+c+'"]')) ||
             titleStop.some(s => dryTitle.startsWith(s) || dryTitle.endsWith(s)) ||
-            firstPar.textContent.replace(/(\r\n|\n|\r)/gm, '').match(/\(.*(born|died|buried|lived)[^()]*[0-9]{2,}.*\)|([0-9]{2,}[^()]+[0-9]{2,}[,. A-zÀ-ÿ]*\))|( \(?municipality\)? (in|of) | \(?district\)? (in|of) | a \(?village\)? | a \(?town\)? | \(?city\)? in | comune of | located in | volcano in | subregion of | surname of | son of | name,? given )/gm)
+            firstPar.textContent.replace(/(\r\n|\n|\r)/gm, '').match(/\(.*(born|died|buried|lived)[^()]*[0-9]{2,}.*\)|([0-9]{2,}[^()]+[0-9]{2,}[,. A-zÀ-ÿ]*\))|( \(?municipality\)? (in|of) | \(?district\)? (in|of) | a \(?village\)? | a \(?town\)? | \(?city\)? in | comune of | volcano in | subregion of | surname of | son of | name,? given )/gm)
             //firstPar regex:: (\([^\(\)]*(Greek|Punic|Latin|Hebrew|ca|c\.):?.*[0-9] (AD|BC|C\.E\.))|
         ){
                 randomBtn.click();

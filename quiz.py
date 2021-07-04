@@ -208,10 +208,10 @@ class Quiz:
         sample_size = len(board[str(lvl)])
         cr,beta = cls.correct_rate(lvl, board), random.betavariate(4,4)
         if cr > beta:
-        if lvl == len(cls.ladder) and sample_size > cls.total_sample_size(board) * 0.0618:
-            lvl = round(random.gammavariate(len(cls.ladder), 0.5)) # rebounce back from top
-        else:
-            lvl += 1
+            if lvl == len(cls.ladder) and sample_size > cls.total_sample_size(board) * 0.0618:
+                lvl = round(random.gammavariate(len(cls.ladder), 0.5)) # rebounce back from top
+            else:
+                lvl += 1
         lvl = min(lvl, len(cls.ladder))
         return lvl, board
 

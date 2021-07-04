@@ -13,40 +13,55 @@ conn = pyodbc.connect(conn_str)
 
 
 def insert_by_titles():
-    url = 'http://en.wikipedia.org/wiki/'
     en_titles = []
     with open('./titles.tsv', 'r', encoding='utf8') as f:
         for l in f:
             en_titles.append(l.split('\t')[2].strip())
     for title in en_titles:
-        r = requests.get(url+title)
-        soup = BeautifulSoup(r.content, features='html5lib')
-        en_title = soup.select_one('h1#firstHeading').text
-        langs = {'en': re.sub(r"\'", "''", en_title)}
-        for a_tag in soup.find_all('a', class_='interlanguage-link-target', href=True):
-            lang_code = re.match(r'https:\/\/([a-z\-]+)', a_tag['href'])[1]
-            wiki_title = re.sub(r' – [^–]+$', '', a_tag['title'])
-            wiki_title = re.sub(r"\'", "''", wiki_title)
-            langs[lang_code] = wiki_title
-        href_wikidata = soup.select_one('li#t-wikibase').find_all('a')[0]['href']
-        wikidata_id = re.search(r'\d+$', href_wikidata).group(0)
-        text_lastedit = re.search(r'on (\d{1,2} \w+ \d{4})', soup.select_one('li#footer-info-lastmod').text).group(1)
-        date_lastedit = datetime.strptime(text_lastedit, '%d %B %Y').strftime('%Y-%m-%d')
-        print(('Q'+wikidata_id).ljust(12, ' '), date_lastedit, en_title, sep='\t')
-        sql_insert_wiki(wikidata_id, langs, date_lastedit)
+        url = 'https://en.wikipedia.org/wiki/'
+        insert_en_title(url+title)
+        print()
 
 
-def sql_insert_wiki(wikidata_id, langs, date_lastedit:str):
+def insert_en_title(titleurl, depth=1):
+    r = requests.get(titleurl)
+    soup = BeautifulSoup(r.content, features='html5lib')
+    link_wikidata = soup.select_one('li#t-wikibase')
+    if link_wikidata is None:
+        print('No wikidata -', titleurl)
+        return
+    wikidata_id = re.search(r'\d+$', link_wikidata.find_all('a')[0]['href']).group(0)
+    en_title = soup.select_one('h1#firstHeading').text
+    langs = {'en': re.sub(r"\'", "''", en_title)}
+    for a_tag in soup.find_all('a', class_='interlanguage-link-target', href=True):
+        lang_code = re.match(r'https:\/\/([a-z\-]+)', a_tag['href'])[1]
+        wiki_title = re.sub(r' – [^–]+$', '', a_tag['title'])
+        wiki_title = re.sub(r"\'", "''", wiki_title)
+        langs[lang_code] = wiki_title
+    text_lastedit = re.search(r'on (\d{1,2} \w+ \d{4})', soup.select_one('li#footer-info-lastmod').text).group(1)
+    date_lastedit = datetime.strptime(text_lastedit, '%d %B %Y').strftime('%Y-%m-%d')
+    print(('Q'+wikidata_id).ljust(12, ' '), date_lastedit, len(langs), en_title, sep='\t')
+    if len(langs) >= 20 and not en_title.startswith('Category:') and not en_title.startswith('Wikipedia:'):
+        sql_insert_wiki(wikidata_id, langs, date_lastedit, depth)
+        if depth <= 2:
+            depth += 1
+            sparql_get_hyperclass(wikidata_id, depth)
+
+
+def sql_insert_wiki(wikidata_id, langs, date_lastedit:str, depth=1):
     cursor = conn.cursor()
     cursor.execute(f"SELECT id,lang_count,edited_enwiki FROM wiki.item WHERE id = {wikidata_id}")
     rs = cursor.fetchall()
     if len(rs) == 0:
-        sqlstr = f"INSERT INTO wiki.item VALUES ({wikidata_id}, {str(len(langs))}, GETDATE(), GETDATE(), '{date_lastedit}' )"
+        sqlstr = f"INSERT INTO wiki.item VALUES ({wikidata_id}, {str(len(langs))}, NULL, GETDATE(), GETDATE(), '{date_lastedit}' )"
         cursor.execute(sqlstr)
         cursor.commit()
         cursor.execute(prepare_insert_articles(wikidata_id, langs))
         cursor.commit()
         print(('Q'+wikidata_id).ljust(12, ' '),'Created')
+        if depth > 1:
+            with open('./sortitles.tsv', 'a', encoding='utf8') as f:
+                f.write(('Q'+wikidata_id).ljust(12, ' ')+'Created\t'+'https://en.wikipedia.org/wiki/'+langs['en'].replace(' ', '_')+'\n')
     elif rs[0][1] != len(langs) or str(rs[0][2])[:7] != date_lastedit[:7]:
         cursor.execute(f"UPDATE wiki.item SET lang_count={str(len(langs))}, edited_enwiki='{date_lastedit}', updated=GETDATE() WHERE id={wikidata_id};")
         cursor.commit()
@@ -63,6 +78,80 @@ def prepare_insert_articles(wikidata_id, langs):
         s = slugify(t, separator='', lowercase=False)
         values.append(f"( {wikidata_id}, '{c}', N'{t}', '{s}', SOUNDEX('{s}'),SOUNDEX(REVERSE('{s}')) )")
     return f"INSERT INTO wiki.article (item, language, title, title_latin, soundexo, soundexr) VALUES {', '.join(values)}"
+
+
+def sparql_get_hyperclass(qid, depth=0):
+    sparql = """
+    SELECT * WHERE{
+    {
+        SELECT ?c ?cLabel ?article  {
+        VALUES (?i) {(wd:Q"""+str(qid)+""" )}
+        ?i wdt:P31 ?c .
+            ?article schema:about ?c .
+            ?article schema:inLanguage "en" .
+            ?article schema:isPartOf <https://en.wikipedia.org/> .
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+        }
+    }
+    UNION
+    {
+        SELECT  ?s ?sLabel ?article {
+        VALUES (?i) {(wd:Q"""+str(qid)+""" )}
+        ?i wdt:P279 ?s .
+            ?article schema:about ?s .
+            ?article schema:inLanguage "en" .
+            ?article schema:isPartOf <https://en.wikipedia.org/> .
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+        }
+    }
+    }"""
+    headers = {'Accept':'application/json'}
+    r = requests.get('https://query.wikidata.org/sparql?query='+sparql, headers=headers)
+    try:
+        res = r.json()
+        for b in (res['results']['bindings']):
+            if 'c' in b:
+                if b['c']['value'].split('Q')[1] != qid:
+                    instance_of = b['cLabel']['value']
+                    print(f'Q{qid}', 'is', 'instance_of', instance_of, sep='\t')
+                    insert_en_title(b['article']['value'], depth)
+            if 's' in b:
+                if b['s']['value'].split('Q')[1] != qid:
+                    subclass_of = b['sLabel']['value']
+                    print(f'Q{qid}', 'is', 'subclass_of', subclass_of, sep='\t')
+                    insert_en_title(b['article']['value'], depth)
+        print(depth)
+    except:
+        sparql_get_hyperclass(qid, depth)
+
+
+def batch_sparql():
+    items = []
+    with open('./sortitems.tsv', 'r') as f:
+        for l in f:
+            items.append(l.strip())
+    instr = ''
+    if len(items) > 0:
+        while len(instr) < 7000 and len(items) > 0:
+            instr += f'wd:Q{items.pop()},'
+        sparql = """
+    SELECT DISTINCT ?item ?itemLabel 
+    WHERE 
+    {
+    ?item wdt:P279?/wdt:P31?/wdt:P279*/wdt:P31* wd:Q4167410.
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+    ?item wikibase:sitelinks ?linkCount .
+    FILTER (?linkCount >= 20)
+    }"""
+    # FILTER (?item in ("""+instr[:-1]+"""))
+        headers = {'Accept':'application/json'}
+        r = requests.get('https://query.wikidata.org/sparql?query='+sparql, headers=headers)
+        instr=''
+        res = r.json()
+        with open('./sortitles.tsv', 'a', encoding='utf8') as f:
+            for b in res['results']['bindings']:
+                f.write(f"{b['item']['value'].split('Q')[1]}\t{b['itemLabel']['value']}\n")
+        print(len(items))
 
 
 def sql_query_wikidata():
@@ -100,13 +189,26 @@ def delete_by_en_title(en_title):
     print('deleted', item, en_title)
 
 
+def delete_by_wikidata_id(item):
+    cursor = conn.cursor()
+    sqld = f"DELETE FROM wiki.article WHERE item = {item}"
+    cursor.execute(sqld)
+    cursor.commit()
+    sqld = f"DELETE FROM wiki.item WHERE id = {item}"
+    cursor.execute(sqld)
+    cursor.commit()
+    print('deleted', item)
+
+
+tbdws = [
+]
+
 # sql_query_wikidata()
-# tbdws = [
-# ]
-# for c in tbdws:
-#     delete_by_en_title(c)
+
+for c in tbdws:
+    delete_by_en_title(c)
 
 if __name__ == '__main__':
+    # batch_sparql()
     insert_by_titles()
     conn.close()
-
