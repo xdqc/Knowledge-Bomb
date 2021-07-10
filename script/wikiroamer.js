@@ -39,7 +39,7 @@
                                   'Established', 'Dates of operation', 'Cleavage', 'Fracture', 'Results', 'Active regions', 'Operating speed', 'Centuries', 'Episodes', 'Presenter(s)',
                                   'Past members', 'Publisher', 'Published in', 'Published by', 'Date of publication', 'Founded by', 'Route information', 'Highway system', 'Inscription',
                                   'Average attendance', 'Nationality', 'Circuit length', 'Most wins (team)', 'Political groups', 'Abolition', 'Language', 'Winner', 'League', 'Medium',
-                                  'Associated acts', 'Awards and achievements', 'First induction', 'First appearance', 'Number built',
+                                  'Associated acts', 'Awards and achievements', 'First induction', 'First appearance', 'Number built', 'First issued',
                                   'unicode', 'Unicode', 'Unicode codepoint', 'Hexadecimal', 'Penumbral', 'Phonetic usage', 'transliteration', 'Pronunciations', 'The Cyrillic script']);
         const tocStop = ['Medal table', 'Medal summary', 'Qualified teams', 'Group A', 'Group 1', 'Division I', 'Events', 'Matches', 'The match', 'Squads', 'Winners and nominees', 'Fixtures and results',
                          'Semi-finals', 'Championship', 'Match conditions', 'World Group',
@@ -61,8 +61,9 @@
                           'Actress filmographies', 'Male actor filmographies', '2010 censuses', '2020 censuses', 'Heraclius', 'Ancient Greek poets', 'Neoplatonists', 'Viking explorers',
                           'Medieval Italian architecture', 'German male writers', 'Historically recognized plant families', 'COVID-19 pandemic by country', 'German opera companies',
                           'Sicilian tyrants', 'American films', 'FIFA World Cup-related lists', 'French Roman Catholics', 'Pulp magazines', 'Russian male poets', 'Ancient Greek women philosophers',
-                          'Greek explorers', 'Nazi newspapers', 'Iranian rulers', 'Lists of counts', 'Lists of dukes', 'Ancient Greek biographers', 'National association football supercups+',
-                          'Latin letters with diacritics', 'Latin-script digraphs', 'Persian letters', 'Arabic letters', 'Subdivisions of Japan', 'Comarques of Catalonia',
+                          'Greek explorers', 'Nazi newspapers', 'Iranian rulers', 'Lists of counts', 'Lists of dukes', 'Ancient Greek biographers', 'National association football supercups',
+                          'Latin letters with diacritics', 'Letters with stroke', 'Latin-script digraphs', 'Persian letters', 'Arabic letters', 'Subdivisions of Japan', 'Comarques of Catalonia',
+                          'General elections in the United States', 'Achaemenid princesses', 'Lists of roads',
                           'Historical regions', 'Military trucks', 'Golden Globe Awards', 'European youth orchestras', 'Aphorists'];
                        // 'Domain name stubs', 'Flag stubs', 'Greek mythology stubs', 'Explorer stubs', 'Plant stubs', 'Russia river stubs', 'Greek sportspeople stubs', 'Africa river stubs', 'European royalty stubs', 'Pelagonia Region geography stubs', 'Byzantine people stubs', 'Ancient Roman people stubs', 'Theatrical people stubs', 'Philosopher stubs', 'Greek deity stubs', 'Solomon Islands geography stubs',
         const titleStop = ['Wikipedia:', 'List of', 'Lists of', 'Communes of', 'Districts of', 'Provinces of', 'Prefectures of ', 'Regional units of', 'Municipalities of ',
@@ -75,7 +76,7 @@
             Array.from(document.querySelectorAll('span.toctext')).some(toc => tocStop.find(t => t == toc.textContent)) ||
             cateStop.some(c => document.querySelector('a[title="Category:'+c+'"]')) ||
             titleStop.some(s => dryTitle.startsWith(s) || dryTitle.endsWith(s)) ||
-            firstPar.textContent.replace(/(\r\n|\n|\r)/gm, '').match(/\(.*(born|died|buried|lived)[^()]*[0-9]{2,}.*\)|([0-9]{2,}[^()]+[0-9]{2,}[,. A-zÀ-ÿ]*\))|( \(?municipality\)? (in|of) | \(?district\)? (in|of) | a \(?village\)? | a \(?town\)? | \(?city\)? in | comune of | volcano in | subregion of | surname of | son of | name,? given )/gm)
+            firstPar.textContent.replace(/(\r\n|\n|\r)/gm, '').match(/\(.*(born|died|buried|lived)[^()]*[0-9]{2,}.*\)|([0-9]{2,}[^()]+[0-9]{2,}[,;. A-zÀ-ÿ]*\))|( \(?municipality\)?( located)? (in|of) | \(?district\)?( located)? (in|of) | a \(?village\)? | a \(?town\)? | \(?city\)? in | comune of | volcano in | subregion of | surname of | son of | name,? given )/gm)
             //firstPar regex:: (\([^\(\)]*(Greek|Punic|Latin|Hebrew|ca|c\.):?.*[0-9] (AD|BC|C\.E\.))|
         ){
                 randomBtn.click();

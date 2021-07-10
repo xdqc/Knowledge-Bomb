@@ -10,7 +10,11 @@ def root(path):
 
 @app.route('/language')
 def language():
-    return jsonify(Quiz.get_language_list())
+    return jsonify(Quiz.get_languages())
+
+@app.route('/hypernym')
+def hypernym():
+    return jsonify(Quiz.get_hypernyms(request.args.get('ql'),request.args.get('al')))
 
 @app.route('/next', methods=['POST'])
 def next():
@@ -21,4 +25,4 @@ def heartbeat():
     return jsonify({'status': 'healthy'})
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='192.168.1.34', port=80)
