@@ -1,6 +1,8 @@
 import re
 import requests
 import pyodbc
+import webbrowser
+import time
 from datetime import datetime
 from bs4 import BeautifulSoup
 from slugify import slugify
@@ -10,6 +12,7 @@ config = ConfigParser()
 config.read('config.ini')
 conn_str = config['DEFAULT']['CW']
 conn = pyodbc.connect(conn_str)
+
 
 
 def insert_by_titles():
@@ -127,7 +130,7 @@ def sparql_get_hyperclass(qid, depth=0):
 
 def batch_sparql(hypernym, hid, instance_of=True, n_subclass=None):
     sparql = """
-    SELECT DISTINCT ?item ?itemLabel 
+    SELECT DISTINCT ?item ?linkCount
     WHERE {
     VALUES ?hypernym {wd:Q"""+str(hid)+"""} 
     ?item """ \
@@ -135,9 +138,12 @@ def batch_sparql(hypernym, hid, instance_of=True, n_subclass=None):
     +('wdt:P279*' if n_subclass is None else ('wdt:P279?/'*n_subclass))).rstrip('/') \
     +""" ?hypernym;
      wikibase:sitelinks ?linkCount.
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
     FILTER (?linkCount >= 20)
     }"""
+    # ?article schema:about ?item .
+    # ?article schema:inLanguage "en" .
+    # ?article schema:isPartOf <https://en.wikipedia.org/> .
+    # SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
     items = []
     headers = {'Accept':'application/json'}
     r = requests.get('https://query.wikidata.org/sparql?query='+sparql, headers=headers)
@@ -152,54 +158,53 @@ def batch_sparql(hypernym, hid, instance_of=True, n_subclass=None):
     sqlstr = f"SELECT id FROM wiki.item WHERE id IN ({','.join([str(i) for i in items])[:-1]})"
     cursor.execute(sqlstr)
     rs = [r[0] for r in cursor.fetchall()]
-    # with open('./sortitems.tsv', 'a', encoding='utf8') as f:
-    #     for b in res['results']['bindings']:
-    #         item = int(b['item']['value'].split('Q')[1])
-    #         if item not in rs:
-    #             f.write(f"{item}\thttps://en.wikipedia.org/wiki/{b['itemLabel']['value'].replace(' ','_')}\n")
-    #     f.write('\n')
+    with open('./sortitems.tsv', 'a', encoding='utf8') as f:
+        for b in res['results']['bindings']:
+            item = int(b['item']['value'].split('Q')[1])
+            if item not in rs:
+                f.write(f"{hypernym}\t{hid}\t{item}\t{b['linkCount']['value']}\n") #{b['article']['value'].replace(' ','_')}
+        f.write('\n')
     print(f'{len(rs)} of {len(items)} items hypernym updated as {hypernym} ({hid})')
     return len(rs)
 
 def build_hypernym_grid(hypernym=None):
     hypernyms = {
-        'Concept': [(151885,),(151885,True,3)],
-        'Something (concept)': [(35120,False,4),(35120,True,2),(28813620,False,5),(28813620,True,1),(16887380,False,4),(16887380,True,2)],
-        'Object (philosophy)': [(488383,False,5),(488383,True,2)],
-        'Action (philosophy)': [(4026292,),(4026292,True,3)],
-        'Change (philosophy)': [(1150070,),(1150070,True,4)],
+        'Concept': [(151885,),(151885,True,3),813912,3505845],
+        'Something (concept)': [(35120,False,5),(35120,True,2),(28813620,False,5),(28813620,True,1),(16887380,False,4),(16887380,True,2)],
+        'Object (philosophy)': [(488383,False,5),(488383,True,2),(7184903,False,6),(7184903,True,2)],
+        'Action (philosophy)': [(4026292,),(4026292,True,3),124490,1174599,23009459],
+        'Change (philosophy)': [(1150070,),(1150070,True,4),748250],
         'Property (philosophy)': [(937228,),(937228,True,2)],
-        'Terminology': [1725664,1969448],
         'Physical object': [(223557,False,5),(223557,True,1),(1310239,False,6),(1310239,True,2),(98119401,),23497981],
         'Structure': [(6671777,False,4),(6671777,True,2)],
         'Hypothesis': [(41719,),(41719,True,6),18706315],
-        'Phenomenon': [(483247,),(483247,True,4),(16722960,),(16722960,True,5)],
-        'Condition': [813912,3505845],
-        'Information': [(11028,),(11028,True,1),853614,(1151067,),(1151067,True,4),6667497],
+        'Phenomenon': [(483247,),(483247,True,4),(16722960,),(16722960,True,5),602884],
+        'Information': [(11028,),(11028,True,1),(628523,True,5),(1151067,True,5),7748,853614,6667497],
         'System': [(58778,),(58778,True,3),(811979,)],
-        'Behavior': [(9332,),(9332,True,5),(1299714,),(1299714,True,6),602884],
+        'Behavior': [(9332,),(9332,True,5),(1299714,),(1299714,True,6),(11024,True,4)],
         'Knowledge': [9081],
+        'Terminology': [1725664,1969448],
         'Interaction': [52948,381072],
         'Technology ': [11016,2695280],
-        'Astronomical object': [(6999,),(6999,True,0),3235978],
+        'Astronomical object': [(6999,),(6999,True,0),17444909,9262,3235978,27521],
         'Document': [(49848,),(49848,True,3),(47461344,),(47461344,True,1),740464,2751586],
         'Organism': [(7239,),(7239,True,2),(16334298,),(16334298,True,2),729,756,39833,55983715],
-        'Humanities': [80083,11042,853725,210272,780687,7406919,14897293],
-        'Organization': [(43229,),(43229,True,1),33104069,17197366],
-        'Location': [(2221906,),(2221906,True,0),(27096213,),(27096213,True,1),(271669,True,0),1620908,52551684],
+        'Location': [(2221906,),(2221906,True,0),(27096213,),(27096213,True,1),(271669,True,0),1620908,52551684,123705,20719696],
         'Mathematics': [395,(24034552,),(246672,),(246672,True,3),1140046,11593,47279819,203066],
         'Chemical substance': [(79529,False,4),(43460564,True,3),19549,47154513,56256178,17339814],
-        'Anatomy': [514,66394244],
+        'Sign': [3695082,2001982,9788],
+        'Humanities': [80083,11042,853725,210272,780687,7406919,14897293],
+        'Organization': [(43229,),(43229,True,1),33104069,17197366],
         'Goods': [(28877,),(28877,True,2)],
         'Matter': [35758,177013],
         'Physical property': [4373292,3523867,107715],
+        'Anatomy': [514,66394244,4936952],
         'Language': [315,34770,4536530,17376908],
         'Phrase': [187931,82042,43249,1759988],
         'Axiom': [17736],
         'Theorem': [65943],
         'Theory': [17737],
         'Ideology': [7257],
-        'Time': [11471],
         'Art': [735,6647660,7832362],
         'Genre': [483394,8253],
         'Myth': [12827256,9134,24334685,21070568],
@@ -208,7 +213,7 @@ def build_hypernym_grid(hypernym=None):
         'Infrastructure': [121359],
         'Machine': [11019,839546],
         'Computer science': [21198,66747126,7397,173212,28643],
-        'Symbol': [80071,2001982,9788],
+        'Time': [11471],
         'Shape': [207961],
         'Ethnic group': [41710],
         'Disease': [12136],
@@ -218,12 +223,13 @@ def build_hypernym_grid(hypernym=None):
         'Game': [11410,28114058,17638008],
         'Unit of measurement': [47574],
     }
+    t0 = datetime.now()
     for k, v in hypernyms.items():
         for i in v:
             h = v[0][0] if type(v[0]) is tuple else v[0]
             print(k, h, i)
             res,retry = None,0
-            while res is None and retry<5:
+            while res is None and retry < 5:
                 try:
                     if type(i) is tuple:
                         if len(i) == 3:
@@ -235,6 +241,49 @@ def build_hypernym_grid(hypernym=None):
                 except Exception as e:
                     retry+=1
                     print('Retry',retry,str(e))
+        t1 = datetime.now()
+        print(t1-t0)
+
+def order_hyperitemss():
+    hitems = {}
+    with open('./sortitems.tsv', 'r', encoding='utf8') as f:
+        for l in f:
+            l = l.strip()
+            if l:
+                hypernym, hid, id, lc = l.split('\t')
+                hitems[id] = (hypernym, hid, int(lc))
+    with open('./sortitems1.tsv', 'w', encoding='utf8') as f:
+        for k,v in sorted(hitems.items(), key=lambda i: (i[1][2],i[1][0],i[1][1],i[0]), reverse=True):
+            f.write(f'{v[0]}\t{v[1]}\t{v[2]}\t{k}\n')
+
+def open_sparql_item_links():
+    with open('./sortitems1.tsv', 'r', encoding='utf8') as f:
+        for l in f:
+            qid=l.split('\t')[3]
+            sparql="""SELECT DISTINCT ?item ?article
+    WHERE {
+    VALUES ?item { wd:Q"""+str(qid)+""" } 
+    ?item  wikibase:sitelinks ?linkCount.
+    ?article schema:about ?item .
+    ?article schema:inLanguage "en" .
+    ?article schema:isPartOf <https://en.wikipedia.org/> .
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+    FILTER (?linkCount >= 20)
+    }"""
+            headers = {'Accept':'application/json'}
+            r = requests.get('https://query.wikidata.org/sparql?query='+sparql, headers=headers)
+            res,retry = None,0
+            while res is None and retry < 5:
+                try:
+                    res = r.json()
+                    for b in res['results']['bindings']:
+                        link = b['article']['value']
+                        webbrowser.open(link, new=0, autoraise=True)
+                        print(qid, link, sep='\t')
+                except Exception as e:
+                    retry+=1
+                    print('Retry',retry,qid,str(e),sep='\t')
+            time.sleep(0.8)
 
 
 def delete_by_en_title(en_title):
@@ -274,6 +323,9 @@ for c in tbdws:
     
 
 if __name__ == '__main__':
-    # batch_sparql()
-    insert_by_titles()
+    # insert_by_titles()
+    # order_hyperitemss()
+    # open_sparql_item_links()
+    # build_hypernym_grid()
+    # batch_sparql(514,66394244)
     conn.close()
