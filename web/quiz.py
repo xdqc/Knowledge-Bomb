@@ -99,7 +99,8 @@ class Quiz:
         cursor = cls.conn.cursor()
         res = []
         for h in cursor.execute(sqlstr):
-            res.append({'value':h[0], 'texts': [h[1],h[2],h[3]]})
+            if h[0]:
+                res.append({'value':h[0], 'texts': [h[1],h[2],h[3]]})
         return res
 
     @classmethod
@@ -119,7 +120,7 @@ class Quiz:
             WHERE lang_count >= {level[1]}
                 AND lang_count <  {level[2]}
                 AND id NOT IN ({','.join([str(i) for i in played_correct])})
-                {('AND hypernym IN('+ ",".join([str(h) for h in hypernym if h])+')') if hypernym else ''}
+                {('AND hypernym IN('+ ",".join([str(h) for h in hypernym])+')') if hypernym else 'AND hypernym IS NULL'}
             ) i
             CROSS APPLY (
             SELECT item, title FROM wiki.article
@@ -131,11 +132,12 @@ class Quiz:
             ) a
             ORDER BY CHECKSUM(NEWID())
         """
-        try:
-            cursor = cls.conn.cursor()
-        except:
-            cls.conn = pyodbc.connect(conn_str)
-            cursor = cls.conn.cursor()
+        cursor = None
+        while cursor is None:
+            try:
+                cursor = cls.conn.cursor()
+            except:
+                cls.conn = pyodbc.connect(conn_str)
         cursor.execute(sqlstr)
         result = cursor.fetchall()
         return result[0] if len(result) > 0 else None
