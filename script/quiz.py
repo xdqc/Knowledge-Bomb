@@ -119,7 +119,7 @@ class Quiz:
             WHERE lang_count >= {level[1]}
                 AND lang_count <  {level[2]}
                 AND id NOT IN ({','.join([str(i) for i in played_correct])})
-                {('AND hypernym IN('+ ",".join([str(h) for h in hypernym if h])+')') if hypernym else ''}
+                {('AND hypernym IN('+ ",".join([str(h) for h in hypernym if h])+')') if hypernym else 'AND hypernym is NULL'}
             ) i
             CROSS APPLY (
             SELECT item, title FROM wiki.article

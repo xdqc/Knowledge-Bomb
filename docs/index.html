@@ -117,7 +117,7 @@
         <div class="justify-content-center">
           <b-row v-if="quizStarted" >
             <b-col class="title py-5" 
-              sm="11" md="10" lg="8" xl="6"
+              sm="11" md="10" lg="9" xl="7"
               @touchstart="touchStart($event)"
               @touchend="touchEnd($event)"
               :style="`background-image: url(${titleImage});`">
@@ -132,8 +132,8 @@
           </b-row>
 
           <b-row>
-            <b-col sm="11" md="10" lg="8" xl="6" class="choices">
-              <b-button secondary class="col-4 btn-choice"
+            <b-col sm="11" md="10" lg="9" xl="7" class="choices">
+              <b-button secondary class="col-3 btn-choice"
                 v-for="(choice,index) in choices" :key="index"
                 :style="`height: ${choiceHeight}px`"
                 :id="`choice-${index}`"
