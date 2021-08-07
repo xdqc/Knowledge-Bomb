@@ -99,7 +99,8 @@ class Quiz:
         cursor = cls.conn.cursor()
         res = []
         for h in cursor.execute(sqlstr):
-            res.append({'value':h[0], 'texts': [h[1],h[2],h[3]]})
+            if h[0]:
+                res.append({'value':h[0], 'texts': [h[1],h[2],h[3]]})
         return res
 
     @classmethod
@@ -131,11 +132,12 @@ class Quiz:
             ) a
             ORDER BY CHECKSUM(NEWID())
         """
-        try:
-            cursor = cls.conn.cursor()
-        except:
-            cls.conn = pyodbc.connect(conn_str)
-            cursor = cls.conn.cursor()
+        cursor = None
+        while cursor is None:
+            try:
+                cursor = cls.conn.cursor()
+            except:
+                cls.conn = pyodbc.connect(conn_str)
         cursor.execute(sqlstr)
         result = cursor.fetchall()
         return result[0] if len(result) > 0 else None
