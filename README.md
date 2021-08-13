@@ -13,8 +13,8 @@ Ranking is based on numbers of [qualified Wikidata items](#Qualified-Wikidata-It
   - **`Coverage%`** is language WSM divided by English WSM as percentage
   - **`Articles`** is total [number of Wikipedia articles by language](https://meta.wikimedia.org/wiki/List_of_Wikipedias)
   - **`Solidness%`** is coverage to article ratio with using simple_english as 100% benchmark
-    - high Solidness% indicates more qualified articles per total of that language, eg. #53 wuu (吴语 | Wu)
-    - low Solidness% indicates less qualified articles per total of that language, eg. #148 ceb (Sinugboanong Binisaya | Cebuano)
+    - high Solidness% indicates more qualified per total articles of that language, eg. #53 wuu = 273.57% (吴语 | Wu)
+    - low Solidness% indicates less qualified per total articles of that language, eg. #148 ceb = 0.20% (Sinugboanong Binisaya | Cebuano)
 
 
 |   № |                     Language(Local) | Language                  | Wiki         | Coverage% | Q60 Diamond | Q50 Gold | Q40 Silver | Q30 Bronze | Q20 Iron |   WSM | Articles | Solidness% |

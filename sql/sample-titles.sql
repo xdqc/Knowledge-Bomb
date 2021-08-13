@@ -1,127 +1,128 @@
 /****** Script for SelectTopNRows command from SSMS  ******/
 SELECT TOP (10000) id wikidata
       ,[lang_count] #lang
+	  ,hypernym
 	  ,en.title en
 	  ,es.title es
-	  ,ca.title ca
 	  ,fr.title fr
-	  ,pt.title pt
-	  ,it.title it
-	  ,de.title de
-	  ,nl.title nl
-	  ,pl.title pl
-	  ,cs.title cs
 	  ,ru.title ru
+	  ,de.title de
+	  ,it.title it
 	  ,uk.title uk
-	  ,sv.title sv
+	  ,pt.title pt
 	  ,zh.title zh
 	  ,ja.title ja
-	  ,ko.title ko
+	  ,nl.title nl
+	  ,pl.title pl
 	  ,ar.title ar
+	  ,ca.title ca
 	  ,fa.title fa
-	  ,he.title he
+	  ,sv.title sv
+	  ,ko.title ko
+	  ,cs.title cs
 	  ,fi.title fi
 	  ,tr.title tr
+	  ,he.title he
 	  ,eu.title eu
 	  ,el.title el
 	  ,la.title la
   FROM [wiki].[item] i
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'en'
+	WHERE a.item = i.id AND a.language = 'en' AND LEN(title) < 16
 ) en
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'es'
+	WHERE a.item = i.id AND a.language = 'es' AND LEN(title) < 16
 ) es
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'fr'
+	WHERE a.item = i.id AND a.language = 'fr' AND LEN(title) < 16
 ) fr
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'ru'
+	WHERE a.item = i.id AND a.language = 'ru' AND LEN(title) < 16
 ) ru
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'de'
+	WHERE a.item = i.id AND a.language = 'de' AND LEN(title) < 16
 ) de
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'it'
+	WHERE a.item = i.id AND a.language = 'it' AND LEN(title) < 16
 ) it
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'uk'
+	WHERE a.item = i.id AND a.language = 'uk' AND LEN(title) < 16
 ) uk
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'pt'
+	WHERE a.item = i.id AND a.language = 'pt' AND LEN(title) < 16
 ) pt
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'zh'
+	WHERE a.item = i.id AND a.language = 'zh' AND LEN(title) < 16
 ) zh
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'ja'
+	WHERE a.item = i.id AND a.language = 'ja' AND LEN(title) < 16
 ) ja
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'nl'
+	WHERE a.item = i.id AND a.language = 'nl' AND LEN(title) < 16
 ) nl
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'pl'
+	WHERE a.item = i.id AND a.language = 'pl' AND LEN(title) < 16
 ) pl
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'ar'
+	WHERE a.item = i.id AND a.language = 'ar' AND LEN(title) < 16
 ) ar
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'ca'
+	WHERE a.item = i.id AND a.language = 'ca' AND LEN(title) < 16
 ) ca
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'fa'
+	WHERE a.item = i.id AND a.language = 'fa' AND LEN(title) < 16
 ) fa
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'sv'
+	WHERE a.item = i.id AND a.language = 'sv' AND LEN(title) < 16
 ) sv
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'ko'
+	WHERE a.item = i.id AND a.language = 'ko' AND LEN(title) < 16
 ) ko
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'cs'
+	WHERE a.item = i.id AND a.language = 'cs' AND LEN(title) < 16
 ) cs
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'fi'
+	WHERE a.item = i.id AND a.language = 'fi' AND LEN(title) < 16
 ) fi
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'tr'
+	WHERE a.item = i.id AND a.language = 'tr' AND LEN(title) < 16
 ) tr
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'he'
+	WHERE a.item = i.id AND a.language = 'he' AND LEN(title) < 16
 ) he
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'eu'
+	WHERE a.item = i.id AND a.language = 'eu' AND LEN(title) < 16
 ) eu
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'el'
+	WHERE a.item = i.id AND a.language = 'el' AND LEN(title) < 16
 ) el
-OUTER APPLY(
+CROSS APPLY(
 	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'la'
+	WHERE a.item = i.id AND a.language = 'la' AND LEN(title) < 16
 ) la
-WHERE lang_count > 100 
-   OR lang_count IN (99,88,77,66,55,44,33)
-ORDER BY lang_count DESC, id
+WHERE lang_count >= 20
+  AND hypernym NOT IN (937228,3695082)
+ORDER BY lang_count DESC,hypernym, id

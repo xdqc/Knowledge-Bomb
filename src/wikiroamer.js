@@ -48,7 +48,7 @@
                                   'Associated acts', 'Awards and achievements', 'First induction', 'First appearance', 'Number built', 'First issued', 'Primary user', 'Variants', 'Filling',
                                   'Cartridge', 'Transmission', 'Current champions', 'Last champions', 'Connector types', 'Shutter', 'Ballistic performance', 'Wingspan', 'Track gauge', 'Gauge',
                                   'Confluence', 'List of years in literature', 'Dissolution', 'Deposition', 'Commanders', 'Commander', 'Tributaries', 'Beginning coordinates', 'Home arena',
-                                  'Merger of', 'Composers', 'Directed by', 'Abolished', 'Races', 'Administration', 'Performance',
+                                  'Merger of', 'Composers', 'Directed by', 'Abolished', 'Races', 'Administration', 'Performance', 'Final ruler',
                                   //'Produced', 'Used by', 'Specifications', 'Manufacturer', 'Capacity',
                                   //'Preceded by', 'Followed by', 'Founder', 'Founded', 'Formation', 'Abolition', 'Inaugurated',
                                   'unicode', 'Unicode codepoint', 'Hexadecimal', 'Penumbral', 'Phonetic usage', 'transliteration', 'Pronunciations', 'The Cyrillic script']);
@@ -79,7 +79,7 @@
                           'General elections in the United States', 'Achaemenid princesses', 'Lists of roads', 'Defunct UEFA club competitions', 'Top level football leagues in Europe',
                           'Ancient Greek philosophers', 'Women satirists', 'Ancient Greek mathematicians', 'Roman-era poets', 'Explorers of Asia', '1st-century Romans', 'Italian poets',
                           'Byzantine historians', 'German poets', 'Sanskrit poets', 'Ancient women rulers', 'Praetorian prefects', 'Historically recognized angiosperm genera', 'Historically recognized plant genera',
-                          'Ancient Ephesians', 'Ancient Milesians',
+                          'Ancient Ephesians', 'Ancient Milesians', 'Georgian letters', 'Winter Paralympic Games', 'Association football governing bodies',
                           'Military trucks', 'Golden Globe Awards', 'European youth orchestras', 'Aphorists'];
                        // 'Domain name stubs', 'Flag stubs', 'Greek mythology stubs', 'Explorer stubs', 'Plant stubs', 'Russia river stubs', 'Greek sportspeople stubs', 'Africa river stubs', 'European royalty stubs', 'Pelagonia Region geography stubs', 'Byzantine people stubs', 'Ancient Roman people stubs', 'Theatrical people stubs', 'Philosopher stubs', 'Greek deity stubs', 'Solomon Islands geography stubs',
         const titleStop = ['Wikipedia:', 'Category:', 'Module:', 'Help:', 'Portal:','Template:',
