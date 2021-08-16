@@ -37,7 +37,7 @@ DECLARE @simpleArticle AS int
 	= (SELECT TOP(1) articles FROM wiki.language WHERE code = 'simple')
 
 SELECT TOP (1000)
-	RANK() OVER (ORDER BY (lc_20.c+lc_30.c+lc_40.c+lc_50.c+lc_60.c) DESC) '№'	 
+	RANK() OVER (ORDER BY (lc_20.c+lc_30.c+lc_40.c+lc_50.c+lc_60.c) DESC, lc_60.c DESC, lc_50.c DESC, lc_40.c DESC, lc_30.c DESC, lc_20.c DESC) '№'	 
 	,[name_local] 'Language(Local)'
 	,[name] 'Language'
 	,[code] 'Wiki'
@@ -49,6 +49,7 @@ SELECT TOP (1000)
 	,lc_20.c 'Q20 Iron'
 	,(lc_20.c+lc_30.c+lc_40.c+lc_50.c+lc_60.c) 'WSM'
 	,articles 'Articles'
+	,speakers 'Speakers'
 	,FORMAT(CAST((lc_20.c+lc_30.c+lc_40.c+lc_50.c+lc_60.c) AS float) / articles / @simpleWSM*@simpleArticle, 'P2') 'Solidness%'
 FROM [wiki].[language] l
 
@@ -88,3 +89,8 @@ CROSS APPLY (
 ) lc_60
 
 ORDER BY (lc_20.c+lc_30.c+lc_40.c+lc_50.c+lc_60.c) DESC
+	, lc_60.c DESC
+	, lc_50.c DESC
+	, lc_40.c DESC
+	, lc_30.c DESC
+	, lc_20.c DESC

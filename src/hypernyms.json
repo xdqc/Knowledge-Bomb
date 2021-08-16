@@ -1,0 +1,1663 @@
+[
+  {
+    "hypernym": "Concept",
+    "queries": [
+      {
+        "label": "concept",
+        "item": 151885,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "concept",
+        "item": 151885,
+        "or_instance": true,
+        "subclass_deep": 3
+      },
+      {
+        "label": "state",
+        "item": 3505845,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "condition",
+        "item": 813912,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Something (concept)",
+    "queries": [
+      {
+        "label": "entity",
+        "item": 35120,
+        "or_instance": false,
+        "subclass_deep": 5
+      },
+      {
+        "label": "entity",
+        "item": 35120,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "set",
+        "item": 28813620,
+        "or_instance": false,
+        "subclass_deep": 5
+      },
+      {
+        "label": "set",
+        "item": 28813620,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "group",
+        "item": 16887380,
+        "or_instance": false,
+        "subclass_deep": 4
+      },
+      {
+        "label": "group",
+        "item": 16887380,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "class",
+        "item": 5127848,
+        "or_instance": false,
+        "subclass_deep": 7
+      },
+      {
+        "label": "class",
+        "item": 5127848,
+        "or_instance": true,
+        "subclass_deep": 3
+      },
+      {
+        "label": "class",
+        "item": 16889133,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "class",
+        "item": 16889133,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "type",
+        "item": 21146257,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      { "label": "human", "item": 5, "or_instance": false, "subclass_deep": null }
+    ]
+  },
+  {
+    "hypernym": "Object (philosophy)",
+    "queries": [
+      {
+        "label": "object",
+        "item": 488383,
+        "or_instance": false,
+        "subclass_deep": 5
+      },
+      {
+        "label": "object",
+        "item": 488383,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "abstract object",
+        "item": 7184903,
+        "or_instance": false,
+        "subclass_deep": 6
+      },
+      {
+        "label": "abstract object",
+        "item": 7184903,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "relation",
+        "item": 930933,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "relation",
+        "item": 930933,
+        "or_instance": true,
+        "subclass_deep": 5
+      }
+    ]
+  },
+  {
+    "hypernym": "Mathematics",
+    "queries": [
+      {
+        "label": "mathematics",
+        "item": 395,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "mathematical concept",
+        "item": 24034552,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "mathematical object",
+        "item": 246672,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "mathematical object",
+        "item": 246672,
+        "or_instance": true,
+        "subclass_deep": 3
+      },
+      {
+        "label": "mathematical notation",
+        "item": 1140046,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "type of mathematical function",
+        "item": 47279819,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "relation",
+        "item": 203066,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "function",
+        "item": 11348,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Action (philosophy)",
+    "queries": [
+      {
+        "label": "action",
+        "item": 4026292,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "action",
+        "item": 4026292,
+        "or_instance": true,
+        "subclass_deep": 3
+      },
+      {
+        "label": "activity",
+        "item": 1914636,
+        "or_instance": true,
+        "subclass_deep": 3
+      },
+      {
+        "label": "interaction",
+        "item": 52948,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "violence",
+        "item": 124490,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "attack",
+        "item": 1174599,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "connection",
+        "item": 23009459,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Phenomenon",
+    "queries": [
+      {
+        "label": "phenomenon",
+        "item": 483247,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "phenomenon",
+        "item": 483247,
+        "or_instance": true,
+        "subclass_deep": 4
+      },
+      {
+        "label": "phenomenon",
+        "item": 16722960,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "phenomenon",
+        "item": 16722960,
+        "or_instance": true,
+        "subclass_deep": 5
+      },
+      {
+        "label": "occurrence",
+        "item": 1190554,
+        "or_instance": false,
+        "subclass_deep": 6
+      },
+      {
+        "label": "occurrence",
+        "item": 1190554,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "physical phenomenon",
+        "item": 1293220,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "social phenomenon",
+        "item": 602884,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "event",
+        "item": 1656682,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Change (philosophy)",
+    "queries": [
+      {
+        "label": "change",
+        "item": 1150070,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "change",
+        "item": 1150070,
+        "or_instance": true,
+        "subclass_deep": 4
+      },
+      {
+        "label": "emotion",
+        "item": 9415,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "prediction",
+        "item": 748250,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "process",
+        "item": 67518233,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "natural process",
+        "item": 13878858,
+        "or_instance": true,
+        "subclass_deep": 6
+      }
+    ]
+  },
+  {
+    "hypernym": "Behavior",
+    "queries": [
+      {
+        "label": "behavior",
+        "item": 9332,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "behavior",
+        "item": 9332,
+        "or_instance": true,
+        "subclass_deep": 4
+      },
+      {
+        "label": "habit",
+        "item": 1299714,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "habit",
+        "item": 1299714,
+        "or_instance": true,
+        "subclass_deep": 6
+      },
+      {
+        "label": "communication",
+        "item": 11024,
+        "or_instance": true,
+        "subclass_deep": 3
+      }
+    ]
+  },
+  {
+    "hypernym": "Property (philosophy)",
+    "queries": [
+      {
+        "label": "property",
+        "item": 937228,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "property",
+        "item": 937228,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "quality",
+        "item": 1207505,
+        "or_instance": true,
+        "subclass_deep": 4
+      },
+      {
+        "label": "value",
+        "item": 878143,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "direction",
+        "item": 2151613,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "location",
+        "item": 17334923,
+        "or_instance": false,
+        "subclass_deep": 4
+      },
+      {
+        "label": "location",
+        "item": 17334923,
+        "or_instance": true,
+        "subclass_deep": 1
+      }
+    ]
+  },
+  {
+    "hypernym": "Physical object",
+    "queries": [
+      {
+        "label": "physical object",
+        "item": 223557,
+        "or_instance": false,
+        "subclass_deep": 5
+      },
+      {
+        "label": "physical object",
+        "item": 223557,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "component",
+        "item": 1310239,
+        "or_instance": false,
+        "subclass_deep": 6
+      },
+      {
+        "label": "component",
+        "item": 1310239,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "group or class of physical objects",
+        "item": 98119401,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "layer",
+        "item": 23497981,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "geological structure",
+        "item": 9346860,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Hypothesis",
+    "queries": [
+      {
+        "label": "hypothesis",
+        "item": 41719,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "hypothesis",
+        "item": 41719,
+        "or_instance": true,
+        "subclass_deep": 6
+      },
+      {
+        "label": "hypothetical entity",
+        "item": 18706315,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Information",
+    "queries": [
+      {
+        "label": "information",
+        "item": 11028,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "information",
+        "item": 11028,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "message",
+        "item": 628523,
+        "or_instance": true,
+        "subclass_deep": 5
+      },
+      {
+        "label": "rule",
+        "item": 1151067,
+        "or_instance": true,
+        "subclass_deep": 5
+      },
+      {
+        "label": "data",
+        "item": 42848,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "law",
+        "item": 7748,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "identifier",
+        "item": 853614,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "command",
+        "item": 1665268,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "logical form",
+        "item": 6667497,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Document",
+    "queries": [
+      {
+        "label": "document",
+        "item": 49848,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "document",
+        "item": 49848,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "text",
+        "item": 234460,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "text",
+        "item": 234460,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "written work",
+        "item": 47461344,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "written work",
+        "item": 47461344,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "derivative work",
+        "item": 836950,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "legal act",
+        "item": 740464,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "resolution",
+        "item": 2751586,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Structure",
+    "queries": [
+      {
+        "label": "structure",
+        "item": 6671777,
+        "or_instance": false,
+        "subclass_deep": 4
+      },
+      {
+        "label": "structure",
+        "item": 6671777,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "architectural structure",
+        "item": 811979,
+        "or_instance": false,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "System",
+    "queries": [
+      {
+        "label": "system",
+        "item": 58778,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "system",
+        "item": 58778,
+        "or_instance": true,
+        "subclass_deep": 3
+      }
+    ]
+  },
+  {
+    "hypernym": "Organization",
+    "queries": [
+      {
+        "label": "organization",
+        "item": 43229,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "organization",
+        "item": 43229,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "social group",
+        "item": 874405,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "social group",
+        "item": 874405,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "non-governmental organization",
+        "item": 79913,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "institution",
+        "item": 178706,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "government agency",
+        "item": 327333,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "political organization",
+        "item": 7210356,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "armed organization",
+        "item": 17149090,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "type of organisation",
+        "item": 17197366,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "political concept",
+        "item": 33104069,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Knowledge",
+    "queries": [
+      {
+        "label": "knowledge",
+        "item": 9081,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Humanities",
+    "queries": [
+      {
+        "label": "humanities",
+        "item": 80083,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "culture",
+        "item": 11042,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "social relation",
+        "item": 853725,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "cultural heritage",
+        "item": 210272,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "rights",
+        "item": 780687,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "service",
+        "item": 7406919,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "fictional entity",
+        "item": 14897293,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Technology ",
+    "queries": [
+      {
+        "label": "technology",
+        "item": 11016,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "technique",
+        "item": 2695280,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Astronomical object",
+    "queries": [
+      {
+        "label": "astronomical object",
+        "item": 6999,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "astronomical object",
+        "item": 6999,
+        "or_instance": true,
+        "subclass_deep": 0
+      },
+      {
+        "label": "astronomical object type",
+        "item": 17444909,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "astronomy classification",
+        "item": 25696292,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "asterism",
+        "item": 9262,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "supercluster",
+        "item": 27521,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "star cluster",
+        "item": 168845,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "small Solar System body",
+        "item": 193275,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "satellite",
+        "item": 1297322,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "spiral arm",
+        "item": 2311038,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "circumstellar disk",
+        "item": 3235978,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Organism",
+    "queries": [
+      {
+        "label": "organism",
+        "item": 7239,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "organism",
+        "item": 7239,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "taxon",
+        "item": 16521,
+        "or_instance": true,
+        "subclass_deep": 0
+      },
+      {
+        "label": "group of living things",
+        "item": 16334298,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "group of living things",
+        "item": 16334298,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "animal",
+        "item": 729,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "plant",
+        "item": 756,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "microorganism",
+        "item": 39833,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "organisms known by a particular common name",
+        "item": 55983715,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Location",
+    "queries": [
+      {
+        "label": "geographic location",
+        "item": 2221906,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "geographic location",
+        "item": 2221906,
+        "or_instance": true,
+        "subclass_deep": 0
+      },
+      {
+        "label": "geographic entity",
+        "item": 27096213,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "geographic entity",
+        "item": 27096213,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "landform",
+        "item": 271669,
+        "or_instance": true,
+        "subclass_deep": 0
+      },
+      {
+        "label": "geographic region",
+        "item": 82794,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "administrative territorial entity",
+        "item": 56061,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "landscape",
+        "item": 107425,
+        "or_instance": true,
+        "subclass_deep": 4
+      },
+      {
+        "label": "natural region",
+        "item": 1970725,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "historical region",
+        "item": 1620908,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "historical geographic location",
+        "item": 52551684,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "former geographical object",
+        "item": 96088545,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "neighborhood",
+        "item": 123705,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "physico-geographical object",
+        "item": 20719696,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Chemical substance",
+    "queries": [
+      {
+        "label": "chemical substance",
+        "item": 79529,
+        "or_instance": false,
+        "subclass_deep": 4
+      },
+      {
+        "label": "chemical entity",
+        "item": 43460564,
+        "or_instance": true,
+        "subclass_deep": 3
+      },
+      {
+        "label": "drug",
+        "item": 8386,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "chemical series",
+        "item": 19549,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "period",
+        "item": 101843,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "functional group",
+        "item": 170409,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "group or class of chemical substances",
+        "item": 17339814,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "structural class of chemical compounds",
+        "item": 47154513,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "class of chemical compounds with similar source",
+        "item": 56256178,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Sign",
+    "queries": [
+      {
+        "label": "sign",
+        "item": 3695082,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "notation",
+        "item": 2001982,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "letter",
+        "item": 9788,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Goods",
+    "queries": [
+      {
+        "label": "goods",
+        "item": 28877,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "goods",
+        "item": 28877,
+        "or_instance": true,
+        "subclass_deep": 2
+      }
+    ]
+  },
+  {
+    "hypernym": "Matter",
+    "queries": [
+      {
+        "label": "matter",
+        "item": 35758,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "subatomic particle",
+        "item": 177013,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Physical property",
+    "queries": [
+      {
+        "label": "physical property",
+        "item": 4373292,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "physical quantity",
+        "item": 107715,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "material property",
+        "item": 3523867,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Anatomy",
+    "queries": [
+      {
+        "label": "anatomy",
+        "item": 514,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "anatomical structure",
+        "item": 4936952,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "physical anatomical entity",
+        "item": 66394244,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Language",
+    "queries": [
+      {
+        "label": "language",
+        "item": 315,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "language",
+        "item": 34770,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "language",
+        "item": 4536530,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "languoid",
+        "item": 17376908,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Phrase",
+    "queries": [
+      {
+        "label": "phrase",
+        "item": 187931,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "word class",
+        "item": 82042,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "morpheme",
+        "item": 43249,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "form",
+        "item": 4423888,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "linguistic norm",
+        "item": 1759988,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "language device",
+        "item": 12767945,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Axiom",
+    "queries": [
+      {
+        "label": "axiom",
+        "item": 17736,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Theorem",
+    "queries": [
+      {
+        "label": "theorem",
+        "item": 65943,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Theory",
+    "queries": [
+      {
+        "label": "theory",
+        "item": 17737,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Ideology",
+    "queries": [
+      {
+        "label": "ideology",
+        "item": 7257,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Art",
+    "queries": [
+      { "label": "art", "item": 735, "or_instance": true, "subclass_deep": null },
+      {
+        "label": "work of art",
+        "item": 838948,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "artwork series",
+        "item": 15709879,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "musical work",
+        "item": 2188189,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "literary element",
+        "item": 6647660,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Genre",
+    "queries": [
+      {
+        "label": "genre",
+        "item": 483394,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "fiction",
+        "item": 8253,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "traditional story",
+        "item": 7832362,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Myth",
+    "queries": [
+      {
+        "label": "myth",
+        "item": 12827256,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "mythology",
+        "item": 9134,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "mythical entity",
+        "item": 24334685,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "human who may be fictional",
+        "item": 21070568,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Religion",
+    "queries": [
+      {
+        "label": "religion",
+        "item": 9174,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "religious",
+        "item": 4504549,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "religious identity",
+        "item": 4392985,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "religious concept",
+        "item": 23847174,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "religious behaviour",
+        "item": 2110808,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "religious organization",
+        "item": 1530022,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "Bible",
+        "item": 1845,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Tool",
+    "queries": [
+      {
+        "label": "tool",
+        "item": 39546,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "device",
+        "item": 1183543,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "measuring instrument",
+        "item": 2041172,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "furnishing",
+        "item": 31807746,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Infrastructure",
+    "queries": [
+      {
+        "label": "infrastructure",
+        "item": 121359,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "civil engineering construction",
+        "item": 1411945,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Machine",
+    "queries": [
+      {
+        "label": "machine",
+        "item": 11019,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "machine element",
+        "item": 839546,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Computer science",
+    "queries": [
+      {
+        "label": "computer science",
+        "item": 21198,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "computer science term",
+        "item": 66747126,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "software",
+        "item": 7397,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "computer architecture",
+        "item": 173212,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "paradigm",
+        "item": 28643,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "computer language",
+        "item": 629206,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Time",
+    "queries": [
+      {
+        "label": "time",
+        "item": 11471,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Shape",
+    "queries": [
+      {
+        "label": "shape",
+        "item": 207961,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Ethnic group",
+    "queries": [
+      {
+        "label": "ethnic group",
+        "item": 41710,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Disease",
+    "queries": [
+      {
+        "label": "disease",
+        "item": 12136,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Food",
+    "queries": [
+      {
+        "label": "food",
+        "item": 2095,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "cuisine",
+        "item": 1778821,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Clothing",
+    "queries": [
+      {
+        "label": "clothing",
+        "item": 11460,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Sport",
+    "queries": [
+      {
+        "label": "sport",
+        "item": 349,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "type of sport",
+        "item": 31629,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "position",
+        "item": 1781513,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "sports terminology",
+        "item": 28829877,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Game",
+    "queries": [
+      {
+        "label": "game",
+        "item": 11410,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "game franchise",
+        "item": 28114058,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "game equipment",
+        "item": 17638008,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Unit of measurement",
+    "queries": [
+      {
+        "label": "unit of measurement",
+        "item": 47574,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  }
+]
