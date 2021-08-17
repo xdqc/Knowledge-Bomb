@@ -1,21 +1,19 @@
 
 # Knowledge Bomber
 
-A *vocabulary test* tool, testing knowledge of things vis-à-vis Wikipedia rather than knowledge of words vis-à-vis dictionary, available in the following languages:
+A "vocabulary" test tool, testing knowledge of things vis-à-vis Wikipedia rather than knowledge of words vis-à-vis dictionary, available in the following languages:
 
-### List of Wikipedia Languages
+## List of Wikipedia Languages
 
 Ranking is based on numbers of [qualified Wikidata items](#Qualified-Wikidata-Items) per language. 
 
-  - **`Q60`** is the number of articles having more than 60 language versions, so as `Q50`...`Q20`
-    - `Q60` articles are included in `Q50` articles which are included in `Q40` articles ... which are included in `Q20` articles
+  - **`Q60`** is the number of qualified wikipedia articles with more than *60* language versions, so as `Q50` `Q40` `Q30` `Q20`
   - **`WSM`**, weighted sum model, is `Q60`+`Q50`+`Q40`+`Q30`+`Q20`
-  - **`Coverage%`** is language WSM divided by English WSM as percentage
+    - `Q60` articles are included in `Q50` articles which are included in `Q40` articles ... which are included in `Q20` articles
+  - **`Coverage%`** is the language WSM to English WSM ratio
   - **`Articles`** is total [number of Wikipedia articles by language](https://meta.wikimedia.org/wiki/List_of_Wikipedias)
-  - **`Solidness%`** is coverage to article ratio with using simple_english as 100% benchmark
-    - high Solidness% indicates more qualified per total articles of that language, eg. #53 wuu = 273.57% (吴语 | Wu)
-    - low Solidness% indicates less qualified per total articles of that language, eg. #148 ceb = 0.20% (Sinugboanong Binisaya | Cebuano)
-
+  - **`Speakers`** is L1+L2 speakers of the language in million (source: wikipedia of each language)
+  - **`Solidness%`** is WSM to article ratio, using simple_english as 100% benchmark. low solidness means high proportion trivial articles of the language
 
 |   № |                     Language(Local) | Language                  | Wiki         | Coverage% | Q60 Diamond | Q50 Gold | Q40 Silver | Q30 Bronze | Q20 Iron |   WSM | Articles | Speakers | Solidness% |
 |----:|------------------------------------:|---------------------------|--------------|----------:|------------:|---------:|-----------:|-----------:|---------:|------:|---------:|---------:|-----------:|
@@ -341,7 +339,7 @@ Ranking is based on numbers of [qualified Wikidata items](#Qualified-Wikidata-It
 
 #### Qualified Wikidata Items
 
-A qualified article ([a sample of qualified articles](./sql/sample-titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these [excl.criteria](./src/wikiroamer.js) [incl.criteria](./src/hypernyms.json) :
+A qualified article ([examples](./sql/sample-titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these [excl.criteria](./src/wikiroamer.js), [incl.criteria](./src/hypernyms.json) :
 
 - Has more than *THRESHHOLD* number of different languages versions (e.g. set *THRESHHOLD* = 20, 30 or 40, get Q20_Items, Q30_Items or Q40_Items respectively).
 - Is not a specific person, place, biota, event, chemical, medical subject, astronomical object, company, product, publication, team, sport match, song, years, decades, days, unicode, etc., nor a collection of such entities.
