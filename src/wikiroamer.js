@@ -20,7 +20,7 @@
     const langCount = document.querySelectorAll('li.interlanguage-link').length + 1;
     const isDisputed = !!document.querySelector('table.box-Disputed');
     if (langCount < 20 ||
-        document.querySelector('table.biography, table.geography, table.biota, table.vevent, table.sidebar-games-events') ||
+        document.querySelector('table.biography, table.geography, table.biota, table.vevent, table.ib-settlement, table.ib-country, table.sidebar-games-events') ||
         document.querySelector('span#coordinates') ||
         isDisputed
     ) {
@@ -29,7 +29,7 @@
         const dryTitle = [].reduce.call(document.querySelector("h1#firstHeading").childNodes, (a, b) => a + (b.nodeType === 3 ? b.textContent : ''), '').replace(/\([^()]*\)/g, '').trim();
         const firstPar = Array.from(document.querySelectorAll('p')).find(p => p.textContent.length > 4);
                                   //'Occupation', 'Years active', 'Introduced', 'Venue', 'Location', 'Season', 'Result', 'Date','Capital','Mass','MeSH','Constellation','Religion','Area', 'Borders', 'Music awards', 'Inscription',
-        const infoStop = new Set(['CAS Number', 'PubMed search', 'SIMBAD', 'X-SAMPA', 'Pfam', 'RefSeq', 'Locus', 'ISSN', 'ISBN', 'TLD type', 'COSPAR ID', 'NCBI',
+        const infoStop = new Set(['CAS Number', 'CAS no.', 'PubMed search', 'SIMBAD', 'X-SAMPA', 'Pfam', 'RefSeq', 'Locus', 'ISSN', 'ISBN', 'TLD type', 'COSPAR ID', 'NCBI',
                                   'Full name', 'Born', 'Died', 'Burial', 'Date of birth', 'Gender', 'Spouse', 'Website', 'Web site', 'Official website', 'URL', 'Government website',
                                   'Active', 'Founder(s)', 'Leaders', 'Leader', 'Author', 'Author(s)', 'Affiliations', 'Appearances', 'Adopted', 'Adoption', 'Registration', 'Engagements',
                                   'Teams', 'Members', 'Champion', 'Champions', 'Competition', 'Association', 'Production', 'Release', 'Repealed', 'Response', 'Membership', 'Ceased',
@@ -48,15 +48,17 @@
                                   'Associated acts', 'Awards and achievements', 'First induction', 'First appearance', 'Number built', 'First issued', 'Primary user', 'Variants', 'Filling',
                                   'Cartridge', 'Transmission', 'Current champions', 'Last champions', 'Connector types', 'Shutter', 'Ballistic performance', 'Wingspan', 'Track gauge', 'Gauge',
                                   'Confluence', 'List of years in literature', 'Dissolution', 'Deposition', 'Commanders', 'Commander', 'Tributaries', 'Beginning coordinates', 'Home arena',
-                                  'Merger of', 'Composers', 'Directed by', 'Abolished', 'Races', 'Administration', 'Performance', 'Final ruler',
+                                  'Merger of', 'Composers', 'Directed by', 'Abolished', 'Races', 'Administration', 'Performance', 'Final ruler', 'Year of creation', 'National origin',
+                                  'Publication', 'FIFA affiliation', 'Media type', 'Motives', 'Government',
+                                  'unicode', 'Unicode codepoint', 'Hexadecimal', 'Penumbral', 'Phonetic usage', 'transliteration', 'Pronunciations', 'The Cyrillic script']);
                                   //'Produced', 'Used by', 'Specifications', 'Manufacturer', 'Capacity',
                                   //'Preceded by', 'Followed by', 'Founder', 'Founded', 'Formation', 'Abolition', 'Inaugurated',
-                                  'unicode', 'Unicode codepoint', 'Hexadecimal', 'Penumbral', 'Phonetic usage', 'transliteration', 'Pronunciations', 'The Cyrillic script']);
         const tocStop = ['Medal table', 'Medal summary', 'Qualified teams', 'Group A', 'Group 1', 'Division I', 'Matches', 'The match', 'Squads', 'Winners and nominees', 'Fixtures and results',
                          'Semi-finals', 'Championship', 'Match conditions', 'World Group',
-                         //'Life',
+                         'Life',
                          'Holidays and observances', 'Neighbourhoods', 'Personal life', 'Life and work', 'Early life', 'Later life', 'Biography'];
         const cateStop = ['Disambiguation pages',
+                          'Temporary maintenance holdings',
                           'All stub articles',
                           'Living people', 'Year of birth unknown', 'Year of death unknown',
                           'Lists and galleries of flags', 'National coats of arms', 'National emblems', 'Presidents by country', 'Heads of government by country', 'Lists of cities by country',
@@ -79,13 +81,14 @@
                           'General elections in the United States', 'Achaemenid princesses', 'Lists of roads', 'Defunct UEFA club competitions', 'Top level football leagues in Europe',
                           'Ancient Greek philosophers', 'Women satirists', 'Ancient Greek mathematicians', 'Roman-era poets', 'Explorers of Asia', '1st-century Romans', 'Italian poets',
                           'Byzantine historians', 'German poets', 'Sanskrit poets', 'Ancient women rulers', 'Praetorian prefects', 'Historically recognized angiosperm genera', 'Historically recognized plant genera',
-                          'Ancient Ephesians', 'Ancient Milesians', 'Georgian letters', 'Winter Paralympic Games', 'Association football governing bodies',
+                          'Ancient Ephesians', 'Ancient Milesians', 'Georgian letters', 'Winter Paralympic Games', 'Association football governing bodies', 'Generals of Alexander the Great',
+                          'Hellenistic-era historians', 'Scheduled association football competitions', 'Summer Paralympic Games', 'Forbes lists',
                           'Military trucks', 'Golden Globe Awards', 'European youth orchestras', 'Aphorists'];
                        // 'Domain name stubs', 'Flag stubs', 'Greek mythology stubs', 'Explorer stubs', 'Plant stubs', 'Russia river stubs', 'Greek sportspeople stubs', 'Africa river stubs', 'European royalty stubs', 'Pelagonia Region geography stubs', 'Byzantine people stubs', 'Ancient Roman people stubs', 'Theatrical people stubs', 'Philosopher stubs', 'Greek deity stubs', 'Solomon Islands geography stubs',
         const titleStop = ['Wikipedia:', 'Category:', 'Module:', 'Help:', 'Portal:','Template:',
                            'List of', 'Lists of', 'Communes of', 'Districts of', 'Provinces of', 'Prefectures of ', 'Regional units of', 'Municipalities of ',
                            'Flag of', 'Flags of', 'Coat of arms of ', 'Official names of', 'Administrative divisions of', 'Local government in', 'Cities of ', 'Towns of ',
-                           'ISO', 'IEEE', 'ATC code', 'Olympics', 'Olympiad', 'UEFA Euro', 'IAAF', 'Championships', 'Islam in', 'Grand Prix', 'AFI',
+                           'ISO', 'IEEE', 'ATC code', 'Olympics', 'Olympiad', 'UEFA Euro', 'IAAF', 'Championships', 'Islam in', 'Grand Prix', 'AFI', 'by country',
                            'medal table', 'episodes'];
         if (//!dryTitle ||
             !firstPar ||

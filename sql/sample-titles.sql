@@ -53,168 +53,99 @@ END
 GO
 
 
-SELECT TOP (10000) [id] wikidata
-      ,[lang_count] #lang
-	  ,en.title en
-	  ,es.title es
-	  ,fr.title fr
-	  ,ru.title ru
-	  ,de.title de
-	  ,it.title it
-	  ,uk.title uk
-	  ,pt.title pt
-	  ,zh.title zh
-	  ,ja.title ja
-	  ,nl.title nl
-	  ,pl.title pl
-	  ,ar.title ar
-	  ,ca.title ca
-	  ,fa.title fa
-	  ,sv.title sv
-	  ,ko.title ko
-	  ,cs.title cs
-	  ,fi.title fi
-	  ,id.title id
-	  ,tr.title tr
-	  ,no.title no
-	  ,he.title he
-	  ,eu.title eu
-	  ,el.title el
-	  ,la.title la
-	  ,hypernym
+DROP TABLE IF EXISTS wiki.title
+CREATE TABLE wiki.title (wikidata int not null, #lang int, hyper int)  
+ALTER TABLE [wiki].[title] ADD  CONSTRAINT [PK__title__wikidata] PRIMARY KEY CLUSTERED 
+(
+	[wikidata] ASC
+)WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
 
-  FROM [wiki].[item] i
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'en' AND LEN(title) < 16
-) en
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'es' AND LEN(title) < 16
-) es
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'fr' AND LEN(title) < 16
-) fr
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'ru' AND LEN(title) < 14
-) ru
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'de' AND LEN(title) < 16
-) de
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'it' AND LEN(title) < 16
-) it
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'uk' AND LEN(title) < 14
-) uk
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'pt' AND LEN(title) < 16
-) pt
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'zh' AND LEN(title) < 8
-) zh
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'ja' AND LEN(title) < 10
-) ja
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'nl' AND LEN(title) < 16
-) nl
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'pl' AND LEN(title) < 16
-) pl
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'ar' AND LEN(title) < 16
-) ar
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'ca' AND LEN(title) < 16
-) ca
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'fa' AND LEN(title) < 16
-) fa
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'sv' AND LEN(title) < 16
-) sv
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'ko' AND LEN(title) < 10
-) ko
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'cs' AND LEN(title) < 16
-) cs
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'fi' AND LEN(title) < 16
-) fi
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'id' AND LEN(title) < 16
-) id
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'tr' AND LEN(title) < 16
-) tr
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'no' AND LEN(title) < 16
-) no
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'he' AND LEN(title) < 14
-) he
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'eu' AND LEN(title) < 16
-) eu
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'el' AND LEN(title) < 16
-) el
-CROSS APPLY(
-	SELECT item,title FROM wiki.article a
-	WHERE a.item = i.id AND a.language = 'la' AND LEN(title) < 16
-) la
+INSERT INTO wiki.title (wikidata, #lang, hyper) SELECT id,lang_count,hypernym FROM wiki.item
+
+DECLARE @idColumn int
+DECLARE @langId nvarchar(20)
+
+SELECT @idColumn = min(id) from wiki.language l
+WHILE @idColumn is not null
+BEGIN
+	/*
+		Do all the stuff that you need to do
+	*/
+	SELECT @langId = code FROM wiki.language WHERE id=@idColumn
+	DECLARE @query nvarchar(max) = CONCAT(
+	N'ALTER TABLE wiki.title ADD [', @langId, N'] nvarchar(max) null;')
+	exec(@query)
+	
+	set @query = CONCAT(
+	N'UPDATE wiki.title SET [', @langId, N'] = a.title FROM [wiki].[article] a WHERE a.item = wiki.title.wikidata AND a.language = ''', @langId, ''';')
+	print @query
+	exec(@query)
+	
+	select @idColumn = min(id) from wiki.language l where l.id > @idColumn
+END
+SELECT * FROM wiki.title;
+GO
+;
+
+
+SELECT TOP (10000) wikidata
+      ,[#lang]
+	  ,en en
+	  ,es es
+	  ,fr fr
+	  ,de de
+	  ,it it
+	  ,pt pt
+	  ,ru ru
+	  ,uk uk
+	  ,zh zh
+	  ,ja ja
+	  ,nl nl
+	  ,pl pl
+	  ,ar ar
+	  ,fa fa
+	  ,ca ca
+	  ,sv sv
+	  ,ko ko
+	  ,cs cs
+	  ,fi fi
+	  ,id id
+	  ,tr tr
+	  ,no no
+	  ,he he
+	  ,eu eu
+	  ,el el
+	  ,la la
+	  ,hyper
+  FROM [wiki].[title] t
 
 ORDER BY 
-	 LEN(dbo.RemoveParen(en.title))
-	+LEN(dbo.RemoveParen(es.title))
-	+LEN(dbo.RemoveParen(fr.title))
-	+LEN(dbo.RemoveParen(ru.title))
-	+LEN(dbo.RemoveParen(de.title))
-	+LEN(dbo.RemoveParen(it.title))
-	+LEN(dbo.RemoveParen(uk.title))
-	+LEN(dbo.RemoveParen(pt.title))
-	+LEN(dbo.RemoveParen(zh.title))
-	+LEN(dbo.RemoveParen(ja.title))
-	+LEN(dbo.RemoveParen(nl.title))
-	+LEN(dbo.RemoveParen(pl.title))
-	+LEN(dbo.RemoveParen(ar.title))
-	+LEN(dbo.RemoveParen(ca.title))
-	+LEN(dbo.RemoveParen(fa.title))
-	+LEN(dbo.RemoveParen(sv.title))
-	+LEN(dbo.RemoveParen(ko.title))
-	+LEN(dbo.RemoveParen(cs.title))
-	+LEN(dbo.RemoveParen(fi.title))
-	+LEN(dbo.RemoveParen(id.title))
-	+LEN(dbo.RemoveParen(tr.title))
-	+LEN(dbo.RemoveParen(no.title))
-	+LEN(dbo.RemoveParen(he.title))
-	+LEN(dbo.RemoveParen(eu.title))
-	+LEN(dbo.RemoveParen(el.title))
-	+LEN(dbo.RemoveParen(la.title))
+	 LEN(dbo.RemoveParen(en))
+	+LEN(dbo.RemoveParen(es))
+	+LEN(dbo.RemoveParen(fr))
+	+LEN(dbo.RemoveParen(ru))
+	+LEN(dbo.RemoveParen(de))
+	+LEN(dbo.RemoveParen(it))
+	+LEN(dbo.RemoveParen(uk))
+	+LEN(dbo.RemoveParen(pt))
+	+LEN(dbo.RemoveParen(zh))
+	+LEN(dbo.RemoveParen(ja))
+	+LEN(dbo.RemoveParen(nl))
+	+LEN(dbo.RemoveParen(pl))
+	+LEN(dbo.RemoveParen(ar))
+	+LEN(dbo.RemoveParen(ca))
+	+LEN(dbo.RemoveParen(fa))
+	+LEN(dbo.RemoveParen(sv))
+	+LEN(dbo.RemoveParen(ko))
+	+LEN(dbo.RemoveParen(cs))
+	+LEN(dbo.RemoveParen(fi))
+	+LEN(dbo.RemoveParen(id))
+	+LEN(dbo.RemoveParen(tr))
+	+LEN(dbo.RemoveParen(no))
+	+LEN(dbo.RemoveParen(he))
+	+LEN(dbo.RemoveParen(eu))
+	+LEN(dbo.RemoveParen(el))
+	+LEN(dbo.RemoveParen(la))
 	,hypernym, lang_count DESC, id
 GO
