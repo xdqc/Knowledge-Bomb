@@ -149,3 +149,30 @@ ORDER BY
 	+LEN(dbo.RemoveParen(la))
 	,hypernym, lang_count DESC, id
 GO
+DECLARE @langs TABLE (col nvarchar(20))
+INSERT INTO @langs SELECT  [COLUMN_NAME] 
+FROM [INFORMATION_SCHEMA].[COLUMNS]
+WHERE TABLE_SCHEMA='wiki' AND TABLE_NAME='title'
+AND ORDINAL_POSITION > 3 
+AND ORDINAL_POSITION < 258
+
+
+DECLARE @lang nvarchar(MAX);
+SELECT @lang = COALESCE(@lang + '],[' + col, col ) FROM @langs
+SET @lang = '['+@lang+']'
+
+DECLARE @langnull nvarchar(MAX);
+SELECT @langnull = COALESCE(@langnull + '] IS NOT NULL AND [' + col, col ) FROM @langs
+SET @langnull = '['+@langnull+'] IS NOT NULL'
+
+
+DECLARE @query nvarchar(MAX) = CONCAT(
+N'SELECT TOP (1000) [wikidata]
+      ,[#lang]
+      ,[hyper] , '
+	  , @lang  ,' FROM [wiki].[title]
+  WHERE en is not null --', @langnull, '
+  ORDER BY LEN( (CONCAT_WS('' '', ', @lang,'))) DESC')
+
+print @query
+exec(@query)
