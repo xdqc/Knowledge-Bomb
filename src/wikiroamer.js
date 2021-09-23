@@ -20,7 +20,7 @@
     const langCount = document.querySelectorAll('li.interlanguage-link').length + 1;
     const isDisputed = !!document.querySelector('table.box-Disputed');
     if (langCount < 20 ||
-        document.querySelector('table.biography, table.geography, table.biota, table.vevent, table.ib-settlement, table.ib-country, table.sidebar-games-events') ||
+        document.querySelector('table.biography, table.geography, table.biota, table.vevent, table.ib-settlement, table.ib-country, ib-former-subdiv, table.sidebar-games-events') ||
         document.querySelector('span#coordinates') ||
         isDisputed
     ) {
@@ -82,7 +82,7 @@
                           'Ancient Greek philosophers', 'Women satirists', 'Ancient Greek mathematicians', 'Roman-era poets', 'Explorers of Asia', '1st-century Romans', 'Italian poets',
                           'Byzantine historians', 'German poets', 'Sanskrit poets', 'Ancient women rulers', 'Praetorian prefects', 'Historically recognized angiosperm genera', 'Historically recognized plant genera',
                           'Ancient Ephesians', 'Ancient Milesians', 'Georgian letters', 'Winter Paralympic Games', 'Association football governing bodies', 'Generals of Alexander the Great',
-                          'Hellenistic-era historians', 'Scheduled association football competitions', 'Summer Paralympic Games', 'Forbes lists',
+                          'Hellenistic-era historians', 'Scheduled association football competitions', 'Summer Paralympic Games', 'Forbes lists', 'Unidentified astronomical objects',
                           'Military trucks', 'Golden Globe Awards', 'European youth orchestras', 'Aphorists'];
                        // 'Domain name stubs', 'Flag stubs', 'Greek mythology stubs', 'Explorer stubs', 'Plant stubs', 'Russia river stubs', 'Greek sportspeople stubs', 'Africa river stubs', 'European royalty stubs', 'Pelagonia Region geography stubs', 'Byzantine people stubs', 'Ancient Roman people stubs', 'Theatrical people stubs', 'Philosopher stubs', 'Greek deity stubs', 'Solomon Islands geography stubs',
         const titleStop = ['Wikipedia:', 'Category:', 'Module:', 'Help:', 'Portal:','Template:',
