@@ -1,5 +1,5 @@
 
-# Knowledge Bomber
+# Knowledge Bomber :bomb:
 
 A "vocabulary" test tool, testing knowledge of things vis-à-vis Wikipedia rather than knowledge of words vis-à-vis dictionary, available in the following languages:
 
@@ -15,7 +15,7 @@ Ranking is based on numbers of [qualified Wikidata items](#Qualified-Wikidata-It
   - **`Speakers`** is L1+L2 speakers of the language in million (source: wikipedia of each language)
   - **`Solidness%`** is WSM to article ratio, using simple_english as 100% benchmark. low solidness means high proportion trivial articles of the language
 
-|Rank |                     Language(Local) | Language                  | Wiki         | Coverage% | Q60 Diamond | Q50 Gold | Q40 Silver | Q30 Bronze | Q20 Iron |   WSM | Articles | Solidness% |
+|Rank |                     Language(Local) | Language                  | Wiki         | Coverage% | Q60 :1st_place_medal: | Q50 :2nd_place_medal: | Q40 :3rd_place_medal: | Q30 :medal_sports: | Q20 :medal_military: |   WSM | Articles | Solidness% |
 |-----|------------------------------------:|---------------------------|--------------|----------:|------------:|---------:|-----------:|-----------:|---------:|------:|---------:|-----------:|
 | 1   |                             English | English                   | en           |   100.00% |        4931 |     7454 |      12053 |      20351 |    37567 | 82356 |  6356841 |      4.85% |
 | 2   |                             Español | Spanish                   | es           |    96.96% |        4925 |     7408 |      11908 |      19901 |    35710 | 79852 |  1707441 |     17.52% |
