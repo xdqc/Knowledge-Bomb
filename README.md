@@ -339,8 +339,15 @@ Ranking is based on numbers of [qualified Wikidata items](#Qualified-Wikidata-It
 
 ### Qualified Wikidata Items
 
-A qualified article ([examples](./data/sample-titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these [criteria (excl)](./src/wikiroamer.js), [criteria (incl)](./src/hypernyms.json) :
+A qualified article ([examples](data/sample-titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these [criteria (excl)](src/wikiroamer.js), [criteria (incl)](src/hypernyms.json) :
 
 - With more than *20* languages versions (set *THRESHHOLD* = 20, 30 or 40, get Q20_Items, Q30_Items or Q40_Items respectively).
 - Representing a generic knowledge, which is not a particular person, place, biota, event, chemical, astronomical object, company, product, publication, team, sport match, song, years, decades, days, unicode, etc., nor a collection of such entities.
-- [Hypernym](./src/hypernyms.json) of (`instance_of`?/`subclass_of`*) items above.
+- [Hypernym](src/hypernyms.json) of (`instance_of`?/`subclass_of`*) items above.
+
+### Hypernym Categories
+
+Wikidata items / Wikipedia articles are categorized in the following hypernyms. The design purpose is to achieve balanced number of items/articles per hypernym category for gameplay, rather than building an ontologically correct semantic network.
+
+![hypernym-categories](docs/hypernym-categories.jpg)
+

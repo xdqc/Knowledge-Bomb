@@ -13,18 +13,6 @@
         "item": 151885,
         "or_instance": true,
         "subclass_deep": 3
-      },
-      {
-        "label": "state",
-        "item": 3505845,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "condition",
-        "item": 813912,
-        "or_instance": true,
-        "subclass_deep": null
       }
     ]
   },
@@ -210,10 +198,28 @@
         "subclass_deep": 3
       },
       {
+        "label": "occurrence",
+        "item": 1190554,
+        "or_instance": false,
+        "subclass_deep": 6
+      },
+      {
+        "label": "occurrence",
+        "item": 1190554,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
         "label": "activity",
         "item": 1914636,
         "or_instance": true,
         "subclass_deep": 3
+      },
+      {
+        "label": "event",
+        "item": 1656682,
+        "or_instance": true,
+        "subclass_deep": null
       },
       {
         "label": "interaction",
@@ -269,18 +275,6 @@
         "subclass_deep": 5
       },
       {
-        "label": "occurrence",
-        "item": 1190554,
-        "or_instance": false,
-        "subclass_deep": 6
-      },
-      {
-        "label": "occurrence",
-        "item": 1190554,
-        "or_instance": true,
-        "subclass_deep": 2
-      },
-      {
         "label": "physical phenomenon",
         "item": 1293220,
         "or_instance": true,
@@ -293,13 +287,60 @@
         "subclass_deep": null
       },
       {
-        "label": "event",
-        "item": 1656682,
+        "label": "state",
+        "item": 3505845,
         "or_instance": true,
         "subclass_deep": null
       }
     ]
   },
+  {
+    "hypernym": "Property (philosophy)",
+    "queries": [
+      {
+        "label": "property",
+        "item": 937228,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "property",
+        "item": 937228,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "quality",
+        "item": 1207505,
+        "or_instance": true,
+        "subclass_deep": 4
+      },
+      {
+        "label": "value",
+        "item": 878143,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "direction",
+        "item": 2151613,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "location",
+        "item": 17334923,
+        "or_instance": false,
+        "subclass_deep": 4
+      },
+      {
+        "label": "location",
+        "item": 17334923,
+        "or_instance": true,
+        "subclass_deep": 1
+      }
+    ]
+  },  
   {
     "hypernym": "Change (philosophy)",
     "queries": [
@@ -373,53 +414,6 @@
         "item": 11024,
         "or_instance": true,
         "subclass_deep": 3
-      }
-    ]
-  },
-  {
-    "hypernym": "Property (philosophy)",
-    "queries": [
-      {
-        "label": "property",
-        "item": 937228,
-        "or_instance": false,
-        "subclass_deep": null
-      },
-      {
-        "label": "property",
-        "item": 937228,
-        "or_instance": true,
-        "subclass_deep": 2
-      },
-      {
-        "label": "quality",
-        "item": 1207505,
-        "or_instance": true,
-        "subclass_deep": 4
-      },
-      {
-        "label": "value",
-        "item": 878143,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "direction",
-        "item": 2151613,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "location",
-        "item": 17334923,
-        "or_instance": false,
-        "subclass_deep": 4
-      },
-      {
-        "label": "location",
-        "item": 17334923,
-        "or_instance": true,
-        "subclass_deep": 1
       }
     ]
   },
@@ -612,6 +606,17 @@
     ]
   },
   {
+    "hypernym": "Knowledge",
+    "queries": [
+      {
+        "label": "knowledge",
+        "item": 9081,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
     "hypernym": "Structure",
     "queries": [
       {
@@ -648,6 +653,95 @@
         "item": 58778,
         "or_instance": true,
         "subclass_deep": 3
+      }
+    ]
+  },
+  {
+    "hypernym": "Location",
+    "queries": [
+      {
+        "label": "geographic location",
+        "item": 2221906,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "geographic location",
+        "item": 2221906,
+        "or_instance": true,
+        "subclass_deep": 0
+      },
+      {
+        "label": "geographic entity",
+        "item": 27096213,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "geographic entity",
+        "item": 27096213,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "landform",
+        "item": 271669,
+        "or_instance": true,
+        "subclass_deep": 0
+      },
+      {
+        "label": "geographic region",
+        "item": 82794,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "administrative territorial entity",
+        "item": 56061,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "landscape",
+        "item": 107425,
+        "or_instance": true,
+        "subclass_deep": 4
+      },
+      {
+        "label": "natural region",
+        "item": 1970725,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "historical region",
+        "item": 1620908,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "historical geographic location",
+        "item": 52551684,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "former geographical object",
+        "item": 96088545,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "neighborhood",
+        "item": 123705,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "physico-geographical object",
+        "item": 20719696,
+        "or_instance": true,
+        "subclass_deep": null
       }
     ]
   },
@@ -709,6 +803,12 @@
         "subclass_deep": null
       },
       {
+        "label": "criminal organization",
+        "item": 1788992,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
         "label": "type of organisation",
         "item": 17197366,
         "or_instance": true,
@@ -717,17 +817,6 @@
       {
         "label": "political concept",
         "item": 33104069,
-        "or_instance": true,
-        "subclass_deep": null
-      }
-    ]
-  },
-  {
-    "hypernym": "Knowledge",
-    "queries": [
-      {
-        "label": "knowledge",
-        "item": 9081,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -743,20 +832,8 @@
         "subclass_deep": null
       },
       {
-        "label": "culture",
-        "item": 11042,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
         "label": "social relation",
         "item": 853725,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "cultural heritage",
-        "item": 210272,
         "or_instance": true,
         "subclass_deep": null
       },
@@ -775,6 +852,34 @@
       {
         "label": "fictional entity",
         "item": 14897293,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Culture",
+    "queries": [
+      {
+        "label": "culture",
+        "item": 11042,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "cultural heritage",
+        "item": 210272,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "History",
+    "queries": [
+      {
+        "label": "history",
+        "item": 309,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -922,95 +1027,6 @@
       {
         "label": "organisms known by a particular common name",
         "item": 55983715,
-        "or_instance": true,
-        "subclass_deep": null
-      }
-    ]
-  },
-  {
-    "hypernym": "Location",
-    "queries": [
-      {
-        "label": "geographic location",
-        "item": 2221906,
-        "or_instance": false,
-        "subclass_deep": null
-      },
-      {
-        "label": "geographic location",
-        "item": 2221906,
-        "or_instance": true,
-        "subclass_deep": 0
-      },
-      {
-        "label": "geographic entity",
-        "item": 27096213,
-        "or_instance": false,
-        "subclass_deep": null
-      },
-      {
-        "label": "geographic entity",
-        "item": 27096213,
-        "or_instance": true,
-        "subclass_deep": 1
-      },
-      {
-        "label": "landform",
-        "item": 271669,
-        "or_instance": true,
-        "subclass_deep": 0
-      },
-      {
-        "label": "geographic region",
-        "item": 82794,
-        "or_instance": true,
-        "subclass_deep": 1
-      },
-      {
-        "label": "administrative territorial entity",
-        "item": 56061,
-        "or_instance": true,
-        "subclass_deep": 2
-      },
-      {
-        "label": "landscape",
-        "item": 107425,
-        "or_instance": true,
-        "subclass_deep": 4
-      },
-      {
-        "label": "natural region",
-        "item": 1970725,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "historical region",
-        "item": 1620908,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "historical geographic location",
-        "item": 52551684,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "former geographical object",
-        "item": 96088545,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "neighborhood",
-        "item": 123705,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "physico-geographical object",
-        "item": 20719696,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -1402,6 +1418,12 @@
         "subclass_deep": null
       },
       {
+        "label": "religious belief",
+        "item": 2728698,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
         "label": "religious behaviour",
         "item": 2110808,
         "or_instance": true,
@@ -1520,17 +1542,6 @@
       {
         "label": "computer language",
         "item": 629206,
-        "or_instance": true,
-        "subclass_deep": null
-      }
-    ]
-  },
-  {
-    "hypernym": "Time",
-    "queries": [
-      {
-        "label": "time",
-        "item": 11471,
         "or_instance": true,
         "subclass_deep": null
       }
