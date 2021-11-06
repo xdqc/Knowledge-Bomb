@@ -1,12 +1,12 @@
 from flask import Flask, request, jsonify, send_from_directory
-from quiz import Quiz
+from .quiz import Quiz
 
-app = Flask(__name__, static_folder='app')
+app = Flask(__name__, static_folder='../docs')
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def root(path):
-    return send_from_directory('', 'index.html')
+    return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/language')
 def language():
@@ -25,4 +25,4 @@ def heartbeat():
     return jsonify({'status': 'healthy'})
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=80)
+    app.run(host='0.0.0.0', port=80, debug=False)

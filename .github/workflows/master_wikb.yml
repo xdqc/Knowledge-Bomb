@@ -61,3 +61,4 @@ jobs:
           app-name: 'wikb'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_DE04FBA7ED0D473ABCE80E8E7CE0B1B0 }}
+          startUpCommand: 'gunicorn --bind=0.0.0.0 --workers=4 startup:app'
