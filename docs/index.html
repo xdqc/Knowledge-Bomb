@@ -15,6 +15,12 @@
     <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
     <script src="https://unpkg.com/vue-async-computed"></script>
     <style>
+      :root {
+        --japanese-indigo: #1B4157;
+        --jelly-bean-blue: #437C9B;
+        --moonstones-blue: #71A6C1;
+        --steel-wiki-blue: #3888B6;
+      }
       body {
         background-color: whitesmoke;
         -webkit-touch-callout: none; /* iOS Safari */
@@ -24,15 +30,37 @@
       h1 {
         text-transform: capitalize;
       }
+      .bg-steel-blue {
+        background-color: var(--steel-wiki-blue);
+      }
+      .bd-steel-blue {
+        color: var(--steel-wiki-blue);
+        border-color: var(--steel-wiki-blue);
+      }
+      .bg-steel-blue-hover:hover {
+        background-color: var(--steel-wiki-blue);
+      }
       .btn-choice {
         border-radius: 0%;
-        border-color: gray;
+        border-color: var(--moonstones-blue);
         border-style: dotted;
         border-width: 1px;
         padding: 0.15rem;
         font-size: 1.5rem;
         font-family:'Segoe UI', 'Microsoft YaHei', "Hiragino Kaku Gothic Pro", 'MS PGothic', Tahoma, Geneva, Verdana, sans-serif;
         overflow-wrap: break-word;
+      }
+      .btn-secondary {
+        background-color: var(--jelly-bean-blue);
+      }
+      .btn-secondary:hover {
+        background-color: var(--japanese-indigo);
+      }
+      .btn-secondary:focus {
+        background-color: var(--japanese-indigo);
+      }
+      .btn-outline-light {
+        border-color: transparent;
       }
       a.title-link {
         color: black;
@@ -51,14 +79,13 @@
       .custom-switch {
         width: 12.25rem;
       }
+      .custom-control-input:checked~.custom-control-label::before {
+        background-color: var(--steel-wiki-blue)!important;
+      }
       @media (max-width: 576px) {
         body, html {
           padding:0;
           overflow-x: hidden;
-        }
-        .container {
-          padding:0;
-          margin:0;
         }
         .navbar-fixed-top, .navbar-fixed-bottom, .navbar-static-top {
           margin-left: 0;
@@ -68,12 +95,15 @@
         .btn-choice {
           font-size: 1.2rem;
         }
+        .mobile-w-0 {
+          max-width: 0%;
+        }
       }
     </style>
   </head>
   <body>
     <div id="app">
-      <b-jumbotron class="" :header="pageTitle" lead="　">
+      <b-jumbotron class="" :header="pageTitle" lead="　" v-show="!quizStarted">
         <b-container>
           <b-form-group
             v-if="!quizStarted"
@@ -93,41 +123,52 @@
           >
             <b-form-select v-model="qlang" :options="qlangOptions" label="qlang" class="mb-3"></b-form-select>
           </b-form-group>
-        </b-row>
-        <b-btn variant="outline-success" style="width: 100%;" :disabled="startBtnDisabled" :class="{disabled:startBtnDisabled}"
-          v-if="!quizStarted&&!!qlang&&!!alang"
-          @click="newGame">
-          💣 &gt;&gt;&gt; &nbsp; {{ startBtnTxt }} &nbsp; &lt;&lt;&lt; 💣
-        </b-btn>
-      
-        <b-btn v-b-toggle.collapse-hypernyms  class="float-right" variant="outline-light"
-          v-if="quizStarted">💣
-        </b-btn>
-        <b-collapse id="collapse-hypernyms">
-          <b-form-group label=" " v-slot="{ ariaDescribedby }">
-            <b-form-checkbox-group
-            v-model="hypernyms"
-            :options="hypernym_options"
-            :aria-describedby="ariaDescribedby"
-            switches
-            size="sm"
-            ></b-form-checkbox-group>
-            <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" @click="switchHypernymLang">🔄</b-btn>
-            <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" @click="reverseHypernymSelect">🔛</b-btn>
-          </b-form-group>
-        </b-collapse>
+          <b-row>
+            <b-col class="col-sm-5 col-md-4 p-1 mobile-w-0"></b-col>
+            <b-col class="pl-2">
+              <b-btn style="width: 100%;" :disabled="startBtnDisabled" :class="{disabled:startBtnDisabled}"
+                v-if="!quizStarted&&qlang&&alang&&qlang!==alang"
+                @click="newGame">
+                💣 &gt;&gt;&gt; &nbsp; {{ startBtnTxt }} &nbsp; &lt;&lt;&lt; 💣
+              </b-btn>
+            </b-col>
+          </b-row>
+        </b-container>
       </b-jumbotron>
-          
+      
       <b-container>
+        <b-row v-if="quizStarted">
+          <b-col class="flex">
+            <b-btn v-b-toggle.collapse-hypernyms  class="float-right" variant="outline-light"
+              >💣
+            </b-btn>
+          </b-col>
+          <b-collapse id="collapse-hypernyms">
+            <b-form-group label=" " v-slot="{ ariaDescribedby }">
+              <b-form-checkbox-group
+              v-model="hypernyms"
+              :options="hypernym_options"
+              :aria-describedby="ariaDescribedby"
+              switches
+              size="sm"
+              ></b-form-checkbox-group>
+              <b-col class="text-center">
+                <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" @click="switchHypernymLang">🔄</b-btn>
+                <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" @click="reverseHypernymSelect">🔛</b-btn>
+              </b-col>
+            </b-form-group>
+          </b-collapse>
+        </b-row>
+
         <b-row class="flex" v-if="quizStarted">
-          <b-progress class="d-inline-flex col col-9 col-sm-10 col-lg-11 p-0" max="63" height="2rem" striped :animated="progressAnimate">
-            <b-progress-bar style="animation-direction: reverse;"
+          <b-progress class="d-inline-flex col col-9 col-sm-10 col-xl-11 p-0" max="63" height="2rem" striped :animated="progressAnimate">
+            <b-progress-bar class="bg-steel-blue" style="animation-direction: reverse;"
               :value="lvl+10"
               :label="`Lv. ${lvl} (${quizPlayed})`">
             </b-progress-bar>
           </b-progress>
-          <b-col class="col-3 col-sm-2 col-lg-1">
-            <b-btn class="w-100" variant="outline-primary"  v-on:click="endGame">End</b-btn>
+          <b-col class="col-3 col-sm-2 col-xl-1 pr-0">
+            <b-btn class="w-100 bd-steel-blue bg-steel-blue-hover" variant="outline-primary"  v-on:click="endGame">End</b-btn>
           </b-col>
         </b-row>
 
@@ -138,7 +179,7 @@
               @touchstart="touchStart($event)"
               @touchend="touchEnd($event)"
               @click="toggleDisplayTitleImg"
-              :style="displayTitleImage ? `background-image: url(${titleImage});` : 'border: 1px outset;'">
+              :style="displayTitleImage ? `background-image:url(${titleImage});` : 'border-right:1px outset;box-sizing:border-box;'">
               <h2 class="display-3 my-4 mx-2">
                 <a class="title-link" target="_blank"
                   @mouseover="speakTitle"
@@ -166,7 +207,7 @@
         </div>
 
         <div v-if="showScore">
-          <b-alert variant="success" :show="showScore">Game Over ~   knowledge in {{ qLanguage }} : {{ score }}%</b-alert>
+          <b-alert variant="success" :show="showScore">Game Over ~   knowledge score : {{ score }}%</b-alert>
           <b-progress class="my-1"
             :max="quizPlayed"
             :title="Object.values(board).filter(v=>v.length>0).length +' Levels'"
@@ -229,7 +270,7 @@
           .then(() => { this.popHypernym(true) })
 
           window.addEventListener('keydown', (e) => {
-            const KEYMAP = {'7':0,'8':1,'9':2,'4':3,'5':4,'6':5,'1':6,'2':7,'3':8,'.':10}
+            const KEYMAP = {'7':0,'8':1,'9':2,'4':3,'5':4,'6':5,'1':6,'2':7,'3':8,}
             const MOVEMAP = {
               'ArrowUp': i => i-3 >= 0 ? i-3 : i-3+9,
               'ArrowDown': i => i+3 < 9 ? i+3 : i+3-9,
@@ -247,6 +288,7 @@
               }
               if (e.key == '0') this.speakTitle()
               if (e.key == '+') document.getElementsByClassName('title-link')[0].click()
+              if (e.key == '.') this.displayTitleImage = !this.displayTitleImage
             }
           })
 
@@ -268,7 +310,7 @@
             return this.qlang_options.filter(l => l.value != this.alang)
           },
           alangOptions() {
-            return this.alang_options.filter(l => l.value != this.qlang)
+            return this.alang_options//.filter(l => l.value != this.qlang)
           },
           qLanguage() {
             return this.qlang_options.find(l => l.value == this.qlang).text
@@ -335,7 +377,6 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
             // }
             // return '#'
             //END_DEBUG
-            console.log(imgUrls)
             return imgUrls.find(i=>i) || '#'
           },
           async pageTitle() {
@@ -424,6 +465,7 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
           },
 
           selectChoice: function(e, index) {
+            e.target.classList.remove('btn-secondary')
             e.target.classList.add('disabled')
             if (this.answer == index) {
               e.target.classList.add('btn-success')
@@ -434,7 +476,7 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
             let flag = 0
             setTimeout(() => {
               flag = 1
-            }, 100);
+            }, 150);
             fetch(`${window.location.origin}/next`, {
               method: 'POST',
               headers: {'Content-Type': 'application/json'},
@@ -475,6 +517,7 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
             .finally(() => {
               let interval = setInterval(() => {
                 if(flag == 1) {
+                  e.target.classList.add('btn-secondary')
                   e.target.classList.remove('btn-success')
                   e.target.classList.remove('btn-danger')
                   e.target.classList.remove('disabled')

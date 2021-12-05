@@ -10,59 +10,59 @@ conn_str = env('SQL_READ')
 class Quiz:
     conn = pyodbc.connect(conn_str)
     ladder = [ # lvl,lo_langcount,hi_langcount,num_of_items
-        (1,147,300,281),
-        (2,120,147,294),
-        (3,106,120,305),
+        (1,147,300,283),
+        (2,120,147,299),
+        (3,106,120,307),
         (4,97,106,296),
-        (5,91,97,277),
-        (6,86,91,288),
-        (7,82,86,289),
-        (8,78,82,335),
-        (9,75,78,305),
-        (10,72,75,368),
-        (11,69,72,366),
+        (5,91,97,276),
+        (6,86,91,295),
+        (7,82,86,287),
+        (8,78,82,340),
+        (9,75,78,303),
+        (10,72,75,365),
+        (11,69,72,374),
         (12,67,69,299),
-        (13,65,67,340),
-        (14,63,65,337),
-        (15,61,63,405),
-        (16,59,61,392),
-        (17,57,59,429),
-        (18,55,57,413),
-        (19,54,55,262),
-        (20,53,54,280),
-        (21,52,53,305),
-        (22,51,52,334),
-        (23,50,51,304),
-        (24,49,50,381),
+        (13,65,67,339),
+        (14,63,65,339),
+        (15,61,63,407),
+        (16,59,61,388),
+        (17,57,59,430),
+        (18,55,57,417),
+        (19,54,55,269),
+        (20,53,54,285),
+        (21,52,53,304),
+        (22,51,52,325),
+        (23,50,51,306),
+        (24,49,50,393),
         (25,48,49,383),
-        (26,47,48,377),
-        (27,46,47,422),
-        (28,45,46,440),
-        (29,44,45,459),
-        (30,43,44,460),
-        (31,42,43,537),
-        (32,41,42,543),
-        (33,40,41,617),
-        (34,39,40,571),
-        (35,38,39,646),
-        (36,37,38,757),
-        (37,36,37,730),
-        (38,35,36,798),
-        (39,34,35,872),
-        (40,33,34,937),
-        (41,32,33,928),
-        (42,31,32,1045),
-        (43,30,31,1084),
-        (44,29,30,1213),
-        (45,28,29,1245),
-        (46,27,28,1465),
-        (47,26,27,1475),
-        (48,25,26,1570),
-        (49,24,25,1754),
-        (50,23,24,1902),
-        (51,22,23,2076),
-        (52,21,22,2233),
-        (53,20,21,2425),
+        (26,47,48,379),
+        (27,46,47,425),
+        (28,45,46,437),
+        (29,44,45,460),
+        (30,43,44,468),
+        (31,42,43,549),
+        (32,41,42,529),
+        (33,40,41,613),
+        (34,39,40,580),
+        (35,38,39,657),
+        (36,37,38,738),
+        (37,36,37,737),
+        (38,35,36,807),
+        (39,34,35,869),
+        (40,33,34,941),
+        (41,32,33,936),
+        (42,31,32,1033),
+        (43,30,31,1103),
+        (44,29,30,1194),
+        (45,28,29,1281),
+        (46,27,28,1467),
+        (47,26,27,1459),
+        (48,25,26,1579),
+        (49,24,25,1768),
+        (50,23,24,1914),
+        (51,22,23,2083),
+        (52,21,22,2251),
+        (53,20,21,2461),
     ]
 
     @classmethod
@@ -238,10 +238,10 @@ class Quiz:
     def level_up(cls, lvl, board, qid):
         board[str(lvl)].append(qid)
         sample_size = len(board[str(lvl)])
-        cr,beta = cls.correct_rate(lvl, board), random.betavariate(4,4)
+        cr,beta = cls.correct_rate(lvl, board), random.betavariate(10,10)
         if cr > beta:
             if lvl == len(cls.ladder) and sample_size > cls.total_sample_size(board) * 0.0618:
-                lvl = round(random.gammavariate(len(cls.ladder), 0.5)) # rebounce back from top
+                lvl = round(random.gammavariate(len(cls.ladder), 0.2)) # rebounce back from top
             else:
                 lvl += 1
         lvl = min(lvl, len(cls.ladder))
@@ -255,11 +255,23 @@ class Quiz:
 
     @classmethod
     def calculate_score(cls, board):
+        min_rate = 1
+        avg_rate = 0
+        reached_level = 0
         score = 0
+        total = 0
         for lvlstr in board:
             lvl = int(lvlstr)
-            score += cls.correct_rate(lvl, board, final=True) * cls.level_items_count(lvl)
-        return score / sum([l[3] for l in cls.ladder]) * 100
+            rate = cls.correct_rate(lvl, board, final=True)
+            if len(board[lvlstr]) > 0:
+                min_rate = min(min_rate, rate)
+                avg_rate = (avg_rate*(lvl-1)+(min_rate*(lvl-1)+rate)/lvl) / lvl
+                score += rate * cls.level_items_count(lvl)
+                reached_level += 1
+            else:
+                score += avg_rate * cls.level_items_count(lvl) * (len(cls.ladder)-lvl+reached_level)/(len(cls.ladder)+lvl-reached_level)
+            total += cls.level_items_count(lvl)
+        return score / total * 100
 
     @classmethod
     def correct_rate(cls, lvl, board, final=False):
@@ -267,7 +279,7 @@ class Quiz:
         sample_size = len(board[str(lvl)])/1.0
         if sample_size > 0:
             level_items_count = cls.level_items_count(lvl)
-            miss_coef = math.log10((max(level_items_count-sample_size**2, 1)) / sample_size) + math.log1p(lvl)
+            miss_coef = math.log10((max(level_items_count-sample_size**3, 1)) / (sample_size+1)) + math.log1p(lvl)
             if final:
                 miss_coef = max(miss_coef * lvl / len(cls.ladder)**2, 0)
             correct_count = len([k for k in board[str(lvl)] if k > 0])
