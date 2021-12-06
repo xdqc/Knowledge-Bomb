@@ -82,6 +82,21 @@
       .custom-control-input:checked~.custom-control-label::before {
         background-color: var(--steel-wiki-blue)!important;
       }
+      .dropdown-lang .dropdown-menu {
+        position: fixed!important;
+        transform: translate(-50%, -30%)!important;
+        left: 50%!important;
+        top: 30%!important;
+        width: 100%;
+        height: 700px;
+        border: none;
+        background-color: white;
+      }
+      .dropdown-lang button {
+        position: absolute;
+        white-space: nowrap;
+        color: var(--japanese-indigo);
+      }
       @media (max-width: 576px) {
         body, html {
           padding:0;
@@ -112,7 +127,17 @@
             label-cols-md="4"
             :label="labelAnswer"
           >
-            <b-form-select v-model="alang" :options="alangOptions" label="alang"></b-form-select>
+            <div style="display: flex;">
+              <b-dropdown v-show="windowWidth>1300" variant="outline-light" class="dropdown-lang float-right" text="🗺" no-caret>
+                <b-btn v-for="(l,i) in leximap" :key="i" 
+                  class="btn-dropdown-lang" variant="outline-light" :size="i>0?'sm':''" 
+                  :style="`top:${l.coord_y-100}px;left:${l.coord_x+windowWidth/2-760}px;`"
+                  @click="onClickLeximapBtnAlang($event, l)">
+                  {{l.text}}
+                </b-btn>
+              </b-dropdown>
+              <b-form-select v-model="alang" :options="alangOptions" label="alang" class="float-left"></b-form-select>
+            </div>
           </b-form-group>
           <b-form-group
             v-if="!quizStarted"
@@ -121,7 +146,17 @@
             label-cols-md="4"
             :label="labelQuestion"
           >
-            <b-form-select v-model="qlang" :options="qlangOptions" label="qlang" class="mb-3"></b-form-select>
+            <div style="display: flex;">
+              <b-dropdown v-show="windowWidth>1300" variant="outline-light" class="dropdown-lang float-right" text="🗺" no-caret>
+                <b-btn v-for="(l,i) in leximap" :key="i" 
+                  class="btn-dropdown-lang" variant="outline-light" :size="i>0?'sm':''" 
+                  :style="`top:${l.coord_y-100}px;left:${l.coord_x+windowWidth/2-760}px;color:${l.value==alang?'var(--moonstones-blue)':'var(--japanese-indigo)'};`"
+                  @click="onClickLeximapBtnQlang($event, l)">
+                  {{l.text}}
+                </b-btn>
+              </b-dropdown>
+              <b-form-select v-model="qlang" :options="qlangOptions" label="qlang" class="float-left"></b-form-select>
+            </div>
           </b-form-group>
           <b-row>
             <b-col class="col-sm-5 col-md-4 p-1 mobile-w-0"></b-col>
@@ -129,7 +164,7 @@
               <b-btn style="width: 100%;" :disabled="startBtnDisabled" :class="{disabled:startBtnDisabled}"
                 v-if="!quizStarted&&qlang&&alang&&qlang!==alang"
                 @click="newGame">
-                💣 &gt;&gt;&gt; &nbsp; {{ startBtnTxt }} &nbsp; &lt;&lt;&lt; 💣
+                 &gt;&gt;&gt; &nbsp; {{ startBtnTxt }} &nbsp; &lt;&lt;&lt; 
               </b-btn>
             </b-col>
           </b-row>
@@ -139,9 +174,7 @@
       <b-container>
         <b-row v-if="quizStarted">
           <b-col class="flex">
-            <b-btn v-b-toggle.collapse-hypernyms  class="float-right" variant="outline-light"
-              >💣
-            </b-btn>
+            <b-btn v-b-toggle.collapse-hypernyms  class="float-right" variant="outline-light">💣</b-btn>
           </b-col>
           <b-collapse id="collapse-hypernyms">
             <b-form-group label=" " v-slot="{ ariaDescribedby }">
@@ -239,6 +272,7 @@
           alang: '',
           qlang_options: [{ value: '', text: '(Question Language)' }],
           alang_options: [{ value: '', text: '(Answers Language)' }],
+          leximap: [],
           q_title: '',
           q_id: 0,
           lvl: 1,
@@ -257,7 +291,7 @@
           hypernym_index: 1,
         },
         mounted: function() {
-          //populate language optios
+          //populate language options
           fetch(`${window.location.origin}/language`)
           .then(resp => resp.json())
           .then(data => {
@@ -266,6 +300,13 @@
             let langs = [...window.navigator.languages.reduce((s,a)=>{s.add(a.slice(0,2));return s},new Set())]
             this.alang = langs[0] ? langs[0] : ''
             this.qlang = langs[1] ? langs[1] : ''
+            // populate language lexical map selector
+            this.leximap = data.filter(d => d.coord_x > 0).map(d=>({
+              value: d.value,
+              text: d.text,
+              coord_x: d.coord_x,
+              coord_y: d.coord_y,
+            }))
           })
           .then(() => { this.popHypernym(true) })
 
@@ -310,7 +351,8 @@
             return this.qlang_options.filter(l => l.value != this.alang)
           },
           alangOptions() {
-            return this.alang_options//.filter(l => l.value != this.qlang)
+            console.log(this.alang_options.filter(o=>o.coord_x>0))
+            return this.alang_options
           },
           qLanguage() {
             return this.qlang_options.find(l => l.value == this.qlang).text
@@ -608,7 +650,16 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
 
           toggleDisplayTitleImg: function() {
             this.displayTitleImage = !this.displayTitleImage
-          }
+          },
+
+          onClickLeximapBtnAlang: function(e, lexi, setLang) {
+            this.alang = lexi.value
+            e.target.parentElement.previousSibling.click()
+          },
+          onClickLeximapBtnQlang: function(e, lexi, setLang) {
+            this.qlang = lexi.value
+            e.target.parentElement.previousSibling.click()
+          },
         }
       })
     </script>

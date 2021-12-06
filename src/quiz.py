@@ -67,13 +67,15 @@ class Quiz:
 
     @classmethod
     def get_languages(cls):
-        sqlstr = 'SELECT code,name_local,label_question,label_answer FROM wiki.language'
+        sqlstr = 'SELECT code,name_local,label_question,label_answer,coord_x,coord_y FROM wiki.language'
         cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
         res = []
         for lang in cursor.execute(sqlstr):
-              res.append({'value':lang[0], 'text':lang[1], 'label_q':lang[2], 'label_a':lang[3]})
-        return res[:201]
+            res.append({'value':lang[0], 'text':lang[1], 
+                'label_q':lang[2], 'label_a':lang[3],
+                'coord_x':lang[4], 'coord_y':lang[5]})
+        return res[:301]
 
     @classmethod
     def get_hypernyms(cls, qlang, alang):
