@@ -67,7 +67,7 @@ class Quiz:
 
     @classmethod
     def get_languages(cls):
-        sqlstr = 'SELECT code,name_local,label_question,label_answer,coord_x,coord_y FROM wiki.language'
+        sqlstr = 'SELECT TOP(300) code,name_local,label_question,label_answer,coord_x,coord_y FROM wiki.language ORDER BY [rank]'
         cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
         res = []
@@ -75,15 +75,33 @@ class Quiz:
             res.append({'value':lang[0], 'text':lang[1], 
                 'label_q':lang[2], 'label_a':lang[3],
                 'coord_x':lang[4], 'coord_y':lang[5]})
-        return res[:301]
+        return res
+
+    @classmethod
+    def get_language_names(cls, lang):
+        sqlstr = f"""DECLARE @langfix AS nvarchar(max)
+            = (SELECT TOP(1) langfix FROM wiki.language WHERE code = '{lang}')
+        SELECT code, TRIM(REPLACE(REPLACE(COALESCE(a.title, l.name), @langfix, ''), '()', '')) as title,
+            CASE WHEN title IS NULL THEN NULL ELSE coord_x END, 
+            CASE WHEN title IS NULL THEN NULL ELSE coord_y END
+        FROM wiki.language l
+        OUTER APPLY (
+            SELECT item,title FROM wiki.article a
+            WHERE a.item = l.item 
+            AND a.language = '{lang}'
+        ) a
+        ORDER BY CASE WHEN a.title IS NULL THEN 1 ELSE 0 END, title, l.name"""
+        cursor = cls.conn.cursor()
+        res = []
+        for lang in cursor.execute(sqlstr):
+            res.append({'value':lang[0], 'text':lang[1][:1].upper()+lang[1][1:], 
+                'coord_x':lang[2], 'coord_y':lang[3]})
+        return res
 
     @classmethod
     def get_hypernyms(cls, qlang, alang):
         sqlstr = f"""SELECT  DISTINCT 
-            hypernym
-            ,e.title
-            ,q.title
-            ,a.title
+            hypernym ,e.title ,a.title ,q.title
         FROM [wiki].[item] i
         OUTER APPLY (
             SELECT title FROM wiki.article
@@ -91,12 +109,12 @@ class Quiz:
         ) e
         OUTER APPLY (
             SELECT title FROM wiki.article
-            WHERE language = '{qlang}' AND item = i.hypernym
-        ) q
-        OUTER APPLY (
-            SELECT title FROM wiki.article
             WHERE language = '{alang}' AND item = i.hypernym
         ) a
+        OUTER APPLY (
+            SELECT title FROM wiki.article
+            WHERE language = '{qlang}' AND item = i.hypernym
+        ) q
         ORDER BY e.title"""
         cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
@@ -113,27 +131,22 @@ class Quiz:
         if len(played_correct) == 0:
               played_correct.extend([0])
         sqlstr = f"""
-            SELECT TOP(1) i.[id]
-            ,q.title
-            ,a.title
-            ,a.title_latin
-            FROM (
+        SELECT TOP(1) i.[id] ,q.title ,a.title ,a.title_latin
+        FROM (
             SELECT [id]
             FROM [wiki].[item]
             WHERE lang_count >= {level[1]}
                 AND lang_count <  {level[2]}
                 AND id NOT IN ({','.join([str(i) for i in played_correct])})
                 {('AND hypernym IN('+ ",".join([str(h) for h in hypernym if h])+')') if hypernym else 'AND hypernym is NULL'}
-            ) i
-            CROSS APPLY (
+        ) i
+        CROSS APPLY (
             SELECT item, title FROM wiki.article
-            WHERE language = '{qlang}' AND item = i.id
-            ) q
-            CROSS APPLY (
+            WHERE language = '{qlang}' AND item = i.id) q
+        CROSS APPLY (
             SELECT item, title, title_latin FROM wiki.article 
-            WHERE language = '{alang}' AND item = i.id
-            ) a
-            ORDER BY CHECKSUM(NEWID())
+            WHERE language = '{alang}' AND item = i.id) a
+        ORDER BY CHECKSUM(NEWID())
         """
         cursor = None
         while cursor is None:
@@ -149,29 +162,22 @@ class Quiz:
     def get_similar_titles(cls, item, a_title_latin, alang):
         num = 9
         sqlstr = f"""
-        SELECT title, r FROM
-        (
-          SELECT title, r FROM
-          (
+        SELECT title, r FROM (
+          SELECT title, r FROM (
             SELECT TOP ({num}) 
-              title, 
-              ABS(item - {item}) * 0.001 * (ABS(CHECKSUM(NewId())) % 127 + 1) r
+              title, ABS(item - {item}) * 0.001 * (ABS(CHECKSUM(NewId())) % 127 + 1) r
             FROM wiki.article
             WHERE language = '{alang}'
               AND (soundexo = SOUNDEX('{a_title_latin}') AND soundexo <> '0000')
-            ORDER BY r
-          ) a
+            ORDER BY r) a
           UNION
-          SELECT title, r FROM
-          (
+          SELECT title, r FROM (
             SELECT TOP ({num}) 
-              title, 
-              ABS(item - {item}) * 0.01 * (ABS(CHECKSUM(NewId())) % 127 + 1) r
+              title, ABS(item - {item}) * 0.01 * (ABS(CHECKSUM(NewId())) % 127 + 1) r
             FROM wiki.article
             WHERE language = '{alang}'
               AND (soundexr = SOUNDEX(REVERSE('{a_title_latin}')) )
-            ORDER BY r
-          ) b 
+            ORDER BY r) b 
         ) u
         ORDER BY r
         """
@@ -182,14 +188,11 @@ class Quiz:
             if r[0] not in result: # order should be preserved and no duplicate
                 result.append(r[0])
         if len(result) < num:
-            sqlstr = f"""
-            SELECT
-              title
+            sqlstr = f""" SELECT title
             FROM wiki.article
             WHERE language = '{alang}'
             ORDER BY ABS(item - {item}) * 0.0001 * (ABS(CHECKSUM(NewId())) % 127 + 1)
-            OFFSET (1) ROWS FETCH NEXT ({num}) ROWS ONLY
-            """
+            OFFSET (1) ROWS FETCH NEXT ({num}) ROWS ONLY """
             cursor.execute(sqlstr)
             result.extend([r[0] for r in cursor.fetchall() if r[0] not in result])
         return result[:num]

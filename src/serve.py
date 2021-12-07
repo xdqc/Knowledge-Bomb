@@ -12,9 +12,13 @@ def root(path):
     return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/language')
-@limiter.limit('1/second', error_message='chill, knowledge bomber!')
+@limiter.limit('2/second', error_message='chill, knowledge bomber!')
 def language():
-    return jsonify(Quiz.get_languages())
+    lang = request.args.get('lang')
+    if lang:
+        return jsonify(Quiz.get_language_names(lang))
+    else:
+        return jsonify(Quiz.get_languages())
 
 @app.route('/hypernym')
 @limiter.limit('1/second', error_message='chill, knowledge bomber!')

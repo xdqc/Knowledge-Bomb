@@ -84,18 +84,41 @@
       }
       .dropdown-lang .dropdown-menu {
         position: fixed!important;
-        transform: translate(-50%, -30%)!important;
-        left: 50%!important;
-        top: 30%!important;
-        width: 100%;
-        height: 700px;
+        transform: translate(0%, 0%)!important;
+        left: 1%!important;
+        top: 5%!important;
+        width: 98%;
+        min-height: 90%;
+        max-height: 700px;
         border: none;
-        background-color: white;
+        overflow: auto;
+        z-index: 10000;
       }
       .dropdown-lang button {
         position: absolute;
         white-space: nowrap;
         color: var(--japanese-indigo);
+      }
+      .dropdown-lang button:hover {
+        z-index: 100;
+      }
+      .group-hypernyms {
+        column-count: 5;
+      }        
+      @media (max-width: 1200px) {
+        .group-hypernyms {
+          column-count: 4;
+        }
+      }
+      @media (max-width: 992px) {
+        .group-hypernyms {
+          column-count: 3;
+        }
+      }
+      @media (max-width: 768px) {
+        .group-hypernyms {
+          column-count: 2;
+        }
       }
       @media (max-width: 576px) {
         body, html {
@@ -118,7 +141,7 @@
   </head>
   <body>
     <div id="app">
-      <b-jumbotron class="" :header="pageTitle" lead="　" v-show="!quizStarted">
+      <b-jumbotron class="" :header="pageTitle" :lead="headerLead" v-show="!quizStarted">
         <b-container>
           <b-form-group
             v-if="!quizStarted"
@@ -128,15 +151,15 @@
             :label="labelAnswer"
           >
             <div style="display: flex;">
-              <b-dropdown v-show="windowWidth>1300" variant="outline-light" class="dropdown-lang float-right" text="🗺" no-caret>
-                <b-btn v-for="(l,i) in leximap" :key="i" 
+              <b-form-select v-model="alang" :options="alangOptions" label="alang"></b-form-select>
+              <b-dropdown variant="outline-light" class="dropdown-lang" text="🗺" no-caret>
+                <b-btn v-for="(l,i) in aLeximap" :key="i" 
                   class="btn-dropdown-lang" variant="outline-light" :size="i>0?'sm':''" 
-                  :style="`top:${l.coord_y-100}px;left:${l.coord_x+windowWidth/2-760}px;`"
+                  :style="`top:${l.coord_y-120}px;left:${l.coord_x*Math.max(1,windowWidth/1440)-100}px;`"
                   @click="onClickLeximapBtnAlang($event, l)">
                   {{l.text}}
                 </b-btn>
               </b-dropdown>
-              <b-form-select v-model="alang" :options="alangOptions" label="alang" class="float-left"></b-form-select>
             </div>
           </b-form-group>
           <b-form-group
@@ -147,15 +170,15 @@
             :label="labelQuestion"
           >
             <div style="display: flex;">
-              <b-dropdown v-show="windowWidth>1300" variant="outline-light" class="dropdown-lang float-right" text="🗺" no-caret>
-                <b-btn v-for="(l,i) in leximap" :key="i" 
-                  class="btn-dropdown-lang" variant="outline-light" :size="i>0?'sm':''" 
-                  :style="`top:${l.coord_y-100}px;left:${l.coord_x+windowWidth/2-760}px;color:${l.value==alang?'var(--moonstones-blue)':'var(--japanese-indigo)'};`"
+              <b-form-select v-model="qlang" :options="qlangOptions" label="qlang" class=""></b-form-select>
+              <b-dropdown variant="outline-light" class="dropdown-lang" text="🗺" no-caret>
+                <b-btn v-for="(l,i) in qLeximap" :key="i" 
+                  class="btn-dropdown-lang" variant="outline-light" size="sm"
+                  :style="`top:${l.coord_y-120}px;left:${l.coord_x*Math.max(1,windowWidth/1440)-100}px;color:${l.value==alang?'var(--blue)':'var(--japanese-indigo)'};`"
                   @click="onClickLeximapBtnQlang($event, l)">
                   {{l.text}}
                 </b-btn>
               </b-dropdown>
-              <b-form-select v-model="qlang" :options="qlangOptions" label="qlang" class="float-left"></b-form-select>
             </div>
           </b-form-group>
           <b-row>
@@ -173,17 +196,13 @@
       
       <b-container>
         <b-row v-if="quizStarted">
-          <b-col class="flex">
-            <b-btn v-b-toggle.collapse-hypernyms  class="float-right" variant="outline-light">💣</b-btn>
-          </b-col>
           <b-collapse id="collapse-hypernyms">
             <b-form-group label=" " v-slot="{ ariaDescribedby }">
-              <b-form-checkbox-group
+              <b-form-checkbox-group class="group-hypernyms mt-4"
               v-model="hypernyms"
               :options="hypernym_options"
               :aria-describedby="ariaDescribedby"
-              switches
-              size="sm"
+              stacked switches size="sm"
               ></b-form-checkbox-group>
               <b-col class="text-center">
                 <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" @click="switchHypernymLang">🔄</b-btn>
@@ -191,6 +210,9 @@
               </b-col>
             </b-form-group>
           </b-collapse>
+          <b-col class="flex">
+            <b-btn v-b-toggle.collapse-hypernyms  class="float-right" variant="outline-light">💣</b-btn>
+          </b-col>
         </b-row>
 
         <b-row class="flex" v-if="quizStarted">
@@ -262,7 +284,6 @@
       </b-container>
     </div>
 
-    <!-- Start running your app -->
     <script>
       window.app = new Vue({
         el: '#app',
@@ -272,7 +293,8 @@
           alang: '',
           qlang_options: [{ value: '', text: '(Question Language)' }],
           alang_options: [{ value: '', text: '(Answers Language)' }],
-          leximap: [],
+          aLeximap: [],
+          qLeximap: [],
           q_title: '',
           q_id: 0,
           lvl: 1,
@@ -295,13 +317,12 @@
           fetch(`${window.location.origin}/language`)
           .then(resp => resp.json())
           .then(data => {
-            this.qlang_options = data
             this.alang_options = data
-            let langs = [...window.navigator.languages.reduce((s,a)=>{s.add(a.slice(0,2));return s},new Set())]
-            this.alang = langs[0] ? langs[0] : ''
-            this.qlang = langs[1] ? langs[1] : ''
+            let browserLangs = [...window.navigator.languages.reduce((s,a)=>{s.add(a.slice(0,2));return s},new Set())]
+            this.alang = browserLangs[0] ? browserLangs[0] : ''
+            this.qlang = browserLangs[1] ? browserLangs[1] : ''
             // populate language lexical map selector
-            this.leximap = data.filter(d => d.coord_x > 0).map(d=>({
+            this.aLeximap = data.filter(d => d.coord_x > 0).map(d=>({
               value: d.value,
               text: d.text,
               coord_x: d.coord_x,
@@ -351,14 +372,10 @@
             return this.qlang_options.filter(l => l.value != this.alang)
           },
           alangOptions() {
-            console.log(this.alang_options.filter(o=>o.coord_x>0))
             return this.alang_options
           },
-          qLanguage() {
-            return this.qlang_options.find(l => l.value == this.qlang).text
-          },
           labelQuestion() {
-            return this.qlang_options.find(l => l.value == this.alang).label_q || this.qlang_options[0].label_q
+            return this.alang_options.find(l => l.value == this.alang).label_q || this.alang_options[0].label_q
           },
           labelAnswer() {
             return this.alang_options.find(l => l.value == this.alang).label_a || this.alang_options[0].label_a
@@ -421,6 +438,13 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
             //END_DEBUG
             return imgUrls.find(i=>i) || '#'
           },
+          async qLeximap() {
+            if (!this.alang) return
+            const resp = await fetch(`${window.location.origin}/language?lang=${this.alang}`)
+            const data = await resp.json()
+            this.qlang_options = data
+            return data.filter(l => l.coord_x > 0)
+          },
           async pageTitle() {
             const title = 'Knowledge bomb'
             const resp = await fetch("https://translate.api.skitzen.com/translate", {
@@ -448,6 +472,21 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
               headers: { "Content-Type": "application/json" }
             })
             return ((await resp.json()).translatedText || txt).toUpperCase()
+          },
+          async headerLead() {
+            if (this.score < 0) return '　'
+            const txt = 'every language itself is also a Wikidata item'
+            const resp = await fetch("https://translate.api.skitzen.com/translate", {
+              method: "POST",
+              body: JSON.stringify({
+                q: txt,
+                source: "en",
+                target: this.alang,
+                format: "text"
+              }),
+              headers: { "Content-Type": "application/json" }
+            })
+            return ((await resp.json()).translatedText || txt)
           },
         },
         methods: {
@@ -633,14 +672,17 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
                   texts: h.texts,
                   text: h.texts[this.hypernym_index]
                 }))
-              if (onMount) this.hypernyms = data.map(h=>h.value)
+                .sort((h1,h2) => h1.text.localeCompare(h2.text, this.alang))
+              if (onMount) {
+                // by default fill-in all hypernyms, excluding language==315
+                this.hypernyms = data.filter(h=>h.value!==315).map(h=>h.value)
+              }
             })
           },
           switchHypernymLang: function() {
             this.hypernym_index = (this.hypernym_index+1)%3
-            this.hypernym_options
-                // .filter(h => h.texts[this.hypernym_index])
-                .forEach(h => h.text=h.texts[this.hypernym_index])
+            this.hypernym_options.forEach(h => h.text=h.texts[this.hypernym_index])
+            this.hypernym_options.sort((h1,h2) => h1.text.localeCompare(h2.text, (this.hypernym_index==2?this.qlang:this.alang)))
           },
           reverseHypernymSelect: function() {
             this.hypernyms = this.hypernym_options
