@@ -3,11 +3,10 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from .quiz import Quiz
 
-app = Flask(__name__, static_folder='../docs')
+app = Flask(__name__, static_folder='../www')
 limiter = Limiter(app, key_func=get_remote_address)
 
 @app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
 def root(path):
     return send_from_directory(app.static_folder, 'index.html')
 

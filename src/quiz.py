@@ -91,6 +91,7 @@ class Quiz:
             AND a.language = '{lang}'
         ) a
         ORDER BY CASE WHEN a.title IS NULL THEN 1 ELSE 0 END, title, l.name"""
+        cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
         res = []
         for lang in cursor.execute(sqlstr):
