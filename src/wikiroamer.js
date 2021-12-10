@@ -1,4 +1,4 @@
-// ==UserScript==
+// ==UserScript==K
 // @name         wikipedia random page filter
 // @namespace    http://tampermonkey.net/
 // @version      0.1
@@ -20,7 +20,7 @@
     const langCount = document.querySelectorAll('li.interlanguage-link').length + 1;
     const isDisputed = !!document.querySelector('table.box-Disputed');
     if (langCount < 20 ||
-        document.querySelector('table.biography, table.geography, table.biota, table.vevent, table.ib-settlement, table.ib-country, ib-former-subdiv, table.sidebar-games-events') ||
+        document.querySelector('table.biography, table.geography, table.biota, table.vevent, table.ib-settlement, table.ib-country, table.ib-former-subdiv, table.sidebar-games-events') ||
         document.querySelector('span#coordinates') ||
         isDisputed
     ) {
@@ -49,14 +49,14 @@
                                   'Cartridge', 'Transmission', 'Current champions', 'Last champions', 'Connector types', 'Shutter', 'Ballistic performance', 'Wingspan', 'Track gauge', 'Gauge',
                                   'Confluence', 'List of years in literature', 'Dissolution', 'Deposition', 'Commanders', 'Commander', 'Tributaries', 'Beginning coordinates', 'Home arena',
                                   'Merger of', 'Composers', 'Directed by', 'Abolished', 'Races', 'Administration', 'Performance', 'Final ruler', 'Year of creation', 'National origin',
-                                  'Publication', 'FIFA affiliation', 'Media type', 'Motives', 'Government',
+                                  'Publication', 'FIFA affiliation', 'Media type', 'Motives', 'Government', 'Distributor(s)', 'Matches played', 'Leading companies', 'Country', 'Stations',
                                   'unicode', 'Unicode codepoint', 'Hexadecimal', 'Penumbral', 'Phonetic usage', 'transliteration', 'Pronunciations', 'The Cyrillic script']);
                                   //'Produced', 'Used by', 'Specifications', 'Manufacturer', 'Capacity',
                                   //'Preceded by', 'Followed by', 'Founder', 'Founded', 'Formation', 'Abolition', 'Inaugurated',
         const tocStop = ['Medal table', 'Medal summary', 'Qualified teams', 'Group A', 'Group 1', 'Division I', 'Matches', 'The match', 'Squads', 'Winners and nominees', 'Fixtures and results',
                          'Semi-finals', 'Championship', 'Match conditions', 'World Group',
-                         'Life',
-                         'Holidays and observances', 'Neighbourhoods', 'Personal life', 'Life and work', 'Early life', 'Later life', 'Biography'];
+                         'Life', 'Personal life', 'Life and work', 'Early life', 'Later life', 'Biography and work', 'Biography', 'Bibliography',
+                         'Holidays and observances', 'Neighbourhoods', ];
         const cateStop = ['Disambiguation pages',
                           'Temporary maintenance holdings',
                           'All stub articles',
@@ -83,6 +83,7 @@
                           'Byzantine historians', 'German poets', 'Sanskrit poets', 'Ancient women rulers', 'Praetorian prefects', 'Historically recognized angiosperm genera', 'Historically recognized plant genera',
                           'Ancient Ephesians', 'Ancient Milesians', 'Georgian letters', 'Winter Paralympic Games', 'Association football governing bodies', 'Generals of Alexander the Great',
                           'Hellenistic-era historians', 'Scheduled association football competitions', 'Summer Paralympic Games', 'Forbes lists', 'Unidentified astronomical objects',
+                          'Halloween television specials', '2010 deaths', '2021 deaths', 'International professional associations', 'Gothic painters', 'Byzantine painters',
                           'Military trucks', 'Golden Globe Awards', 'European youth orchestras', 'Aphorists'];
                        // 'Domain name stubs', 'Flag stubs', 'Greek mythology stubs', 'Explorer stubs', 'Plant stubs', 'Russia river stubs', 'Greek sportspeople stubs', 'Africa river stubs', 'European royalty stubs', 'Pelagonia Region geography stubs', 'Byzantine people stubs', 'Ancient Roman people stubs', 'Theatrical people stubs', 'Philosopher stubs', 'Greek deity stubs', 'Solomon Islands geography stubs',
         const titleStop = ['Wikipedia:', 'Category:', 'Module:', 'Help:', 'Portal:','Template:',

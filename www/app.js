@@ -1,6 +1,9 @@
 new Vue({
   el: '#app',
   data: {
+    quoteLang: '',
+    quoteQuote: '',
+    quoteTitle: '',
     qlang: '',
     alang: '',
     qlang_options: [{ value: '', text: '(Question Language)' }],
@@ -10,6 +13,7 @@ new Vue({
     q_title: '',
     q_title_en: '',
     q_id: 0,
+    q_hypernym: 0,
     lvl: 1,
     board: {},
     choices: [],
@@ -105,6 +109,12 @@ new Vue({
     },
     quizCorrect() {
       return Object.values(this.board).reduce((s,v) => s+v.filter(u=>u>0).length, 0)
+    },
+    qHypernymTexts() {
+      // hypernym_option.texts {[0]:English, [1]:<Answer Language>}
+      const hypernym = this.hypernym_options.find(h=>h.value===this.q_hypernym)
+      if (hypernym) return hypernym.texts
+      else return [null,null,null]
     },
     choiceHeight() {
       this.windowWidth
@@ -220,6 +230,7 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
       .then(data => {
         this.lvl = data.lvl
         this.q_id = data.q_id
+        this.q_hypernym = data.q_hypernym
         this.q_title = data.q_title
         this.q_title_en = data.q_title_en
         this.choices = data.choices
@@ -290,6 +301,7 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
           let interval = setInterval(() => {
             if(flag == 1) {
               this.q_id = data.q_id
+              this.q_hypernym = data.q_hypernym
               this.q_title = data.q_title
               this.q_title_en = data.q_title_en
               this.choices = data.choices
@@ -297,8 +309,12 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
               setTimeout(() => {
                 window.scrollTo(0,document.body.scrollHeight)
                 // Update wikiquote foreach question
-                const en_hypernym = this.hypernym_options.find(h=>h.value===data.q_hypernym).texts[0]
-                this.fetchLeadQuote([].concat(data.q_title_en, en_hypernym))
+                this.fetchLeadQuote([
+                  this.choices[this.answer], 
+                  this.qHypernymTexts[1], 
+                  this.q_title_en, 
+                  this.qHypernymTexts[0]
+                ])
               }, 0);
               clearInterval(interval)
             }
@@ -332,7 +348,10 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
     gameOver: function (score) {
       this.score = score
       this.choices = []
+      this.q_id = 0
       this.q_title = ''
+      this.q_title_en = ''
+      this.q_hypernym = ''
       document.getElementsByClassName('jumbotron')[0].classList.remove('py-0', 'mb-0')
       document.getElementsByClassName('wikiquote')[0].classList.add('justify-content-center')
 
@@ -367,10 +386,7 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
     speakTitle: function (e,i) {
       let text = i >=0 ? this.choices[i] : this.q_title
       let lang = i >=0 ? this.alang : this.qlang
-      let langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == lang)
-      if (langVoices.length == 0) {
-        langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == 'en')
-      }
+      let langVoices = this.getSpeechSynthesisVoices(lang)
       let sp = new SpeechSynthesisUtterance(text)
       sp.voice = langVoices[Math.floor(Math.random()*langVoices.length)]
       speechSynthesis.cancel()
@@ -436,15 +452,18 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
 
     /** Wikiquote START */
     fetchLeadQuote: function (topics, isMatch) {
-      let quoteLang = topics && topics.length > 0 ? 'en' : this.alang
+      if (!!topics) topics = topics.filter(t => !!t).map(t => t.replace(/\(/m, '|').replace(/\)/m, ''))
+      // onclick for match, use existing quoteLang
+      let quoteLang = isMatch ? this.quoteLang : this.alang
       let depth = 0
-      const resolve = (q, depth) => {
+      const resolve = (q) => {
         depth++
         if (!q.quote) {
           Wikiquote(quoteLang).getRandomQuote((depth<10?topics:[]), resolve, error)
         } else {
-          document.getElementById('quote-quote').innerHTML = q.quote
-          document.getElementById('quote-title').innerHTML = '—— '+q.titles
+          this.quoteLang = quoteLang
+          this.quoteQuote = this.stripHtml(q.quote)
+          this.quoteTitle = '—— '+q.titles
         }
       }
       const error = (err) => {
@@ -462,17 +481,35 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
           // }[this.alang] ||
            'en'
         }
-        Wikiquote(quoteLang).getRandomQuote([], resolve, error)
+        if ((err.code == 'queryGeneratorLinksNoAlang' || err.code == 'queryGeneratorLinksNoResultAlang') && this.alang != 'en') {
+          Wikiquote(quoteLang).getRandomQuote(topics, resolve, error)
+        } else {
+          Wikiquote(quoteLang).getRandomQuote([], resolve, error)
+        }
       }
       Wikiquote(quoteLang).getRandomQuote(topics, resolve, error, isMatch)
     },
     speakQuote: function(e) {
-      let langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == 'en')
-      let sp = new SpeechSynthesisUtterance(e.target.innerText)
+      const sp = new SpeechSynthesisUtterance(e.target.innerText)
+      const langVoices = this.getSpeechSynthesisVoices(this.quoteLang)
       sp.voice = langVoices[Math.floor(Math.random()*langVoices.length)]
       speechSynthesis.cancel()
       speechSynthesis.speak(sp)
     },
+    getSpeechSynthesisVoices: function(lang) {
+      let langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == lang)
+      if (langVoices.length == 0) {
+        langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == 'en')
+      }
+      return langVoices
+    },
+    stripHtml: function(html)
+    {
+      let tmp = document.createElement("div");
+      tmp.innerHTML = html;
+      return tmp.textContent || tmp.innerText || "";
+    }
+
     /** Wikiquote END */
   },
 })
