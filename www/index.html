@@ -17,10 +17,17 @@
   </head>
   <body>
     <div id="app">
-      <b-jumbotron class="" :header="pageTitle" :lead="headerLead" v-show="!quizStarted">
+      <b-jumbotron class="" :header="pageTitle" lead="">
         <b-container>
+          <b-row class="wikiquote justify-content-center mt-2">
+            <b-col class="flex col-sm-10 col-md-9 col-lg-8 col-xl-7" @click="fetchLeadQuote([q_title_en],true)">
+              <p @mouseover="speakQuote" id="quote-quote"></p>
+              <p class="float-right" id="quote-title"></p>
+            </b-col>
+          </b-row>
+
           <b-form-group
-            v-if="!quizStarted"
+            v-show="!quizStarted"
             horizontal
             label-cols-sm="5"
             label-cols-md="4"
@@ -39,7 +46,7 @@
             </div>
           </b-form-group>
           <b-form-group
-            v-if="!quizStarted"
+            v-show="!quizStarted"
             horizontal
             label-cols-sm="5"
             label-cols-md="4"
@@ -57,11 +64,11 @@
               </b-dropdown>
             </div>
           </b-form-group>
-          <b-row>
+          <b-row v-if="!quizStarted&&qlang&&alang&&qlang!==alang">
             <b-col class="col-sm-5 col-md-4 p-1 mobile-w-0"></b-col>
             <b-col class="pl-2">
-              <b-btn style="width: 100%;" :disabled="startBtnDisabled" :class="{disabled:startBtnDisabled}"
-                v-if="!quizStarted&&qlang&&alang&&qlang!==alang"
+              <b-btn style="width: 100%;" :disabled="startBtnDisabled" 
+                :class="{disabled:startBtnDisabled}"
                 @click="newGame">
                  &gt;&gt;&gt; &nbsp; {{ startBtnTxt }} &nbsp; &lt;&lt;&lt; 
               </b-btn>
@@ -159,6 +166,8 @@
         </div>
       </b-container>
     </div>
-    <script src="./www/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript" src="./www/wikiquote.js"></script>
+    <script type="text/javascript" src="./www/app.js"></script>
   </body>
 </html>

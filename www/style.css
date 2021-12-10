@@ -84,6 +84,13 @@ a.title-link {
 .dropdown-lang button:hover {
   z-index: 100;
 }
+#quote-quote {
+  font-style: italic;
+  margin-bottom: 0;
+}
+#quote-title {
+  font-style: oblique;
+}
 .group-hypernyms {
   column-count: 5;
 }        

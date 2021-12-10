@@ -132,9 +132,9 @@ class Quiz:
         if len(played_correct) == 0:
               played_correct.extend([0])
         sqlstr = f"""
-        SELECT TOP(1) i.[id] ,q.title ,a.title ,a.title_latin
+        SELECT TOP(1) i.[id], i.hypernym, q.title, q_en.title, a.title ,a.title_latin
         FROM (
-            SELECT [id]
+            SELECT [id], hypernym
             FROM [wiki].[item]
             WHERE lang_count >= {level[1]}
                 AND lang_count <  {level[2]}
@@ -144,6 +144,9 @@ class Quiz:
         CROSS APPLY (
             SELECT item, title FROM wiki.article
             WHERE language = '{qlang}' AND item = i.id) q
+        CROSS APPLY (
+            SELECT item, title FROM wiki.article
+            WHERE language = 'en' AND item = i.id) q_en
         CROSS APPLY (
             SELECT item, title, title_latin FROM wiki.article 
             WHERE language = '{alang}' AND item = i.id) a
@@ -208,15 +211,17 @@ class Quiz:
                 return cls.final_score(board)
             return cls.run_level(1 if lvl == len(cls.ladder) else lvl+1, board, qlang, alang, hypernym, recurr)
         
-        id,q_title,a_title,a_title_latin = level
+        q_id,q_hypernym,q_title,q_title_en,a_title,a_title_latin = level
         # query database to select items with similar sound
-        similar_titles = cls.get_similar_titles(id, a_title_latin, alang)
+        similar_titles = cls.get_similar_titles(q_id, a_title_latin, alang)
         random.shuffle(similar_titles)
         correct_choice = similar_titles.index(a_title)
         return {
             'lvl': lvl, 
-            'q_id': id, 
-            'q_title': q_title, 
+            'q_id': q_id, 
+            'q_hypernym': q_hypernym, 
+            'q_title': q_title,
+            'q_title_en': q_title_en,
             'a_title': a_title, 
             'choices': similar_titles, 
             'answer': correct_choice,
