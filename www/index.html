@@ -19,8 +19,9 @@
     <div id="app">
       <b-jumbotron class="" :header="pageTitle" lead="">
         <b-container>
-          <b-row class="wikiquote justify-content-center pt-2">
-            <b-col class="flex col-sm-10 col-md-9 col-lg-8 col-xl-7" @click="fetchLeadQuote([q_title_en,choices[answer],qHypernymTexts[0],qHypernymTexts[1]], quizStarted)">
+          <b-row class="wikiquote justify-content-center pt-2"
+            @click="fetchLeadQuote([q_title_en,choices[answer],qHypernymTexts[0],qHypernymTexts[1]], quizStarted)">
+            <b-col class="flex col-sm-10 col-md-9 col-lg-8 col-xl-7" >
               <span style="display: none;" id="quote-lang">{{ quoteLang }}</span>
               <p @mouseover="speakQuote" id="quote-quote">{{ quoteQuote }}</p>
               <p class="float-right" id="quote-title">{{ quoteTitle }}</p>
