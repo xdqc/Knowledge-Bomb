@@ -66,16 +66,29 @@
               </b-dropdown>
             </div>
           </b-form-group>
-          <b-row v-if="!quizStarted&&qlang&&alang&&qlang!==alang">
-            <b-col class="col-sm-5 col-md-4 p-1 mobile-w-0"></b-col>
-            <b-col class="pl-2">
-              <b-btn style="width: 100%;" :disabled="startBtnDisabled" 
+          <b-form-group 
+            v-show="!quizStarted&&qlang&&alang&&qlang!==alang"
+            horizontal
+            label-cols-sm="5"
+            label-cols-md="4"
+            :label="labelGameStart"
+          >
+              <b-btn v-show="showScore" variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(1)">1️⃣</b-btn>
+              <b-btn v-show="showScore" variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(2)">2️⃣</b-btn>
+              <b-btn variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(3)">3️⃣</b-btn>
+              <b-btn variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(4)">4️⃣</b-btn>
+              <b-btn variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(6)">6️⃣</b-btn>
+              <b-btn variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(8)">8️⃣</b-btn>
+              <b-btn variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(9)">9️⃣</b-btn>
+              <b-btn v-show="showScore" variant="outline" size="lg" style="font-size: x-large;" :disabled="startBtnDisabled" @click="setDifficulty(12)">1️⃣2️⃣</b-btn>
+              <b-btn v-show="showScore" variant="outline" size="lg" style="font-size: x-large;" :disabled="startBtnDisabled" @click="setDifficulty(16)">1️⃣6️⃣</b-btn>
+
+              <!-- <b-btn style="width: 100%;" :disabled="startBtnDisabled" 
                 :class="{disabled:startBtnDisabled}"
                 @click="newGame">
                  &gt;&gt;&gt; &nbsp; {{ startBtnTxt }} &nbsp; &lt;&lt;&lt; 
-              </b-btn>
-            </b-col>
-          </b-row>
+              </b-btn> -->
+          </b-form-group>
         </b-container>
       </b-jumbotron>
       
@@ -119,7 +132,7 @@
               @touchstart="touchStart($event)"
               @touchend="touchEnd($event)"
               @click="toggleDisplayTitleImg"
-              :style="displayTitleImage ? `background-image:url(${titleImage});` : 'border-right:1px outset;box-sizing:border-box;'">
+              :style="displayTitleImage ? `background-image:url(${titleImageUrl});` : 'border:1px outset;box-sizing:border-box;'">
               <h2 class="display-3 my-4 mx-2">
                 <a class="title-link" target="_blank"
                   @mouseover="speakTitle"
@@ -133,9 +146,9 @@
 
           <b-row>
             <b-col sm="11" md="10" lg="9" xl="7" class="choices p-0">
-              <b-button secondary class="col-4 btn-choice"
+              <b-button secondary class="btn-choice" :class="`col-`+12/Math.floor(Math.sqrt(difficulty))"
                 v-for="(choice,index) in choices" :key="index"
-                :style="`height: ${choiceHeight}px`"
+                :style="`height: ${choiceHeight}px; font-size: ${choiceFontSize}px`"
                 :id="`choice-${index}`"
                 @click="selectChoice($event,index)"
                 @touchstart="touchStart($event,index)"
@@ -147,7 +160,7 @@
         </div>
 
         <div v-if="showScore">
-          <b-alert variant="success" :show="showScore">Game Over ~   knowledge score : {{ score }}%</b-alert>
+          <b-alert variant="success" :show="showScore">Game Over ~  difficulty {{ difficulty }} ~ score {{ score }}%</b-alert>
           <b-progress class="my-1"
             :max="quizPlayed"
             :title="Object.values(board).filter(v=>v.length>0).length +' Levels'"

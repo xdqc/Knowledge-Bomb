@@ -1,6 +1,7 @@
 new Vue({
   el: '#app',
   data: {
+    difficulty: 4,
     quoteLang: '',
     quoteQuote: '',
     quoteTitle: '',
@@ -47,6 +48,7 @@ new Vue({
         }))
       })
       .then(() => { this.popHypernym(true) })
+      .catch((err) => { console.log(err) })
     })()
 
     window.addEventListener('keydown', (e) => {
@@ -80,10 +82,9 @@ new Vue({
     }
   },
   watch: {
-    qlang: function() {
-      if (!!this.qlang)
-      this.fetchLeadQuote()
-    } 
+    alang: function() {
+      if (!!this.alang) this.fetchLeadQuote()
+    },
   },
   computed: {
     showScore() {
@@ -99,10 +100,16 @@ new Vue({
       return this.alang_options
     },
     labelQuestion() {
-      return this.alang_options.find(l => l.value == this.alang).label_q || this.alang_options[0].label_q
+      return this.alang_options.find(l => l.value === this.alang).label_q || this.alang_options[0].label_q
     },
     labelAnswer() {
-      return this.alang_options.find(l => l.value == this.alang).label_a || this.alang_options[0].label_a
+      return this.alang_options.find(l => l.value === this.alang).label_a || this.alang_options[0].label_a
+    },
+    labelGameStart() {
+      return this.alang_options.find(l => l.value === this.alang).label_s || this.alang_options[0].label_s
+    },
+    gameTitle() {
+      return this.alang_options.find(l => l.value === this.alang).label_t || this.alang_options[0].label_t
     },
     quizPlayed() {
       return Object.values(this.board).reduce((s,v) => s+v.length, 0)
@@ -111,8 +118,8 @@ new Vue({
       return Object.values(this.board).reduce((s,v) => s+v.filter(u=>u>0).length, 0)
     },
     qHypernymTexts() {
-      // hypernym_option.texts {[0]:English, [1]:<Answer Language>}
-      const hypernym = this.hypernym_options.find(h=>h.value===this.q_hypernym)
+      // hypernym_option.texts [0]:English, [1]:<Answer Language>, [2]<Question Language>
+      const hypernym = this.hypernym_options.find(h=>h.value === this.q_hypernym)
       if (hypernym) return hypernym.texts
       else return [null,null,null]
     },
@@ -120,36 +127,42 @@ new Vue({
       this.windowWidth
       let row = document.getElementsByClassName('choices')[0]
       let width =  window.getComputedStyle(row).width.slice(0, -2)
-      return width / 3
+      return Math.ceil(width / this.difficulty * Math.floor(Math.sqrt(this.difficulty)))
+    },
+    choiceFontSize() {
+      this.windowWidth && this.difficulty
+      let row = document.getElementsByClassName('choices')[0] 
+      let width =  window.getComputedStyle(row).width.slice(0, -2)
+      return Math.ceil(width / 10 / Math.sqrt(this.difficulty) * (1+(Math.sqrt(this.difficulty)-1)/12))
     },
   },
   asyncComputed: {
-    async titleImage() {
-      if (!this.displayTitleImage) return '#'
+    async titleImageUrl() {
+      if (!this.displayTitleImage) return 'javascript:void(0)'
 
-      let sparqalQuery = `
-SELECT ?item ?pic ?flag ?chem ?logo ?taxnrg ?locator ?dist ?collage ?icon ?trid ?schem ?rimg {
-VALUES (?item) {(wd:Q${this.q_id})}
-OPTIONAL { ?item wdt:P18 ?pic }
-OPTIONAL { ?item wdt:P41 ?flag }
-OPTIONAL { ?item wdt:P117 ?chem }
-OPTIONAL { ?item wdt:P154 ?logo }
-OPTIONAL { ?item wdt:P181 ?taxnrg }
-OPTIONAL { ?item wdt:P242 ?locator }
-OPTIONAL { ?item wdt:P1846 ?dist }
-OPTIONAL { ?item wdt:P2716 ?collage }
-OPTIONAL { ?item wdt:P2910 ?icon }
-OPTIONAL { ?item wdt:P4896 ?trid }
-OPTIONAL { ?item wdt:P5555 ?schem }
-OPTIONAL { ?item wdt:P6802 ?rimg }
+      const IMG_TYPE = ['collage','trid','schem','chem','pic','dist','locator','taxnrg','flag','logo','icon','rimg']
+      const sparqalQuery = `
+SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
+  VALUES (?item) {(wd:Q${this.q_id})}
+  OPTIONAL { ?item wdt:P2716 ?collage }
+  OPTIONAL { ?item wdt:P4896 ?trid }
+  OPTIONAL { ?item wdt:P5555 ?schem }
+  OPTIONAL { ?item wdt:P117 ?chem }
+  OPTIONAL { ?item wdt:P18 ?pic }
+  OPTIONAL { ?item wdt:P1846 ?dist }
+  OPTIONAL { ?item wdt:P242 ?locator }
+  OPTIONAL { ?item wdt:P181 ?taxnrg }
+  OPTIONAL { ?item wdt:P41 ?flag }
+  OPTIONAL { ?item wdt:P154 ?logo }
+  OPTIONAL { ?item wdt:P2910 ?icon }
+  OPTIONAL { ?item wdt:P6802 ?rimg }
 }`
-      let resp = await fetch(`https://query.wikidata.org/sparql?query=${sparqalQuery}`, {
+      const resp = await fetch(`https://query.wikidata.org/sparql?query=${sparqalQuery}`, {
         headers: {'Accept':'application/json'},
       })
-      let data = await resp.json()
-      const IMG_TYPE = ['collage','trid','schem','chem','pic','dist','locator','taxnrg','flag','logo','icon','rimg']
-      let imgUrls = IMG_TYPE.map(i => {
-        let t = data.results.bindings.filter(b => b[i])
+      const data = await resp.json()
+      const imgUrls = IMG_TYPE.map(i => {
+        const t = data.results.bindings.filter(b => b[i])
         return t.length>0 ? t[Math.floor(t.length*Math.random())][i].value : null
       })
       //DEBUG - add wikidata img
@@ -191,53 +204,34 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
       })
       return (await resp.json()).translatedText || title
     },
-    async startBtnTxt() {
-      const txt = 'start'
-      const resp = await fetch("https://translate.mentality.rip/translate", {
-        method: "POST",
-        body: JSON.stringify({
-          q: txt,
-          source: "en",
-          target: this.alang,
-          format: "text"
-        }),
-        headers: { "Content-Type": "application/json" }
-      })
-      return ((await resp.json()).translatedText || txt).toUpperCase()
-    },
   },
   methods: {
     /** Basic Game Actions BEGIN */
+    setDifficulty: function(d) {
+      this.difficulty = d
+      this.newGame()
+    },
+
     newGame: function() {
       if (!this.qlang || !this.alang) {
         alert('no language selected')
       }
-      this.gameStart()
+      this.startBtnDisabled = true
       fetch(`${window.location.origin}/next`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          lvl: -1,
-          board: {},
-          qlang: this.qlang,
-          alang: this.alang,
-          hypernym: this.hypernyms,
-          qid: 0,
-          is_correct: true,
-        })
+        body: JSON.stringify(this.packPayload(-1, 0, {}, true))
       })
       .then(resp => resp.json())
       .then(data => {
         this.lvl = data.lvl
-        this.q_id = data.q_id
-        this.q_hypernym = data.q_hypernym
-        this.q_title = data.q_title
-        this.q_title_en = data.q_title_en
-        this.choices = data.choices
-        this.answer = data.answer
         this.board = data.board
+        this.unpackRespData(data)
       })
-      .then(() => { this.popHypernym() })
+      .then(() => { 
+        this.gameStart()
+        this.popHypernym()
+      })
       .finally(() => { this.startBtnDisabled = false })
       this.score = -1
     },
@@ -246,15 +240,7 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
       fetch(`${window.location.origin}/next`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          lvl: 0,
-          board: this.board,
-          qlang: this.qlang,
-          alang: this.alang,
-          hypernym: this.hypernyms,
-          qid: 0,
-          is_correct: false,
-        })
+        body: JSON.stringify(this.packPayload(0, 0, this.board, false))
       })
       .then(resp => resp.json())
       .then(data => {
@@ -266,30 +252,24 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
     },
 
     selectChoice: function(e, index) {
+      e.preventDefault()
       e.target.classList.remove('btn-secondary')
       e.target.classList.add('disabled')
-      if (this.answer == index) {
-        e.target.classList.add('btn-success')
-      } else {
-        e.target.classList.add('btn-danger')
+      if (this.difficulty > 1) {
+        e.target.classList.add(this.answer === index ? 'btn-success' : 'btn-danger')
       }
+
       this.progressAnimate = true
-      let flag = 0
+      // wait short period of time showing green/red for user choice correctness
+      let waitflag = 0
       setTimeout(() => {
-        flag = 1
-      }, 150);
+        waitflag = 1
+      }, 100);
+
       fetch(`${window.location.origin}/next`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          lvl: this.lvl,
-          board: this.board,
-          qid: this.q_id,
-          qlang: this.qlang,
-          alang: this.alang,
-          hypernym: this.hypernyms,
-          is_correct: this.answer == index,
-        })
+        body: JSON.stringify(this.packPayload(this.lvl, this.q_id, this.board, this.answer===index))
       })
       .then(resp => resp.json())
       .then(data => {
@@ -299,53 +279,71 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
           this.gameOver(data.score)
         } else {
           let interval = setInterval(() => {
-            if(flag == 1) {
-              this.q_id = data.q_id
-              this.q_hypernym = data.q_hypernym
-              this.q_title = data.q_title
-              this.q_title_en = data.q_title_en
-              this.choices = data.choices
-              this.answer = data.answer
+            if(waitflag == 1) {
+              this.unpackRespData(data)
               setTimeout(() => {
-                window.scrollTo(0,document.body.scrollHeight)
-                // Update wikiquote foreach question
-                this.fetchLeadQuote([
-                  this.choices[this.answer], 
-                  this.qHypernymTexts[1], 
-                  this.q_title_en, 
-                  this.qHypernymTexts[0]
-                ])
+                let scrollingElement = (document.scrollingElement || document.body);
+                scrollingElement.scrollTop = scrollingElement.scrollHeight;
               }, 0);
               clearInterval(interval)
             }
-          }, 5);
+          }, 10);
         }
+
       })
-      .catch((err) => {
-        console.log(err)
-      })
+      .catch((err) => { console.log(err) })
       .finally(() => {
         let interval = setInterval(() => {
-          if(flag == 1) {
+          if(waitflag == 1) {
             e.target.classList.add('btn-secondary')
-            e.target.classList.remove('btn-success')
-            e.target.classList.remove('btn-danger')
             e.target.classList.remove('disabled')
-            e.target.blur()
+            if (this.difficulty > 1) {
+              e.target.classList.remove('btn-success')
+              e.target.classList.remove('btn-danger')
+            }
+            e.target.blur() // Desktop browser: remove focus on anchor; TODO: blur on iOS safari
             e.handled = true
             this.progressAnimate = false
             clearInterval(interval)
           }
-        }, 5);
+        }, 10);
       })
+
+      // Update wikiquote foreach question
+      this.fetchLeadQuote([
+        this.choices[this.answer], 
+        this.qHypernymTexts[1], 
+        this.q_title_en, 
+        this.qHypernymTexts[0]
+      ])
     },
 
-    gameStart: function () {
-      this.startBtnDisabled = true
+    packPayload: function(lvl, qid, board, is_correct) {
+      return {
+        lvl: lvl,
+        board: board,
+        qid: qid,
+        qlang: this.qlang,
+        alang: this.alang,
+        hypernym: this.hypernyms,
+        is_correct: is_correct,
+        difficulty: this.difficulty,
+      }
+    },
+    unpackRespData: function(data) {
+      this.q_id = data.q_id
+      this.q_hypernym = data.q_hypernym
+      this.q_title = data.q_title
+      this.q_title_en = data.q_title_en
+      this.choices = data.choices
+      this.answer = data.answer
+    },
+
+    gameStart: function() {
       document.getElementsByClassName('jumbotron')[0].classList.add('py-0','mb-0')
       document.getElementsByClassName('wikiquote')[0].classList.remove('justify-content-center')
     },
-    gameOver: function (score) {
+    gameOver: function(score) {
       this.score = score
       this.choices = []
       this.q_id = 0
@@ -354,38 +352,37 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
       this.q_hypernym = ''
       document.getElementsByClassName('jumbotron')[0].classList.remove('py-0', 'mb-0')
       document.getElementsByClassName('wikiquote')[0].classList.add('justify-content-center')
-
-      this.fetchLeadQuote()
     },
     /** Basic Game Actions END */
 
     /** Game Scores BEGIN */
-    scoreBar: function (v) {
-      return JSON.parse(JSON.stringify(v)).reduce((a,u) => {
-        let e = a[a.length-1] || 0
-        if (e*u > 0) a[a.length-1] += Math.sign(u)
-        else a.push(Math.sign(u))
-        return a
+    scoreBar: function(v) {
+      // fold list of int to subgroup of consecutive pos/neg count
+      return JSON.parse(JSON.stringify(v)).reduce((arr,next) => {
+        let end = arr[arr.length-1] || 0
+        if (end*next > 0) arr[arr.length-1] += Math.sign(next)
+        else arr.push(Math.sign(next))
+        return arr
       }, [])
     },
     /** Game Scores END */
 
-    
     /** Language picker BEGIN */
-    onClickLeximapBtnAlang: function(e, lexi, setLang) {
+    onClickLeximapBtnAlang: function(e, lexi) {
       this.alang = lexi.value
       e.target.parentElement.previousSibling.click()
     },
-    onClickLeximapBtnQlang: function(e, lexi, setLang) {
+    onClickLeximapBtnQlang: function(e, lexi) {
       this.qlang = lexi.value
       e.target.parentElement.previousSibling.click()
     },
     /** Language picker END */
 
     /** Question Title interactions BEGIN */
-    speakTitle: function (e,i) {
+    speakTitle: function(e,i) {
       let text = i >=0 ? this.choices[i] : this.q_title
       let lang = i >=0 ? this.alang : this.qlang
+      lang = this.toMajorLang(lang, true)
       let langVoices = this.getSpeechSynthesisVoices(lang)
       let sp = new SpeechSynthesisUtterance(text)
       sp.voice = langVoices[Math.floor(Math.random()*langVoices.length)]
@@ -431,7 +428,7 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
             texts: h.texts,
             text: h.texts[this.hypernym_index]
           }))
-          .sort((h1,h2) => h1.text.localeCompare(h2.text, this.alang))
+          .sort((h1,h2) => h1.text.localeCompare(h2.text, this.toMajorLang(this.alang)))
         if (onMount) {
           // by default fill-in all hypernyms, excluding language==315
           this.hypernyms = data.filter(h=>h.value!==315).map(h=>h.value)
@@ -441,7 +438,7 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
     switchHypernymLang: function() {
       this.hypernym_index = (this.hypernym_index+1)%3
       this.hypernym_options.forEach(h => h.text=h.texts[this.hypernym_index])
-      this.hypernym_options.sort((h1,h2) => h1.text.localeCompare(h2.text, (this.hypernym_index==2?this.qlang:this.alang)))
+      this.hypernym_options.sort((h1,h2) => h1.text.localeCompare(h2.text, this.toMajorLang(this.hypernym_index==2?this.qlang:this.alang)))
     },
     reverseHypernymSelect: function() {
       this.hypernyms = this.hypernym_options
@@ -451,65 +448,81 @@ OPTIONAL { ?item wdt:P6802 ?rimg }
     /** Hypernym options END */
 
     /** Wikiquote START */
-    fetchLeadQuote: function (topics, isMatch) {
+    fetchLeadQuote: function(topics, isMatch) {
       if (!!topics) topics = topics.filter(t => !!t).map(t => t.replace(/\(/m, '|').replace(/\)/m, ''))
-      // onclick for match, use existing quoteLang
-      let quoteLang = isMatch ? this.quoteLang : this.alang
+      // onclick(for match), use existing quoteLang
+      let quoteLang = isMatch ? this.quoteLang : this.toMajorLang(this.alang)
       let depth = 0
       const resolve = (q) => {
         depth++
-        if (!q.quote) {
-          Wikiquote(quoteLang).getRandomQuote((depth<10?topics:[]), resolve, error)
-        } else {
+        if (q.quote) {
           this.quoteLang = quoteLang
-          this.quoteQuote = this.stripHtml(q.quote)
+          this.quoteQuote = q.quote
           this.quoteTitle = '—— '+q.titles
-        }
-      }
-      const error = (err) => {
-        console.log(err)
-        if (err.code != 'nosuchsection') {
-          quoteLang = 
-          // {
-          //   'zh-yue': 'zh',
-          //   'zh-min-nan': 'zh',
-          //   'wuu': 'zh',
-          //   'hak': 'zh',
-          //   'cdo': 'zh',
-          //   'oc': 'fr',
-          //   'co': 'fr',
-          // }[this.alang] ||
-           'en'
-        }
-        if ((err.code == 'queryGeneratorLinksNoAlang' || err.code == 'queryGeneratorLinksNoResultAlang') && this.alang != 'en') {
-          Wikiquote(quoteLang).getRandomQuote(topics, resolve, error)
         } else {
-          Wikiquote(quoteLang).getRandomQuote([], resolve, error)
+          Wikiquote(quoteLang).getRandomQuote((depth<10?topics:[]), resolve, reject)
         }
       }
-      Wikiquote(quoteLang).getRandomQuote(topics, resolve, error, isMatch)
+      const reject = (err) => {
+        if (!['nosuchsection', 'noPageCategories', 'unPageCategories'].includes(err.code)) {
+          quoteLang = 'en'
+        }
+        Wikiquote(quoteLang).getRandomQuote(
+          ((err.code == 'queryGeneratorLinksNoAlang' || err.code == 'queryGeneratorLinksNoResultAlang') && this.alang != 'en') ? topics : [],
+          resolve, reject)
+      }
+      Wikiquote(quoteLang).getRandomQuote(topics, resolve, reject, isMatch)
     },
     speakQuote: function(e) {
       const sp = new SpeechSynthesisUtterance(e.target.innerText)
-      const langVoices = this.getSpeechSynthesisVoices(this.quoteLang)
+      const lang = this.toMajorLang(this.quoteLang, true)
+      const langVoices = this.getSpeechSynthesisVoices(lang)
       sp.voice = langVoices[Math.floor(Math.random()*langVoices.length)]
       speechSynthesis.cancel()
       speechSynthesis.speak(sp)
     },
     getSpeechSynthesisVoices: function(lang) {
-      let langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == lang)
+      const sliceLen = lang.startsWith('zh-') ? 5 : 2
+      let langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,sliceLen) == lang)
       if (langVoices.length == 0) {
         langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == 'en')
       }
       return langVoices
     },
-    stripHtml: function(html)
-    {
-      let tmp = document.createElement("div");
-      tmp.innerHTML = html;
-      return tmp.textContent || tmp.innerText || "";
-    }
-
+    // stripHtml: function(html) {
+    //   let tmp = document.createElement("div");
+    //   tmp.innerHTML = html;
+    //   return tmp.textContent || tmp.innerText || "";
+    // },
+    toMajorLang: function(lang, isSpeaking) {
+      const MAJOR_LANG = {
+        'es': ['an','ast'],
+        'pt': ['mwl'],
+        'fr': ['oc', 'co', 'wa', 'nrm', 'pcd', 'frp', 'ht'],
+        'it': ['sc', 'vec', 'lmo', 'scn', 'pms', 'fur', 'nap'],
+        'nl': ['fy', 'af', 'nds-nl', 'li'],
+        'de': ['lb', 'bar', 'als', 'nds', 'stq', 'pdc'],
+        'ru': ['be', 'ce', 'inh', 'os', 'cv', 'tt', 'crh', 'ba', 'xal', 'kk', 'ky', 'sah', 'tyv', 'tg','bxr', 'rue'],
+        'hi': ['pa', 'gu', 'bh', 'mr', 'si', 'sa', 'ne', 'bn', 'kn', 'or', 'te', 'ml', 'ta'],
+        'zh': ['zh-yue', 'hak', 'cdo', 'wuu', 'gan', 'zh-classical'],
+        'id': ['ms', 'jv', 'su', 'mg']
+      }
+      if (isSpeaking) {
+        MAJOR_LANG.es.push('ca', 'eu')
+        MAJOR_LANG.pt.push('gl')
+        MAJOR_LANG.it.push('eo','la')
+        MAJOR_LANG.ru.push(...['uk', 'bg', 'sr'])
+        MAJOR_LANG.pl = ['cs', 'sk', 'sl', 'hr', 'bs']
+        MAJOR_LANG.zh = []
+        MAJOR_LANG['zh-CN'] = ['zh', 'wuu', 'gan', 'zh-classical']
+        MAJOR_LANG['zh-HK'] = ['zh-yue', 'hak']
+        MAJOR_LANG['zh-TW'] = ['zh-min-nan', 'cdo']
+      }
+      for (let e of Object.entries(MAJOR_LANG)){
+        if (e[1].indexOf(lang) >= 0) return e[0]
+      }
+      return lang
+    },
     /** Wikiquote END */
   },
 })

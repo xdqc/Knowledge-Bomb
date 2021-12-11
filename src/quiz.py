@@ -67,14 +67,16 @@ class Quiz:
 
     @classmethod
     def get_languages(cls):
-        sqlstr = 'SELECT TOP(300) code,name_local,label_question,label_answer,coord_x,coord_y FROM wiki.language ORDER BY [rank]'
+        sqlstr = '''SELECT TOP(320) code,name_local,label_question,label_answer,label_difficulty,label_gametitle,coord_x,coord_y 
+        FROM wiki.language ORDER BY [rank]'''
         cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
         res = []
         for lang in cursor.execute(sqlstr):
             res.append({'value':lang[0], 'text':lang[1], 
                 'label_q':lang[2], 'label_a':lang[3],
-                'coord_x':lang[4], 'coord_y':lang[5]})
+                'label_s':lang[4], 'label_t':lang[5],
+                'coord_x':lang[6], 'coord_y':lang[7]})
         return res
 
     @classmethod
@@ -163,8 +165,10 @@ class Quiz:
         return result[0] if len(result) > 0 else None
 
     @classmethod
-    def get_similar_titles(cls, item, a_title_latin, alang):
-        num = 9
+    def get_similar_titles(cls, item, a_title_latin, alang, difficulty):
+        if difficulty not in [1,2,3,4,6,8,9,12,16]:
+            difficulty = 4
+        num = difficulty
         sqlstr = f"""
         SELECT title, r FROM (
           SELECT title, r FROM (
@@ -202,18 +206,18 @@ class Quiz:
         return result[:num]
 
     @classmethod
-    def run_level(cls, lvl, board, qlang, alang, hypernym, recurr=0):
+    def run_level(cls, lvl, board, qlang, alang, hypernym, difficulty, recurr=0):
         level = cls.get_item_by_level(lvl, board, qlang, alang, hypernym)
         # when run out of current level, run next level; circle the ladder, stop when done a circle
         if level is None:
             recurr += 1
             if recurr > len(cls.ladder):
                 return cls.final_score(board)
-            return cls.run_level(1 if lvl == len(cls.ladder) else lvl+1, board, qlang, alang, hypernym, recurr)
+            return cls.run_level(1 if lvl == len(cls.ladder) else lvl+1, board, qlang, alang, hypernym, difficulty, recurr)
         
         q_id,q_hypernym,q_title,q_title_en,a_title,a_title_latin = level
         # query database to select items with similar sound
-        similar_titles = cls.get_similar_titles(q_id, a_title_latin, alang)
+        similar_titles = cls.get_similar_titles(q_id, a_title_latin, alang, difficulty)
         random.shuffle(similar_titles)
         correct_choice = similar_titles.index(a_title)
         return {
@@ -230,7 +234,8 @@ class Quiz:
 
     @classmethod
     def next_quiz(cls, data):
-        lvl, board, qid, qlang, alang, hypernym, is_correct = data['lvl'], data['board'], data['qid'], data['qlang'], data['alang'], data['hypernym'], data['is_correct']
+        lvl, board, qid, qlang, alang, hypernym, is_correct, difficulty =  \
+        data['lvl'], data['board'], data['qid'], data['qlang'], data['alang'], data['hypernym'], data['is_correct'], data['difficulty']
         if lvl < 0: # start quiz
             lvl = 1
             for l in cls.ladder:
@@ -239,7 +244,7 @@ class Quiz:
             lvl, board = cls.level_up(lvl, board, qid) if is_correct else cls.level_down(lvl, board, qid)
         if lvl == 0: # end quiz
             return cls.final_score(board)
-        return cls.run_level(lvl, board, qlang, alang, hypernym)
+        return cls.run_level(lvl, board, qlang, alang, hypernym, difficulty)
 
     @classmethod
     def final_score(cls, board):
@@ -290,7 +295,7 @@ class Quiz:
         sample_size = len(board[str(lvl)])/1.0
         if sample_size > 0:
             level_items_count = cls.level_items_count(lvl)
-            miss_coef = math.log10((max(level_items_count-sample_size**3, 1)) / (sample_size+1)) + math.log1p(lvl)
+            miss_coef = math.log10((max(level_items_count-sample_size**3, 1)) / (sample_size+1)) + math.log1p(lvl) - 1
             if final:
                 miss_coef = max(miss_coef * lvl / len(cls.ladder)**2, 0)
             correct_count = len([k for k in board[str(lvl)] if k > 0])

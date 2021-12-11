@@ -53,7 +53,7 @@ var Wikiquote = function (lang) {
 
       },
       error: function (xhr, result, status) {
-        error("Error with opensearch for " + topics)
+        errorFunc("Error with opensearch for " + topics)
       }
     })
   }
@@ -107,11 +107,52 @@ var Wikiquote = function (lang) {
   }
 
   /**
+   * Get the categories for a given page.
+   * Page has undesiered categories will be discard. [films, tv shows]
+   * Page with success categories check pass to getSections
+   */
+  wqa.getCategoriesForPage = function (pageId, success, errorFunc) {
+    $.ajax({
+      url: API_URL,
+      dataType: "jsonp",
+      data: {
+        format: "json",
+        action: "parse",
+        prop: "categories",
+        pageid: pageId
+      },
+
+      success: function (result, status) {
+        if (!result || !result.parse) {
+          status = 404
+          errorFunc(result.error)
+          return
+        }
+        var title = result.parse.title
+        var categories = result.parse.categories
+        if (!categories || categories.length == 0) {
+          errorFunc({code: 'noPageCategories', pageId: pageId, title: title})
+          return
+        }
+        var cateTexts = categories.map(c => c['*'])
+        if (cateTexts.some(t=>/(film|tv_show|disambiguation_pages|消歧义|在世人物|中[國国]共|中华人民|都道府県)/gi.test(t))) {
+          errorFunc({code: 'unPageCategories', pageId: pageId, title: title})
+          return
+        }
+        
+        success(pageId)
+      },
+      error: function (xhr, result, status) {
+        errorFunc("Error getting sections")
+      }
+    })
+  }
+
+  /**
    * Get the sections for a given page.
    * This makes parsing for quotes more manageable.
    * Returns an array of all "1.x" sections as these usually contain the quotes.
-   * If no 1.x sections exists, returns section 1. Returns the titles that were used
-   * in case there is a redirect.
+   * Otherwise do not return sections
    */
   wqa.getSectionsForPage = function (pageId, success, error) {
     $.ajax({
@@ -127,16 +168,17 @@ var Wikiquote = function (lang) {
       success: function (result, status) {
         var sectionArray = []
         var sections = result.parse.sections
+        // console.log(result.parse.title, sections.map(s=> s.index+' '+s.anchor))
         for (var s in sections) {
-          var splitNum = sections[s].number.split('.')
-          if (splitNum.length > 1 && splitNum[0] === "1") {
-            sectionArray.push(sections[s].index)
+          if (['See_also','External_links','Liens_externes','Weblinks','Note','Altri_progetti','Enlaces_externos']
+            .includes(sections[s].anchor)) {
+            break
           }
+          // var splitNum = sections[s].number.split('.')
+          // if (splitNum.length > 1 && splitNum[0] === "1") {
+          // }
+          sectionArray.push(sections[s].index)
         }
-        // Use section 1 if there are no "1.x" sections
-        // if (sectionArray.length === 0) {
-        //   sectionArray.push("1")
-        // }
         success({ titles: result.parse.title, sections: sectionArray })
       },
       error: function (xhr, result, status) {
@@ -185,19 +227,19 @@ var Wikiquote = function (lang) {
         }
         var quotes = result.parse.text["*"]
         var quoteArray = []
-        // Find top level <li> only, or <div class="citation"> (French)
-        var $lis = $(quotes).find('li:not(li li, dl li), div.citation')
+        // Find top level <li> only
+        //  or <div class="citation"> (French)
+        //  or <table><table><td></td></table></table> (Esparanto)
+        var $lis = $(quotes).find('li:not(li li, dl li), div.citation, table table td')
         $lis.each(function () {
-          // Remove all children that aren't <b>
-          $(this).children().remove(':not(b)')
-          var $bolds = $(this).find('b')
+          var text = $(this).text()
+          // Discard pure link
+          if ($(this).children('a').text()==text) return
+          // Remove all children that aren't <b> <a>
+          $(this).children().remove(':not(b, a)')
+          $(this).children().remove('a.autonumber')
 
-          // If the section has bold text, use it.  Otherwise pull the plain text.
-          if ($bolds.length > 0) {
-            quoteArray.push($bolds.html())
-          } else {
-            quoteArray.push($(this).html())
-          }
+          quoteArray.push($(this).text())
         })
         chooseQuote({ titles: result.parse.title, quotes: quoteArray })
       },
@@ -244,11 +286,14 @@ var Wikiquote = function (lang) {
       error(msg)
     }
 
-    // chooseQuote with length between (10,200)
+    // chooseQuote with length between (8,100)
     var chooseQuote = function (quotes) {
       quotes.quotes = quotes.quotes
         .map(q => q.trim())
-        .filter(q => q.length > 10 && q.length < 200)
+        .filter(q => q.length > 8 && q.length < 100 &&
+        !/^([\-—–:]| —|\(\)|\d|as |quote[ds-] at|Encyclopedic article|Wik[ic]|см)/.test(q) &&
+        !/:$/.test(q) &&
+        !/\d{3,4}/g.test(q))
       var randomNum = Math.floor(Math.random() * quotes.quotes.length)
       success({ titles: quotes.titles, quote: quotes.quotes[randomNum] })
     }
@@ -262,10 +307,14 @@ var Wikiquote = function (lang) {
       wqa.getSectionsForPage(pageId, function (sections) { getQuotes(pageId, sections); }, errorFunction)
     }
 
+    var getCategories = function (pageId) {
+      wqa.getCategoriesForPage(pageId, getSections, errorFunction)
+    }
+
     if (topics && topics.length > 0) {
-      wqa.queryGeneratorLinks(topics, getSections, errorFunction, isMatch)
+      wqa.queryGeneratorLinks(topics, getCategories, errorFunction, isMatch)
     } else {
-      wqa.queryRandom([], getSections, errorFunction)
+      wqa.queryRandom([], getCategories, errorFunction)
     }
 
   }

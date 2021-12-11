@@ -28,21 +28,25 @@ h1 {
   border-color: var(--moonstones-blue);
   border-style: dotted;
   border-width: 1px;
+  border: none;
   padding: 0.15rem;
-  font-size: 1.5rem;
   overflow-wrap: break-word;
 }
 .btn-secondary {
-  background-color: var(--jelly-bean-blue);
+  background-color: transparent;
+  color: var(--jelly-bean-blue);
 }
 .btn-secondary:hover {
   background-color: var(--japanese-indigo);
 }
 .btn-secondary:focus {
-  background-color: var(--japanese-indigo);
+  background-color: var(--jelly-bean-blue);
 }
 .btn-outline-light {
   border-color: transparent;
+}
+.btn-outline:hover {
+  background-color: var(--moonstones-blue);
 }
 .title-box {
   padding: 5rem 0;
@@ -103,9 +107,6 @@ a.title-link {
   .group-hypernyms {
     column-count: 3;
   }
-  .btn-choice {
-    font-size: 1.4rem;
-  }
   .title-link {
     font-size: 4rem;
   }
@@ -113,9 +114,6 @@ a.title-link {
 @media (max-width: 768px) {
   .group-hypernyms {
     column-count: 2;
-  }
-  .btn-choice {
-    font-size: 1.2rem;
   }
   .title-link {
     font-size: 3.2rem;
@@ -131,9 +129,6 @@ a.title-link {
     margin-right: 0;
     margin-bottom:0;
   }
-  .btn-choice {
-    font-size: 1.15rem;
-  }
   .title-link {
     font-size: 3rem;
   }
@@ -145,17 +140,11 @@ a.title-link {
   h2.display-3 {
     line-height: 0.667;
   }
-  .btn-choice {
-    font-size: 1.05rem;
-  }
   .title-link {
     font-size: 2.5rem;
   }
 }
 @media (max-width: 380px) {
-  .btn-choice {
-    font-size: 1rem;
-  }
   .title-link {
     font-size: 2.25rem;
   }
