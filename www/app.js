@@ -22,6 +22,7 @@ new Vue({
     score: -1,
     windowWidth: window.innerWidth,
     displayTitleImage: true,
+    displayTopQuote: true,
     startBtnDisabled: false,
     progressAnimate: false,
     touchTimer: null,
@@ -109,6 +110,7 @@ new Vue({
       return this.alang_options.find(l => l.value === this.alang).label_s || this.alang_options[0].label_s
     },
     gameTitle() {
+      if (this.quizStarted) return ''
       return this.alang_options.find(l => l.value === this.alang).label_t || this.alang_options[0].label_t
     },
     quizPlayed() {
@@ -290,6 +292,15 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
           }, 10);
         }
 
+        if (this.displayTopQuote) {
+          // Update wikiquote foreach question
+          this.fetchLeadQuote([
+            this.choices[this.answer], 
+            this.qHypernymTexts[1], 
+            this.q_title_en, 
+            this.qHypernymTexts[0]
+          ])
+        }
       })
       .catch((err) => { console.log(err) })
       .finally(() => {
@@ -308,14 +319,6 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
           }
         }, 10);
       })
-
-      // Update wikiquote foreach question
-      this.fetchLeadQuote([
-        this.choices[this.answer], 
-        this.qHypernymTexts[1], 
-        this.q_title_en, 
-        this.qHypernymTexts[0]
-      ])
     },
 
     packPayload: function(lvl, qid, board, is_correct) {
@@ -340,6 +343,9 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
     },
 
     gameStart: function() {
+      if (this.windowWidth <= 576) {
+        document.getElementById('btn-toggle-display-quote').click()
+      }
       document.getElementsByClassName('jumbotron')[0].classList.add('py-0','mb-0')
       document.getElementsByClassName('wikiquote')[0].classList.remove('justify-content-center')
     },
@@ -352,6 +358,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       this.q_hypernym = ''
       document.getElementsByClassName('jumbotron')[0].classList.remove('py-0', 'mb-0')
       document.getElementsByClassName('wikiquote')[0].classList.add('justify-content-center')
+      this.displayTopQuote = true
     },
     /** Basic Game Actions END */
 
@@ -473,9 +480,16 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       }
       Wikiquote(quoteLang).getRandomQuote(topics, resolve, reject, isMatch)
     },
+
+    toggleDisplayQuote: function(e) {
+      this.displayTopQuote = !this.displayTopQuote
+      e.target.textContent = this.displayTopQuote ? '🧙💬' : '🧙🔇'
+      e.target.title = this.displayTopQuote ? 'Mute me, improve your performance (less network traffic, less laggy)' : "I'll be back"
+    },
+
     speakQuote: function(e) {
       const sp = new SpeechSynthesisUtterance(e.target.innerText)
-      const lang = this.toMajorLang(this.quoteLang, true)
+      const lang = this.toMajorLang(this.quoteLang=='en'?'en':this.alang, true)
       const langVoices = this.getSpeechSynthesisVoices(lang)
       sp.voice = langVoices[Math.floor(Math.random()*langVoices.length)]
       speechSynthesis.cancel()
@@ -511,7 +525,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         MAJOR_LANG.es.push('ca', 'eu')
         MAJOR_LANG.pt.push('gl')
         MAJOR_LANG.it.push('eo','la')
-        MAJOR_LANG.ru.push(...['uk', 'bg', 'sr'])
+        MAJOR_LANG.ru.push('uk', 'bg', 'sr')
         MAJOR_LANG.pl = ['cs', 'sk', 'sl', 'hr', 'bs']
         MAJOR_LANG.zh = []
         MAJOR_LANG['zh-CN'] = ['zh', 'wuu', 'gan', 'zh-classical']

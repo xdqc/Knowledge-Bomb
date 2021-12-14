@@ -37,7 +37,6 @@ var Wikiquote = function (lang) {
       success: function (result, status) {
         if (!result || !result.query) {
           status = 404
-          console.log(result)
           errorFunc({code: (lang=='en'?'queryGeneratorLinksNoEN':'queryGeneratorLinksNoAlang')})
           return
         }
@@ -291,7 +290,7 @@ var Wikiquote = function (lang) {
       quotes.quotes = quotes.quotes
         .map(q => q.trim())
         .filter(q => q.length > 8 && q.length < 100 &&
-        !/^([\-—–:]| —|\(\)|\d|as |quote[ds-] at|Encyclopedic article|Wik[ic]|см)/.test(q) &&
+        !/^([\-—–:]| —|\(|\d|as |quote[ds-] at|Encyclopedic article|Wik[ic]|см)/.test(q) &&
         !/:$/.test(q) &&
         !/\d{3,4}/g.test(q))
       var randomNum = Math.floor(Math.random() * quotes.quotes.length)
