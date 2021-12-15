@@ -48,6 +48,9 @@ h1 {
 .btn-outline:hover {
   background-color: var(--moonstones-blue);
 }
+.btn-outline.disabled:hover {
+  background-color: transparent;
+}
 .title-box {
   padding: 5rem 0;
   background-size: contain;

@@ -67,27 +67,21 @@
             </div>
           </b-form-group>
           <b-form-group 
-            v-show="!quizStarted&&qlang&&alang&&qlang!==alang"
+            v-if="!quizStarted&&qlang&&alang&&qlang!==alang"
             horizontal
             label-cols-sm="5"
             label-cols-md="4"
             :label="labelGameStart"
           >
-              <b-btn v-show="showScore" variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(1)">1️⃣</b-btn>
-              <b-btn v-show="showScore" variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(2)">2️⃣</b-btn>
-              <b-btn variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(3)">3️⃣</b-btn>
-              <b-btn variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(4)">4️⃣</b-btn>
-              <b-btn variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(6)">6️⃣</b-btn>
-              <b-btn variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(8)">8️⃣</b-btn>
-              <b-btn variant="outline" size="lg" style="font-size: xx-large;" :disabled="startBtnDisabled" @click="setDifficulty(9)">9️⃣</b-btn>
-              <b-btn v-show="showScore" variant="outline" size="lg" style="font-size: x-large;" :disabled="startBtnDisabled" @click="setDifficulty(12)">1️⃣2️⃣</b-btn>
-              <b-btn v-show="showScore" variant="outline" size="lg" style="font-size: x-large;" :disabled="startBtnDisabled" @click="setDifficulty(16)">1️⃣6️⃣</b-btn>
-
-              <!-- <b-btn style="width: 100%;" :disabled="startBtnDisabled" 
-                :class="{disabled:startBtnDisabled}"
-                @click="newGame">
-                 &gt;&gt;&gt; &nbsp; {{ startBtnTxt }} &nbsp; &lt;&lt;&lt; 
-              </b-btn> -->
+            <b-btn variant="outline" size="lg"
+              v-for="(d,i) in showDifficulties" :key="i"
+              :style="`font-size: x${d.value>=10?'':'x'}-large;`"
+              :disabled="d.disabled||startBtnDisabled"
+              :title="d.tooltip"
+              v-b-popover.hover.bottom=""
+              @click="setDifficulty(d.value)">
+              {{ d.icon }}
+            </b-btn>
           </b-form-group>
         </b-container>
       </b-jumbotron>
@@ -112,7 +106,7 @@
             </b-form-group>
           </b-collapse>
           <b-col class="flex">
-            <b-btn v-b-toggle.collapse-hypernyms  class="float-right" variant="outline-light">💣</b-btn>
+            <b-btn v-b-toggle.collapse-hypernyms class="float-right" variant="outline-light">💣</b-btn>
           </b-col>
         </b-row>
 
@@ -156,7 +150,7 @@
                 @click="selectChoice($event,index)"
                 @touchstart="touchStart($event,index)"
                 @touchend="touchEnd($event)">
-                {{ choice.replace(/ *\([^)]*\) */g, '') }}
+                {{ choice }}
               </b-button>
             </b-col>
           </b-row>
@@ -183,6 +177,16 @@
           </b-progress>
         </div>
       </b-container>
+      <b-alert
+        v-model="showBottomAlert"
+        class="position-fixed fixed-bottom m-0 rounded-0 px-4"
+        style="z-index: 20000;"
+        variant="warning"
+        dismissible
+      >
+        This site dose not use any performance nor analysis cookies. Only functional cookies are used for remembering language setting and game progress. <br> 
+        Third-party cookies from wikimedia.org may present for the usage of wikidata and wikiquote: <a href="https://foundation.wikimedia.org/wiki/Cookie_statement">Wikimedia cookie statement</a>
+      </b-alert>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="./www/wikiquote.js"></script>

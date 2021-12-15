@@ -72,7 +72,7 @@ class Quiz:
         cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
         res = []
-        for lang in cursor.execute(sqlstr):
+        for lang in cursor.execute(sqlstr).fetchall():
             res.append({'value':lang[0], 'text':lang[1], 
                 'label_q':lang[2], 'label_a':lang[3],
                 'label_s':lang[4], 'label_t':lang[5],
@@ -96,7 +96,7 @@ class Quiz:
         cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
         res = []
-        for lang in cursor.execute(sqlstr):
+        for lang in cursor.execute(sqlstr).fetchall():
             res.append({'value':lang[0], 'text':lang[1][:1].upper()+lang[1][1:], 
                 'coord_x':lang[2], 'coord_y':lang[3]})
         return res
@@ -122,7 +122,7 @@ class Quiz:
         cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
         res = []
-        for h in cursor.execute(sqlstr):
+        for h in cursor.execute(sqlstr).fetchall():
             if h[0]:
                 res.append({'value':h[0], 'texts': [h[1],h[2],h[3]]})
         return res
@@ -160,8 +160,7 @@ class Quiz:
                 cursor = cls.conn.cursor()
             except:
                 cls.conn = pyodbc.connect(conn_str)
-        cursor.execute(sqlstr)
-        result = cursor.fetchall()
+        result = cursor.execute(sqlstr).fetchall()
         return result[0] if len(result) > 0 else None
 
     @classmethod
@@ -190,9 +189,8 @@ class Quiz:
         ORDER BY r
         """
         cursor = cls.conn.cursor()
-        cursor.execute(sqlstr)
         result = [] 
-        for r in cursor.fetchall():
+        for r in cursor.execute(sqlstr).fetchall():
             if r[0] not in result: # order should be preserved and no duplicate
                 result.append(r[0])
         if len(result) < num:
@@ -201,8 +199,7 @@ class Quiz:
             WHERE language = '{alang}'
             ORDER BY ABS(item - {item}) * 0.0001 * (ABS(CHECKSUM(NewId())) % 127 + 1)
             OFFSET (1) ROWS FETCH NEXT ({num}) ROWS ONLY """
-            cursor.execute(sqlstr)
-            result.extend([r[0] for r in cursor.fetchall() if r[0] not in result])
+            result.extend([r[0] for r in cursor.execute(sqlstr).fetchall() if r[0] not in result])
         return result[:num]
 
     @classmethod

@@ -1,3 +1,4 @@
+import time
 from flask import Flask, request, jsonify, send_from_directory
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -14,10 +15,8 @@ def root(path):
 @limiter.limit('2/second', error_message='chill, knowledge bomber!')
 def language():
     lang = request.args.get('lang')
-    if lang:
-        return jsonify(Quiz.get_language_names(lang))
-    else:
-        return jsonify(Quiz.get_languages())
+    resp = jsonify(Quiz.get_language_names(lang) if lang else Quiz.get_languages())
+    return resp
 
 @app.route('/hypernym')
 @limiter.limit('1/second', error_message='chill, knowledge bomber!')
@@ -29,6 +28,20 @@ def hypernym():
 @limiter.limit('9000/day', error_message="It's Over 9000!!")
 def next():
     return jsonify(Quiz.next_quiz(request.get_json()))
+
+@app.route('/save-difficulty-level', methods=['POST'])
+def save_difficulty_level():
+    payload = request.get_json()
+    resp = jsonify(payload)
+    resp.set_cookie('d', f"{hex(round(time.time()*1e6))[:2:-1]}{hex(int(payload['difficultyLvl']))[2:]}", max_age=3600*24*300, secure=True)
+    return resp
+
+@app.route('/save-languages', methods=['POST'])
+def save_languages():
+    payload = request.get_json()
+    resp = jsonify(payload)
+    resp.set_cookie('lang', f"{payload['alang']}+{payload['qlang']}", max_age=3600*24*300, secure=True)
+    return resp
 
 @app.route('/heartbeat')
 def heartbeat():
