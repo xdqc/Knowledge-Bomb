@@ -1,17 +1,22 @@
 :root {
+  --body-background: #F9F9F9;
   --japanese-indigo: #1B4157;
   --jelly-bean-blue: #437C9B;
   --moonstones-blue: #71A6C1;
   --steel-wiki-blue: #3888B6;
+  --light-wiki-blue: #77C1F6;
 }
 body {
-  background-color: whitesmoke;
+  background-color: var(--body-background);
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
             user-select: none;
 }
 h1 {
   text-transform: capitalize;
+}
+.jumbotron {
+  background-image: linear-gradient(to top, var(--light-wiki-blue) 0,#e8f2f8 1px,#ffffff 100%);
 }
 .bg-steel-blue {
   background-color: var(--steel-wiki-blue);
@@ -34,7 +39,7 @@ h1 {
   overflow: auto;
 }
 .btn-secondary {
-  background-color: transparent;
+  background-color: var(--body-background);
   color: var(--jelly-bean-blue);
 }
 .btn-secondary:hover {
@@ -76,21 +81,31 @@ a.title-link {
   position: fixed!important;
   transform: translate(0%, 0%)!important;
   left: 1%!important;
-  top: 5%!important;
+  top: 38%!important;
   width: 98%;
-  min-height: 90%;
-  max-height: 700px;
+  min-height: 680px;
+  max-height: 750px;
   border: none;
   overflow: auto;
   z-index: 10000;
 }
-.dropdown-lang button {
+.dropdown-lang.alang-leximap .dropdown-menu  {
+  background-image: url('./Languages_world_map.svg');
+  background-attachment: local;
+  background-size:cover;
+}
+.dropdown-lang .btn-dropdown-lang {
   position: absolute;
   white-space: nowrap;
   color: var(--japanese-indigo);
 }
 .dropdown-lang button:hover {
+  color: white!important;
+  background-color: var(--moonstones-blue);
   z-index: 100;
+}
+.dropdown-lang.show .dropdown-toggle {
+  background-color: var(--moonstones-blue);
 }
 #quote-quote {
   font-style: italic;
@@ -101,8 +116,16 @@ a.title-link {
 }
 .group-hypernyms {
   column-count: 5;
-}        
+} 
+@media (max-height: 1000px) {
+  .dropdown-lang .dropdown-menu {
+    top: 5%!important;
+  }
+}
 @media (max-width: 1200px) {
+  .dropdown-lang .dropdown-menu {
+    top: 5%!important;
+  }
   .group-hypernyms {
     column-count: 4;
   }
@@ -138,6 +161,9 @@ a.title-link {
   }
   .mobile-w-0 {
     max-width: 0%;
+  }
+  #wikiquote {
+    padding-left: 1rem;
   }
 }
 @media (max-width: 455px) {

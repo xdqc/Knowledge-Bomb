@@ -18,9 +18,11 @@
   </head>
   <body>
     <div id="app">
-      <b-jumbotron class="" :header="labelPageTitle" lead="">
+      <b-jumbotron id="page-header" :header="labelPageTitle" lead="">
+        <a href="https://github.com/xdqc/Knowledge-Bomb" target="_blank" style="position:fixed;top:5px;right:5px;"><img src="./www/GitHub-Mark-32px.png" alt="github" height="20"></a>
         <b-container>
-          <b-row v-show="displayTopQuote" class="wikiquote justify-content-center pt-2"
+          <b-row v-show="!displayTopQuote" class="my-3"></b-row>
+          <b-row v-show="displayTopQuote" class="justify-content-center pt-3" id="wikiquote"
             @click="fetchLeadQuote([q_title_en,choices[answer],qHypernymTexts[0],qHypernymTexts[1]], quizStarted)">
             <b-col class="flex col-sm-10 col-md-9 col-lg-8 col-xl-7" >
               <span style="display: none;" id="quote-lang">{{ quoteLang }}</span>
@@ -31,6 +33,7 @@
 
           <b-form-group
             v-show="!quizStarted"
+            class="mt-4"
             horizontal
             label-cols-sm="5"
             label-cols-md="4"
@@ -38,10 +41,10 @@
           >
             <div style="display: flex;">
               <b-form-select v-model="alang" :options="alangOptions" label="alang"></b-form-select>
-              <b-dropdown variant="outline-light" class="dropdown-lang" text="🗺" no-caret>
+              <b-dropdown variant="outline-light" class="dropdown-lang alang-leximap" text="🗺" no-caret>
                 <b-btn v-for="(l,i) in aLeximap" :key="i" 
                   class="btn-dropdown-lang" variant="outline-light" :size="i>0?'sm':''" 
-                  :style="`top:${l.coord_y-120}px;left:${l.coord_x*Math.max(1,windowWidth/1440)-100}px;`"
+                  :style="`top:${l.coord_y-130}px;left:${l.coord_x*Math.max(1,windowWidth/1440)-100}px;`"
                   @click="onClickLeximapBtnAlang($event, l)">
                   {{ l.text }}
                 </b-btn>
@@ -57,10 +60,10 @@
           >
             <div style="display: flex;">
               <b-form-select v-model="qlang" :options="qlangOptions" label="qlang" class=""></b-form-select>
-              <b-dropdown variant="outline-light" class="dropdown-lang" text="🗺" no-caret>
+              <b-dropdown variant="outline-light" class="dropdown-lang qlang-leximap" text="🗺" no-caret>
                 <b-btn v-for="(l,i) in qLeximap" :key="i" 
                   class="btn-dropdown-lang" variant="outline-light" size="sm"
-                  :style="`top:${l.coord_y-120}px;left:${l.coord_x*Math.max(1,windowWidth/1440)-100}px;color:${l.value==alang?'var(--blue)':'var(--japanese-indigo)'};`"
+                  :style="`top:${l.coord_y-130}px;left:${l.coord_x*Math.max(1,windowWidth/1440)-100}px;color:${l.value==alang?'var(--blue)':'var(--japanese-indigo)'};`"
                   @click="onClickLeximapBtnQlang($event, l)">
                   {{ l.text.replace(/ *\([^)]*\) */g, '') }}
                 </b-btn>
@@ -88,7 +91,7 @@
       </b-jumbotron>
       
       <b-container>
-        <b-row v-if="quizStarted">
+        <b-row v-show="quizStarted">
           <b-collapse id="collapse-hypernyms">
             <b-btn variant="outline-light" style="font-size: large;" id="btn-toggle-display-quote"
               @click="toggleDisplayQuote($event)" 
@@ -107,15 +110,18 @@
             </b-form-group>
           </b-collapse>
           <b-col class="flex">
-            <b-btn v-b-toggle.collapse-hypernyms class="float-right" variant="outline-light">💣</b-btn>
+            <b-btn v-b-toggle.collapse-hypernyms variant="outline-light" 
+              style="position:fixed;top:0;left:0;"
+              @click="toggleCollapseBomb"
+              >💣</b-btn>
           </b-col>
         </b-row>
 
-        <b-row class="flex" v-if="quizStarted">
-          <b-progress class="d-inline-flex col col-9 col-sm-10 col-xl-11 p-0" :max="levelMaxCap+10" height="2rem" striped :animated="progressAnimate">
+        <b-row class="flex mt-2" v-if="quizStarted">
+          <b-progress class="d-inline-flex col col-9 col-sm-10 col-xl-11 p-0" :max="levelMaxCap+5" height="2rem" striped :animated="progressAnimate">
             <b-progress-bar class="bg-steel-blue" style="animation-direction: reverse;"
-              :value="lvl+10"
-              :label="`Lv. ${lvl} (${quizPlayed})`">
+              :value="lvl+5"
+              :label="`Lv. ${lvl} ✔${quizCorrect}/${quizPlayed}`">
             </b-progress-bar>
           </b-progress>
           <b-col class="col-3 col-sm-2 col-xl-1 pr-0">
@@ -178,6 +184,11 @@
           </b-progress>
         </div>
       </b-container>
+
+      <!-- <a href="https://xdqc.github.io/world-trade-map/" target="_blank" v-if="!quizStarted&&!showScore">
+        <img src="./xdqc.github.io_world-trade-map.gif" alt="World Trade Map" srcset="" style="width:100%;margin-top:-2rem;">
+      </a> -->
+
       <b-alert
         v-model="showBottomAlert"
         class="position-fixed fixed-bottom m-0 rounded-0 px-4"
@@ -185,9 +196,12 @@
         variant="warning"
         dismissible
       >
-        Only functional cookies are used for remembering language setting and game progress. <br> 
+        This site does not use any analytical or marketing cookies. Only functional cookies are used for remembering language setting and game progress. <br> 
         Third-party cookies from wikimedia.org may present for accessing wikidata and wikiquote: <a href="https://foundation.wikimedia.org/wiki/Cookie_statement">Wikimedia cookie statement</a>
       </b-alert>
+      <footer class="text-muted" style="position:absolute;bottom:0;text-align:center;width:100%;z-index:-100;">
+        © 2021 KnB.wiki
+      </footer>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="./www/wikiquote.js"></script>

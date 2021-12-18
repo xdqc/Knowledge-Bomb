@@ -20,6 +20,8 @@ new Vue({
     answer: -1,
     score: -1,
     windowWidth: window.innerWidth,
+    windowHeight: window.innerHeight,
+    isCollapsingBomb: true,
     displayTitleImage: true,
     displayTopQuote: true,
     startBtnDisabled: false,
@@ -32,7 +34,7 @@ new Vue({
     difficulty: 4,
     difficultyLvl: 7,
     difficulties: [
-      {value: 1, icon:'1️⃣', tooltip:'Explorer'},
+      {value: 1, icon:'1️⃣', tooltip:'Wanderer'},
       {value: 2, icon:'2️⃣', tooltip:'Novice'},
       {value: 3, icon:'3️⃣', tooltip:'Casual'},
       {value: 4, icon:'4️⃣', tooltip:'Easy'},
@@ -70,6 +72,11 @@ new Vue({
           coord_x: d.coord_x,
           coord_y: d.coord_y,
         }))
+        // show leximap on large screen
+        if (this.windowWidth>1200 && this.windowHeight>1200) {
+          const aLeximapBtn = document.querySelector('.dropdown-lang .dropdown-toggle')
+          aLeximapBtn.click()
+        }
       })
       .then(() => { this.popHypernym(true) })
       .catch((err) => { console.log(err) })
@@ -153,11 +160,11 @@ new Vue({
             dd.icon = '️??'
             dd.tooltip = 'Reach all levels in the previous difficulty to unlock'
           }
-          // if (i===0 && this.difficultyLvl<=this.difficulties.length-3) {
-          //   dd.disabled = true
-          //   dd.icon = this.difficultyLvl<this.difficulties.length-3 ? '️' : '??'
-          //   dd.tooltip = `Finish difficulty ${this.difficultyLvl<this.difficulties.length-3 ? '??' : '9'} to unlock`
-          // }
+          if (i===0 && this.difficultyLvl<=this.difficulties.length-3) {
+            dd.disabled = true
+            dd.icon = this.difficultyLvl<this.difficulties.length-3 ? '️' : '??'
+            dd.tooltip = `Finish difficulty ${this.difficultyLvl<this.difficulties.length-3 ? '??' : '9'} to unlock`
+          }
           return dd 
         })
         .sort((a,b) => a.value-b.value)
@@ -412,8 +419,8 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       if (this.windowWidth <= 576) {
         document.getElementById('btn-toggle-display-quote').click()
       }
-      document.getElementsByClassName('jumbotron')[0].classList.add('py-0','mb-0')
-      document.getElementsByClassName('wikiquote')[0].classList.remove('justify-content-center')
+      document.getElementById('page-header').classList.add('py-0','mb-0')
+      document.getElementById('wikiquote').classList.remove('justify-content-center')
     },
     gameOver: function(score) {
       this.score = score
@@ -422,8 +429,8 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       this.q_title = ''
       this.q_title_en = ''
       this.q_hypernym = ''
-      document.getElementsByClassName('jumbotron')[0].classList.remove('py-0', 'mb-0')
-      document.getElementsByClassName('wikiquote')[0].classList.add('justify-content-center')
+      document.getElementById('page-header').classList.remove('py-0', 'mb-0')
+      document.getElementById('wikiquote').classList.add('justify-content-center')
       this.displayTopQuote = true
 
       // recalculate available difficulties
@@ -563,6 +570,12 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       this.displayTopQuote = !this.displayTopQuote
       e.target.textContent = this.displayTopQuote ? '🧙💬' : '🧙🔇'
       e.target.title = this.displayTopQuote ? 'Mute me, improve your performance (less network traffic, less laggy)' : "I'll be back"
+    },
+
+    toggleCollapseBomb: function(e) {
+      this.isCollapsingBomb = !this.isCollapsingBomb
+      e.target.textContent = this.isCollapsingBomb ? '💣' : '💥'
+      e.target.title = this.isCollapsingBomb ? 'Detonator' : `B${'o'.repeat(Math.max(2,this.quizCorrect))}m!`
     },
 
     speakQuote: function(e) {
