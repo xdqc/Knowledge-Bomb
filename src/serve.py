@@ -33,14 +33,14 @@ def next():
 def save_difficulty_level():
     payload = request.get_json()
     resp = jsonify(payload)
-    resp.set_cookie('d', f"{hex(round(time.time()*1e6))[:2:-1]}{hex(int(payload['difficultyLvl']))[2:]}", max_age=3600*24*300, secure=True)
+    resp.set_cookie('d', f"{hex(round(time.time()*1e6))[:2:-1]}{hex(int(payload['difficultyLvl']))[2:]}", max_age=3600*24*300)
     return resp
 
 @app.route('/save-languages', methods=['POST'])
 def save_languages():
     payload = request.get_json()
     resp = jsonify(payload)
-    resp.set_cookie('lang', f"{payload['alang']}+{payload['qlang']}", max_age=3600*24*300, secure=True)
+    resp.set_cookie('lang', f"{payload['alang']}+{payload['qlang']}", max_age=3600*24*300)
     return resp
 
 @app.route('/heartbeat')

@@ -30,17 +30,18 @@ new Vue({
     hypernym_options: [],
     hypernym_index: 1,
     difficulty: 4,
-    difficultyLvl: 4,
+    difficultyLvl: 7,
     difficulties: [
-      {value: 1, icon:'1️⃣', tooltip:'There you go'},
-      {value: 2, icon:'2️⃣', tooltip:'Easy'},
-      {value: 3, icon:'3️⃣', tooltip:'Normal'},
-      {value: 4, icon:'4️⃣', tooltip:'Hard'},
-      {value: 6, icon:'6️⃣', tooltip:'Expert'},
-      {value: 8, icon:'8️⃣', tooltip:'Master'},
-      {value: 9, icon:'9️⃣', tooltip:'Nightmare'},
-      {value:12, icon:'1️⃣2️⃣', tooltip:'Mephistophelian'},
-      {value:16, icon:'1️⃣6️⃣', tooltip:'Diabolical'},
+      {value: 1, icon:'1️⃣', tooltip:'Explorer'},
+      {value: 2, icon:'2️⃣', tooltip:'Novice'},
+      {value: 3, icon:'3️⃣', tooltip:'Casual'},
+      {value: 4, icon:'4️⃣', tooltip:'Easy'},
+      {value: 6, icon:'6️⃣', tooltip:'Hard'},
+      {value: 8, icon:'8️⃣', tooltip:'Expert'},
+      {value: 9, icon:'9️⃣', tooltip:'Master'},
+      {value:12, icon:'1️⃣2️⃣', tooltip:'Nightmare'},
+      {value:16, icon:'1️⃣6️⃣', tooltip:'Mephistophelian'},
+      {value:24, icon:'2️⃣4️⃣', tooltip:'Diabolical'},
     ]
   },
   mounted: function() {
@@ -126,18 +127,21 @@ new Vue({
     alangOptions() {
       return this.alang_options
     },
+    alangOpt() {
+      return this.alang_options.find(l => l.value === this.alang) || { label_a: '', label_q: '', label_s: '', label_t: ''}
+    },
     labelQuestion() {
-      return this.alang_options.find(l => l.value === this.alang)?.label_q || this.alang_options[0].label_q
+      return this.alangOpt.label_q || this.alang_options[0].label_q
     },
     labelAnswer() {
-      return this.alang_options.find(l => l.value === this.alang)?.label_a || this.alang_options[0].label_a
+      return this.alangOpt.label_a || this.alang_options[0].label_a
     },
     labelGameStart() {
-      return this.alang_options.find(l => l.value === this.alang)?.label_s || this.alang_options[0].label_s
+      return this.alangOpt.label_s || this.alang_options[0].label_s
     },
-    gameTitle() {
+    labelPageTitle() {
       if (this.quizStarted) return ''
-      return this.alang_options.find(l => l.value === this.alang)?.label_t || this.alang_options[0].label_t
+      return this.alangOpt.label_t || this.alang_options[0].label_t
     },
     showDifficulties() {
       return this.difficulties
@@ -149,14 +153,17 @@ new Vue({
             dd.icon = '️??'
             dd.tooltip = 'Reach all levels in the previous difficulty to unlock'
           }
-          if (i===0 && this.difficultyLvl<=this.difficulties.length-2) {
-            dd.disabled = true
-            dd.icon = this.difficultyLvl<this.difficulties.length-2 ? '️' : '??'
-            dd.tooltip = `Finish difficulty ${dd.icon=='' ? '??' : '9'} to unlock`
-          }
+          // if (i===0 && this.difficultyLvl<=this.difficulties.length-3) {
+          //   dd.disabled = true
+          //   dd.icon = this.difficultyLvl<this.difficulties.length-3 ? '️' : '??'
+          //   dd.tooltip = `Finish difficulty ${this.difficultyLvl<this.difficulties.length-3 ? '??' : '9'} to unlock`
+          // }
           return dd 
         })
         .sort((a,b) => a.value-b.value)
+    },
+    levelMaxCap(){
+      return Object.keys(this.board).length
     },
     levelPlayed(){
       return Object.values(this.board).filter(v => v.length>0).length
@@ -608,7 +615,8 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       return langVoices
     },
     getCookieValue: function(name) {
-      return document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
+      const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
+      return m ? m.pop()||'' : ''
     },
     /** Utils END */
   },

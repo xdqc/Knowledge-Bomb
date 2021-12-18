@@ -31,6 +31,7 @@ h1 {
   border: none;
   padding: 0.15rem;
   overflow-wrap: break-word;
+  overflow: auto;
 }
 .btn-secondary {
   background-color: transparent;

@@ -4,6 +4,7 @@ import requests
 import pyodbc
 import webbrowser
 import time
+from collections import Counter
 from datetime import datetime
 from bs4 import BeautifulSoup
 from slugify import slugify
@@ -79,6 +80,48 @@ def prepare_insert_articles(wikidata_id, langs):
         values.append(f"( {wikidata_id}, '{c}', N'{t}', '{s}', SOUNDEX('{s}'),SOUNDEX(REVERSE('{s}')) )")
     return f"INSERT INTO wiki.article (item, language, title, title_latin, soundexo, soundexr) VALUES {', '.join(values)}"
 
+def sql_add_language_coord():
+    LexiMap = hypernyms = json.load(open('./lexical_map.json','r'))
+    cursor = conn.cursor()
+    for lexi in LexiMap:
+        sqlstr = f"UPDATE wiki.language SET coord_x={lexi['x']}, coord_y={lexi['y']} WHERE code='{lexi['l']}'"
+        print(sqlstr)
+        cursor.execute(sqlstr)
+    cursor.commit()
+
+def sql_find_language_fix():
+    cursor = conn.cursor()
+    cursor.execute("SELECT code FROM wiki.language ORDER BY rank")
+    for row in cursor.fetchall():
+        sqlstr = f"""SELECT code, a.title FROM wiki.language l
+        CROSS APPLY (
+            SELECT item,title FROM wiki.article a
+            WHERE a.item = l.item 
+            AND a.language = '{row[0]}'
+        ) a
+        ORDER BY a.title"""
+        cursor.execute(sqlstr)
+        words = []
+        for r in cursor.fetchall():
+            words.extend([x for x in re.split(r'\W+', r[1]) if x])
+        for c in Counter(words).most_common(1):
+            if c[1] > 30 and len(c[0])>3:
+                sqlstr = f"UPDATE wiki.language SET langfix=N'{c[0]}' WHERE code='{row[0]}'"
+                print(sqlstr)
+                cursor.execute(sqlstr)
+                cursor.commit()
+
+def sql_update_language_articles():
+    cursor = conn.cursor()
+    with open('./titlearticles.tsv', 'r', encoding='utf8') as f:
+        for l in f:
+            s = l.split('\t')
+            a = int(s[4].replace(',',''))
+            sqlstr = f"UPDATE wiki.language SET articles={a} WHERE code='{s[3]}'"
+            cursor.execute(sqlstr)
+    cursor.commit()
+
+
 def sparql_get_hyperclass(qid, depth=0):
     sparql = """
     SELECT * WHERE{
@@ -147,7 +190,7 @@ def sparql_batch_hypernym_update(hypernym, hid, is_instance=True, n_subclass=Non
     for b in res['results']['bindings']:
         item = b['item']['value'].split('Q')[1]
         items_all.append(item)
-    for i in range(0,100000,5000):
+    for i in range(0,1000000,5000):
         items = items_all[i:i+5000]
         if len(items) == 0:
             break
@@ -255,25 +298,42 @@ def delete_by_wikidata_id(item):
 
 
 tbdws = [
-'Yemen',
-'Cichlid',
-'QRIO',
-'AD 39',
-'3GPP',
-'Dattatreya',
-'.32 ACP',
-'Fan Li',
-'History of County Wexford',
-'Desertas Islands',
-'Erie Canal',
-'Hyaluronidase',
-'2008 in music',
-'2004 in music',
+'Deaths in 2021',
+'',
 'Al Imran',
-'Lardaro',
+'Alcman',
+'Aukštaitija',
+'Azad Kashmir',
+'Bayan I',
+'Cichlid',
 'Coop Himmelb(l)au',
-'Tonga Trench',
+'Ctesias',
+'Dattatreya',
+'Erie Canal',
+'Ephialtes',
+'Fan Li',
+'Gan Ying',
+'Hyaluronidase',
+'Henutsen',
+'Haggai',
+'Ictinus',
+'Italy',
+'Irish Singles Chart',
+'Ivano-Fracena',
+'Las Regueras',
+'Lardaro',
+'Makurdi',
+'Peaky Blinders',
+'Pope Joan',
+'Pleyel et Cie',
+'QRIO',
 'Terpander',
+'Tehuacán',
+'Tonga Trench',
+'Túrin Turambar',
+'Yemen',
+'Zacchaeus',
+'Zadok',
 ]
 
 for c in tbdws:
@@ -281,9 +341,10 @@ for c in tbdws:
     
 
 if __name__ == '__main__':
-    build_hypernym_grid()
+    # build_hypernym_grid()
+    insert_by_titles()
     # order_hyperitemss()
     # open_sparql_item_links()
-    # insert_by_titles()
     # sparql_batch_hypernym_update(514,66394244)
+    # sql_add_language_coord()
     conn.close()
