@@ -2,6 +2,7 @@ import pyodbc
 import math, random
 from environs import Env
 
+
 env = Env()
 env.read_env()
 
@@ -67,8 +68,8 @@ class Quiz:
 
     @classmethod
     def get_languages(cls):
-        sqlstr = '''SELECT TOP(320) code,name_local,label_question,label_answer,label_difficulty,label_gametitle,coord_x,coord_y 
-        FROM wiki.language ORDER BY [rank]'''
+        sqlstr = """SELECT TOP(320) code,name_local,label_question,label_answer,label_difficulty,label_gametitle,coord_x,coord_y 
+        FROM wiki.language ORDER BY [rank]"""
         cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
         res = []
@@ -81,8 +82,8 @@ class Quiz:
 
     @classmethod
     def get_language_names(cls, lang):
-        sqlstr = f"""DECLARE @langfix AS nvarchar(max)
-            = (SELECT TOP(1) langfix FROM wiki.language WHERE code = '{lang}')
+        sqlstr = """DECLARE @langfix AS nvarchar(max)
+            = (SELECT TOP(1) langfix FROM wiki.language WHERE code = ?)
         SELECT code, TRIM(REPLACE(REPLACE(COALESCE(a.title, l.name), @langfix, ''), '()', '')) as title,
             CASE WHEN title IS NULL THEN NULL ELSE coord_x END, 
             CASE WHEN title IS NULL THEN NULL ELSE coord_y END
@@ -90,20 +91,20 @@ class Quiz:
         OUTER APPLY (
             SELECT item,title FROM wiki.article a
             WHERE a.item = l.item 
-            AND a.language = '{lang}'
+            AND a.language = ?
         ) a
         ORDER BY CASE WHEN a.title IS NULL THEN 1 ELSE 0 END, title, l.name"""
         cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
         res = []
-        for lang in cursor.execute(sqlstr).fetchall():
+        for lang in cursor.execute(sqlstr, [lang,lang]).fetchall():
             res.append({'value':lang[0], 'text':lang[1][:1].upper()+lang[1][1:], 
                 'coord_x':lang[2], 'coord_y':lang[3]})
         return res
 
     @classmethod
     def get_hypernyms(cls, qlang, alang):
-        sqlstr = f"""SELECT  DISTINCT 
+        sqlstr = """SELECT  DISTINCT 
             hypernym ,e.title ,a.title ,q.title
         FROM [wiki].[item] i
         OUTER APPLY (
@@ -112,17 +113,17 @@ class Quiz:
         ) e
         OUTER APPLY (
             SELECT title FROM wiki.article
-            WHERE language = '{alang}' AND item = i.hypernym
+            WHERE language = ? AND item = i.hypernym
         ) a
         OUTER APPLY (
             SELECT title FROM wiki.article
-            WHERE language = '{qlang}' AND item = i.hypernym
+            WHERE language = ? AND item = i.hypernym
         ) q
         ORDER BY e.title"""
         cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
         res = []
-        for h in cursor.execute(sqlstr).fetchall():
+        for h in cursor.execute(sqlstr, [alang, qlang]).fetchall():
             if h[0]:
                 res.append({'value':h[0], 'texts': [h[1],h[2],h[3]]})
         return res
@@ -130,18 +131,18 @@ class Quiz:
     @classmethod
     def get_item_by_level(cls, lvl, board, qlang, alang, hypernym=None):
         level = cls.ladder[lvl-1]
-        played_correct = [k for k in board[str(lvl)] if k > 0]
+        played_correct = [str(k) for k in board[str(lvl)] if k > 0]
         if len(played_correct) == 0:
-              played_correct.extend([0])
+              played_correct.extend(['0'])
         sqlstr = f"""
         SELECT TOP(1) i.[id], i.hypernym, q.title, q_en.title, a.title ,a.title_latin
         FROM (
             SELECT [id], hypernym
             FROM [wiki].[item]
-            WHERE lang_count >= {level[1]}
-                AND lang_count <  {level[2]}
-                AND id NOT IN ({','.join([str(i) for i in played_correct])})
-                {('AND hypernym IN('+ ",".join([str(h) for h in hypernym if h])+')') if hypernym else 'AND hypernym is NULL'}
+            WHERE lang_count >= ?
+                AND lang_count <  ?
+                AND id NOT IN ({','.join(played_correct)})
+                {('AND hypernym IN('+ ",".join([str(h) for h in hypernym if h>0])+')') if hypernym else 'AND hypernym is NULL'}
         ) i
         CROSS APPLY (
             SELECT item, title FROM wiki.article
@@ -154,13 +155,14 @@ class Quiz:
             WHERE language = '{alang}' AND item = i.id) a
         ORDER BY CHECKSUM(NEWID())
         """
+        params = [level[1], level[2]]
         cursor = None
         while cursor is None:
             try:
                 cursor = cls.conn.cursor()
             except:
                 cls.conn = pyodbc.connect(conn_str)
-        result = cursor.execute(sqlstr).fetchall()
+        result = cursor.execute(sqlstr, params).fetchall()
         return result[0] if len(result) > 0 else None
 
     @classmethod
@@ -168,42 +170,46 @@ class Quiz:
         if difficulty not in [1,2,3,4,6,8,9,12,16]:
             difficulty = 4
         num = difficulty
+        alang = alang.replace('--', '')
         sqlstr = f"""
         SELECT title, r FROM (
           SELECT title, r FROM (
-            SELECT TOP ({num}) 
-              title, ABS(item - {item}) * 0.001 * (ABS(CHECKSUM(NewId())) % 127 + 1) r
+            SELECT TOP (?) 
+              title, ABS(item - ?) * 0.001 * (ABS(CHECKSUM(NewId())) % 127 + 1) r
             FROM wiki.article
             WHERE language = '{alang}'
-              AND (soundexo = SOUNDEX('{a_title_latin}') AND soundexo <> '0000')
+              AND (soundexo = SOUNDEX(?) AND soundexo <> '0000')
             ORDER BY r) a
           UNION
           SELECT title, r FROM (
-            SELECT TOP ({num}) 
-              title, ABS(item - {item}) * 0.01 * (ABS(CHECKSUM(NewId())) % 127 + 1) r
+            SELECT TOP (?) 
+              title, ABS(item - ?) * 0.01 * (ABS(CHECKSUM(NewId())) % 127 + 1) r
             FROM wiki.article
             WHERE language = '{alang}'
-              AND (soundexr = SOUNDEX(REVERSE('{a_title_latin}')) )
+              AND (soundexr = SOUNDEX(REVERSE(?)) )
             ORDER BY r) b 
         ) u
         ORDER BY r
         """
+        params = [num,item,alang,a_title_latin]*2
         cursor = cls.conn.cursor()
         result = [] 
-        for r in cursor.execute(sqlstr).fetchall():
+        for r in cursor.execute(sqlstr, [num,item,a_title_latin]*2).fetchall():
             if r[0] not in result: # order should be preserved and no duplicate
                 result.append(r[0])
         if len(result) < num:
-            sqlstr = f""" SELECT title
+            sqlstr = """ SELECT title
             FROM wiki.article
-            WHERE language = '{alang}'
-            ORDER BY ABS(item - {item}) * 0.0001 * (ABS(CHECKSUM(NewId())) % 127 + 1)
-            OFFSET (1) ROWS FETCH NEXT ({num}) ROWS ONLY """
-            result.extend([r[0] for r in cursor.execute(sqlstr).fetchall() if r[0] not in result])
+            WHERE language = ?
+            ORDER BY ABS(item - ?) * 0.0001 * (ABS(CHECKSUM(NewId())) % 127 + 1)
+            OFFSET (1) ROWS FETCH NEXT (?) ROWS ONLY """
+            result.extend([r[0] for r in cursor.execute(sqlstr, [alang,item,num]).fetchall() if r[0] not in result])
         return result[:num]
 
     @classmethod
     def run_level(cls, lvl, board, qlang, alang, hypernym, difficulty, recurr=0):
+        if len(alang) > 12 or len(qlang) > 12:
+            return cls.final_score(board)
         level = cls.get_item_by_level(lvl, board, qlang, alang, hypernym)
         # when run out of current level, run next level; circle the ladder, stop when done a circle
         if level is None:
@@ -213,7 +219,7 @@ class Quiz:
             return cls.run_level(1 if lvl == len(cls.ladder) else lvl+1, board, qlang, alang, hypernym, difficulty, recurr)
         
         q_id,q_hypernym,q_title,q_title_en,a_title,a_title_latin = level
-        # query database to select items with similar sound
+        # find items with similar sound
         similar_titles = cls.get_similar_titles(q_id, a_title_latin, alang, difficulty)
         random.shuffle(similar_titles)
         correct_choice = similar_titles.index(a_title)
