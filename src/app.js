@@ -32,18 +32,20 @@ new Vue({
     hypernym_options: [],
     hypernym_index: 1,
     difficulty: 4,
-    difficultyLvl: 7,
+    difficultyLvl: 4,
     difficulties: [
-      {value: 1, icon:'1️⃣', tooltip:'Wanderer'},
-      {value: 2, icon:'2️⃣', tooltip:'Novice'},
-      {value: 3, icon:'3️⃣', tooltip:'Casual'},
-      {value: 4, icon:'4️⃣', tooltip:'Easy'},
-      {value: 6, icon:'6️⃣', tooltip:'Hard'},
-      {value: 8, icon:'8️⃣', tooltip:'Expert'},
-      {value: 9, icon:'9️⃣', tooltip:'Master'},
-      {value:12, icon:'1️⃣2️⃣', tooltip:'Nightmare'},
-      {value:16, icon:'1️⃣6️⃣', tooltip:'Mephistophelian'},
-      {value:24, icon:'2️⃣4️⃣', tooltip:'Diabolical'},
+      {value: 1, icon:'1️⃣', tooltip:'Wanderer', keymap:{'7':0,'g':0,'u':0,'4':0,'h':0,'j':0}},
+      {value: 2, icon:'2️⃣', tooltip:'Picnic', keymap:{'7':0,'g':0,'u':0,'8':0,'c':0,'i':0,'4':1,'h':1,'j':1,'5':1,'t':1,'k':1}},
+      {value: 3, icon:'3️⃣', tooltip:'Casual', keymap:{'7':0,'g':0,'u':0,'8':0,'c':0,'i':0,'4':1,'h':1,'j':1,'5':1,'t':1,'k':1,'1':2,'m':2,'2':2,'w':2,',':2}},
+      {value: 4, icon:'4️⃣', tooltip:'Simple', keymap:{'7':0,'g':0,'u':0,'8':1,'c':1,'i':1,'4':2,'h':2,'j':2,'5':3,'t':3,'k':3}},
+      {value: 6, icon:'6️⃣', tooltip:'Moderate', keymap:{'7':0,'g':0,'u':0,'8':1,'c':1,'i':1,'4':2,'h':2,'j':2,'5':3,'t':3,'k':3,'1':4,'m':4,'2':5,'w':5,',':5}},
+      {value: 8, icon:'8️⃣', tooltip:'Intricate', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3,'1':4,'h':4,'j':4,'2':5,'t':5,'k':5,'0':6,'m':6,'.':7,'w':7,',':7}},
+      {value: 9, icon:'9️⃣', tooltip:'Devious', keymap:{'7':0,'g':0,'u':0,'8':1,'c':1,'i':1,'9':2,'r':2,'o':2,'4':3,'h':3,'j':3,'5':4,'t':4,'k':4,'6':5,'n':5,'l':5,'1':6,'m':6,'2':7,'w':7,',':7,'3':8,'v':8,'.':8}},
+      {value:12, icon:'1️⃣2️⃣', tooltip:'Fiendish', keymap:{'7':0,'8':1,'9':2,'4':3,'g':3,'u':3,'5':4,'c':4,'i':4,'6':5,'r':5,'o':5,'1':6,'h':6,'j':6,'2':7,'t':7,'k':7,'3':8,'n':8,'l':8,'0':9,'m':9,'.':10,'w':10,',':10,'v':11,'Enter':11}},
+      {value:16, icon:'1️⃣6️⃣', tooltip:'Nightmare', keymap:{'7':0,'8':1,'9':2,'0':3,'g':4,'u':4,'c':5,'i':5,'r':6,'o':6,'l':7,'p':7,'h':8,'j':8,'t':9,'k':9,'n':10,'s':11,';':11,'m':12,'w':13,',':13,'v':14,'.':14,'z':15,}},
+      {value:24, icon:'2️⃣4️⃣', tooltip:'Mephistophelian', keymap:{}},
+      {value:36, icon:'3️⃣6️⃣', tooltip:'Diabolical', keymap:{}},
+      {value:54, icon:'5️⃣4️⃣', tooltip:'Maelstrom', keymap:{}},
     ]
   },
   mounted: function() {
@@ -73,9 +75,8 @@ new Vue({
           coord_y: d.coord_y,
         }))
         // show leximap on large screen
-        if (this.windowWidth>1200 && this.windowHeight>1200) {
-          const aLeximapBtn = document.querySelector('.dropdown-lang .dropdown-toggle')
-          aLeximapBtn.click()
+        if (this.windowWidth>1200 && this.windowHeight>960) {
+          document.querySelector('.dropdown-lang .dropdown-toggle').click()
         }
       })
       .then(() => { this.popHypernym(true) })
@@ -87,25 +88,18 @@ new Vue({
     })(this.getCookieValue('d'))
 
     window.addEventListener('keydown', (e) => {
-      const KEYMAP = {'7':0,'8':1,'9':2,'4':3,'5':4,'6':5,'1':6,'2':7,'3':8,}
-      const MOVEMAP = {
-        'ArrowUp': i => i-3 >= 0 ? i-3 : i-3+9,
-        'ArrowDown': i => i+3 < 9 ? i+3 : i+3-9,
-        'ArrowLeft': i => [0,3,6].indexOf(i) < 0 ? i-1 : i+2,
-        'ArrowRight': i => [2,5,8].indexOf(i) < 0 ? i+1 : i-2,
-      }
       if(this.quizStarted) {
-        let c = document.getElementById('choice-'+KEYMAP[e.key])
+        const getBtnIdxByKey = (key,dif) => this.difficulties[dif].keymap[key]
+        const btnIdx = (key) => getBtnIdxByKey(key, this.difficultyIndex-1)
+        const btnC = (idx) => document.getElementById('choice-'+idx)
+        const c = btnC(btnIdx(e.key))
         if (c) c.click()
-        else {
-          if (MOVEMAP[e.key] && document.activeElement && document.activeElement.classList.contains('btn-choice')){
-            i = parseInt(document.activeElement.id.slice(-1));
-            document.getElementById('choice-'+MOVEMAP[e.key](i)).focus()
-          }
-        }
-        if (e.key == '0') this.speakTitle()
-        if (e.key == '+') document.getElementsByClassName('title-link')[0].click()
-        if (e.key == '.') this.displayTitleImage = !this.displayTitleImage
+        
+        if (e.key == 'a') document.getElementById('btn-bomb').click()
+        if (e.key == '-' || e.key == 'y') this.speakTitle()
+        if (e.key == '/' || e.key == 'q') this.speakQuote()
+        if (e.key == '*' || e.key == 'd') this.toggleDisplayTitleImg()
+        if (e.key == '+' || e.key == 'f') document.getElementsByClassName('title-link')[0].click()
       }
     })
 
@@ -137,6 +131,9 @@ new Vue({
     alangOpt() {
       return this.alang_options.find(l => l.value === this.alang) || { label_a: '', label_q: '', label_s: '', label_t: ''}
     },
+    qlangOpt() {
+      return this.qlang_options.find(l => l.value === this.qlang) || { label_a: '', label_q: '', label_s: '', label_t: ''}
+    },
     labelQuestion() {
       return this.alangOpt.label_q || this.alang_options[0].label_q
     },
@@ -160,14 +157,18 @@ new Vue({
             dd.icon = '️??'
             dd.tooltip = 'Reach all levels in the previous difficulty to unlock'
           }
-          if (i===0 && this.difficultyLvl<=this.difficulties.length-3) {
+          if (i===0 && this.difficultyLvl<=this.difficulties.length-0) {
             dd.disabled = true
-            dd.icon = this.difficultyLvl<this.difficulties.length-3 ? '️' : '??'
-            dd.tooltip = `Finish difficulty ${this.difficultyLvl<this.difficulties.length-3 ? '??' : '9'} to unlock`
+            dd.icon = '??'
+            dd.hide = this.difficultyLvl<this.difficulties.length-4
+            dd.tooltip = `Finish the last difficulty to unlock`
           }
           return dd 
         })
         .sort((a,b) => a.value-b.value)
+    },
+    difficultyIndex() {
+      return this.difficulties.findIndex(d => d.value == this.difficulty)+1
     },
     levelMaxCap(){
       return Object.keys(this.board).length
@@ -198,6 +199,25 @@ new Vue({
       let row = document.getElementsByClassName('choices')[0] 
       let width =  window.getComputedStyle(row).width.slice(0, -2)
       return Math.ceil(width / 10 / Math.sqrt(this.difficulty) * (1+(Math.sqrt(this.difficulty)-1)/12))
+    },
+    hotkeyTable() {
+      const groupBy = (xs, k, f) => xs.reduce((r,x) => {
+        (r[x[k]] = r[x[k]] || []).push(f(x))
+        return r
+      }, {}) 
+      const g = groupBy(Object.entries(this.difficulties[this.difficultyIndex-1].keymap), 1, (x)=>x[0])
+      const gt = Object.entries(g).map(([k,v]) => ({ 
+        Key: v.map(k=>k.length==1 ? k.toUpperCase() : k), 
+        Description: `choose "${this.choices[k]}"`,
+      }))
+      return [
+        {Key: ['A'], Description: `toggle menu collapse`},
+        {Key: ['*','D'], Description: `toggle image display`},
+        {Key: ['/','Q'], Description: `speak quote in ${this.qlang_options.find(l => l.value===this.quoteLang)?.text}`},
+        {Key: ['-','Y'], Description: `speak "${this.q_title}" in ${this.qlangOpt.text}`},
+        {Key: ['+','F'], Description: `lookup "${this.q_title}" on ${this.qlang}.wikipedia.org`},
+        ...gt
+      ]
     },
     showBottomAlert() {
       return !this.getCookieValue('lang')
@@ -274,8 +294,8 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
   },
   methods: {
     /** Basic Game Actions BEGIN */
-    setDifficulty: function(d) {
-      this.difficulty = d
+    setDifficulty: function(df) {
+      this.difficulty = df
       this.newGame()
     },
 
@@ -353,14 +373,10 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         if (data.score >= 0) {
           this.gameOver(data.score)
         } else {
-          let interval = setInterval(() => {
+          let intervalP = setInterval(() => {
             if(waitflag == 1) {
               this.unpackRespData(data)
-              setTimeout(() => {
-                let scrollingElement = (document.scrollingElement || document.body);
-                scrollingElement.scrollTop = scrollingElement.scrollHeight;
-              }, 0);
-              clearInterval(interval)
+              clearInterval(intervalP)
             }
           }, 10);
         }
@@ -377,7 +393,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       })
       .catch((err) => { console.log(err) })
       .finally(() => {
-        let interval = setInterval(() => {
+        let intervalF = setInterval(() => {
           if(waitflag == 1) {
             e.target.classList.add('btn-secondary')
             e.target.classList.remove('disabled')
@@ -388,7 +404,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
             e.target.blur() // Desktop browser: remove focus on anchor; TODO: blur on iOS safari
             e.handled = true
             this.progressAnimate = false
-            clearInterval(interval)
+            clearInterval(intervalF)
           }
         }, 10);
       })
@@ -434,7 +450,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       this.displayTopQuote = true
 
       // recalculate available difficulties
-      if (this.difficulties[this.difficultyLvl-1].value === this.difficulty 
+      if (this.difficultyLvl === this.difficultyIndex 
         && this.score > 0
         && this.levelPlayed === Object.keys(this.board).length) {
         this.difficultyLvl = Math.min(this.difficulties.length+1, this.difficultyLvl+1)
@@ -578,8 +594,8 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       e.target.title = this.isCollapsingBomb ? 'Detonator' : `B${'o'.repeat(Math.max(2,this.quizCorrect))}m!`
     },
 
-    speakQuote: function(e) {
-      const sp = new SpeechSynthesisUtterance(e.target.innerText)
+    speakQuote: function() {
+      const sp = new SpeechSynthesisUtterance(this.quoteQuote)
       const lang = this.toMajorLang(this.quoteLang=='en'?'en':this.alang, true)
       const langVoices = this.getSpeechSynthesisVoices(lang)
       sp.voice = langVoices[Math.floor(Math.random()*langVoices.length)]

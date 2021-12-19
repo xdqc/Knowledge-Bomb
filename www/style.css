@@ -1,16 +1,37 @@
 :root {
-  --body-background: #F9F9F9;
-  --japanese-indigo: #1B4157;
-  --jelly-bean-blue: #437C9B;
-  --moonstones-blue: #71A6C1;
-  --steel-wiki-blue: #3888B6;
-  --light-wiki-blue: #77C1F6;
+  --body-background: #f9f9f9;
+  --mute-neutral-bg: #afb8c133;
+  --japanese-indigo: #1b4157;
+  --half-jpn-indigo: #1b415788;
+  --jelly-bean-blue: #437c9b;
+  --moonstones-blue: #71a6c1;
+  --steel-wiki-blue: #3888b6;
+  --light-wiki-blue: #77c1f6;
 }
 body {
   background-color: var(--body-background);
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
             user-select: none;
+}
+#app {
+  position: relative;
+  min-height: 100vh;
+}
+#quiz-container {
+  padding-bottom: 2rem;
+}
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2rem;
+  padding: 0.25rem 0;
+  text-align: center;
+  width: 100%;
+  clear: both;
+  background-color: var(--mute-neutral-bg);
 }
 h1 {
   text-transform: capitalize;
@@ -29,33 +50,37 @@ h1 {
   background-color: var(--steel-wiki-blue);
 }
 .btn-choice {
-  border-radius: 0%;
-  border-color: var(--moonstones-blue);
-  border-style: dotted;
-  border-width: 1px;
   border: none;
   padding: 0.15rem;
   overflow-wrap: break-word;
-  overflow: auto;
+  overflow: visible;
 }
 .btn-secondary {
   background-color: var(--body-background);
   color: var(--jelly-bean-blue);
 }
 .btn-secondary:hover {
-  background-color: var(--japanese-indigo);
-}
-.btn-secondary:focus {
   background-color: var(--jelly-bean-blue);
 }
+.btn-secondary:focus {
+  background-color: var(--steel-wiki-blue);
+}
 .btn-outline-light {
+  padding: 0 0.5rem;
   border-color: transparent;
 }
-.btn-outline:hover {
-  background-color: var(--moonstones-blue);
+.btn-outline-light:hover {
+  border-style: dotted;
+  border-color: var(--jelly-bean-blue);
 }
+.btn-outline:hover {
+  border-style: dotted;
+  border-color: var(--jelly-bean-blue);
+  box-shadow: 0 0.5rem 0.5rem -0.4rem var(--half-jpn-indigo);
+  transform: translateY(-0.2rem);
+ }
 .btn-outline.disabled:hover {
-  background-color: transparent;
+  background-color: var(--body-background);
 }
 .title-box {
   padding: 5rem 0;
@@ -68,15 +93,6 @@ a.title-link {
   background-color: #f5f5f58f;
   text-decoration: none;
 }
-.progress {
-  border-radius: 0%;
-}
-.custom-switch {
-  width: 12.25rem;
-}
-.custom-control-input:checked~.custom-control-label::before {
-  background-color: var(--steel-wiki-blue)!important;
-}
 .dropdown-lang .dropdown-menu {
   position: fixed!important;
   transform: translate(0%, 0%)!important;
@@ -85,27 +101,36 @@ a.title-link {
   width: 98%;
   min-height: 680px;
   max-height: 750px;
-  border: none;
-  overflow: auto;
   z-index: 10000;
+  border: none;
+  background-size: cover;
+  background-attachment: local;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  box-shadow: 0.5rem 0.5rem 0.5rem -0.6rem var(--japanese-indigo);
 }
 .dropdown-lang.alang-leximap .dropdown-menu  {
-  background-image: url('./Languages_world_map.svg');
-  background-attachment: local;
-  background-size:cover;
+  background-image: url('./asset/Languages_world_map_rotate_filter_a.png');
+}
+.dropdown-lang.qlang-leximap .dropdown-menu  {
+  background-image: url('./asset/Languages_world_map_rotate_filter_q.png');
 }
 .dropdown-lang .btn-dropdown-lang {
   position: absolute;
   white-space: nowrap;
   color: var(--japanese-indigo);
 }
-.dropdown-lang button:hover {
-  color: white!important;
-  background-color: var(--moonstones-blue);
+.dropdown-lang ul button:hover {
+  font-size: 105%;
+  transform: translate(-5%,-10%);
+  border-style: dashed;
+  border-color: var(--jelly-bean-blue);
+  box-shadow: 0 0.2rem 0.2rem -0.15rem var(--half-jpn-indigo);
   z-index: 100;
 }
 .dropdown-lang.show .dropdown-toggle {
-  background-color: var(--moonstones-blue);
+  border-style: dotted;
+  border-color: var(--jelly-bean-blue);
 }
 #quote-quote {
   font-style: italic;
@@ -117,7 +142,34 @@ a.title-link {
 .group-hypernyms {
   column-count: 5;
 } 
-@media (max-height: 1000px) {
+.custom-switch {
+  width: 12.25rem;
+}
+.custom-control-input:checked~.custom-control-label::before {
+  background-color: var(--steel-wiki-blue)!important;
+}
+.progress {
+  border-radius: 0%;
+  background-color: #e9ecef8f;
+}
+.popover {
+  max-width: 360px;
+  transform: translateY(-0.2rem);
+  box-shadow: 0 0.5rem 0.5rem -0.6rem var(--japanese-indigo);
+}
+.popover-header {
+  background-color: var(--body-background);
+}
+.popover kbd {
+  margin: 0 3px;
+  padding: 3px 5px;
+  color: #212529;
+  background-color: #f6f8fa;
+  box-shadow: inset 0 -1px 0 var(--mute-neutral-bg);
+  border: 1px solid var(--mute-neutral-bg);
+  border-radius: 6px;
+}
+@media (max-height: 950px) {
   .dropdown-lang .dropdown-menu {
     top: 5%!important;
   }
@@ -140,7 +192,7 @@ a.title-link {
 }
 @media (max-width: 768px) {
   .group-hypernyms {
-    column-count: 2;
+    column-count: 3;
   }
   .title-link {
     font-size: 3.2rem;
@@ -161,6 +213,9 @@ a.title-link {
   }
   .mobile-w-0 {
     max-width: 0%;
+  }
+  .group-hypernyms {
+    column-count: 2;
   }
   #wikiquote {
     padding-left: 1rem;
