@@ -87,6 +87,7 @@ h1 {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: top right;
+  image-rendering: smooth;
 }
 a.title-link {
   color: black;

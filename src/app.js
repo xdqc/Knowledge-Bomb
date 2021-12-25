@@ -593,17 +593,18 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
 
     toMajorLang: function(lang, isSpeaking) {
       const MAJOR_LANG = {
-        'es': ['an','ast'],
+        'nl': ['fy', 'frr', 'af', 'nds-nl', 'li', 'vls'],
+        'de': ['lb', 'bar', 'als', 'nds', 'stq', 'pdc', 'got'],
+        'es': ['an','ast', 'ext'],
         'pt': ['mwl'],
-        'fr': ['oc', 'co', 'wa', 'nrm', 'pcd', 'frp', 'ht'],
-        'it': ['sc', 'vec', 'lmo', 'scn', 'pms', 'fur', 'nap'],
-        'nl': ['fy', 'af', 'nds-nl', 'li'],
-        'de': ['lb', 'bar', 'als', 'nds', 'stq', 'pdc'],
+        'fr': ['oc', 'co', 'wa', 'nrm', 'pcd', 'frp', 'ht', 'gcr'],
+        'it': ['sc', 'vec', 'lmo', 'scn', 'pms', 'fur', 'nap', 'lij'],
         'ru': ['be', 'ce', 'inh', 'os', 'cv', 'tt', 'crh', 'ba', 'xal', 'kk', 'ky', 'sah', 'tyv', 'tg','bxr', 'rue'],
         'hi': ['pa', 'gu', 'bh', 'mr', 'si', 'sa', 'ne', 'bn', 'kn', 'or', 'te', 'ml', 'ta'],
         'zh': ['zh-yue', 'hak', 'cdo', 'wuu', 'gan', 'zh-classical'],
         'id': ['ms', 'jv', 'su', 'mg']
       }
+      //TODO make it adaptive to available voices on browser and OS
       if (isSpeaking) {
         MAJOR_LANG.es.push('ca', 'eu')
         MAJOR_LANG.pt.push('gl')

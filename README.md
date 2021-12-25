@@ -12,8 +12,8 @@ Source of quizes of this application is data mined from Wikipedia.
 A qualified article ([examples](data/sample_titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these criteria:
 
 - With more than *20* languages versions.
-- Not a Onomatology (Anthroponymy, Taxon, Toponomastics, Hydronym, etc.), which is not a particular person, place, biota, event, chemical, astronomical object, company, product, publication, team, sport match, song, year, decade, day, unicode, etc. [exclusion criteria](src/wikiroamer.js)
-- Can be [Hypernym](data/hypernyms.json) of (`instance_of?/subclass_of*`) items above.
+- Not a Onomatology (Anthroponymy, Taxon, Toponomastics, Hydronym, etc.), which is not a particular person, place, biota, event, chemical, astronomical object, company, product, publication, team, sport match, song, year, decade, day, unicode, etc. [exclusion criteria](src/AI_deeplearning_superwised_algorithm.js)
+- Can be Hypernym of (`instance_of?/subclass_of*`) items above.
 - Not a disambiguation page.
 
 ### Hypernym Categories
@@ -21,6 +21,10 @@ A qualified article ([examples](data/sample_titles.csv)) should be a general, un
 Wikidata items / Wikipedia articles are categorized in the following hypernyms. The design purpose is to achieve balanced number of items/articles per hypernym category for gameplay, simplify as a tree, rather than building an ontologically precise semantic graph.
 
 ![hypernym-categories](docs/hypernym-categories.jpg)
+
+### 2D Language picker based on lexical distance map
+
+Hit the 🗺 button to popup the [2D language picker](docs/lexi_map.PNG). This language picker keeps the constant position of each language no matter showing in which language. It solves the problem of one dimentional language picker ordering the same language alphabetically (even non alphabetical writing system) on variable positions that hard to find: **B**elanda, **D**utch, **F**elemenkçe, **H**ollandees, **N**ederlands, **Ο**λλανδική, **[O]オ**ランダ語, **[H]荷**蘭語 ... 
 
 ### Languages ranking table
 
