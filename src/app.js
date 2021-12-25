@@ -32,17 +32,17 @@ new Vue({
     hypernym_options: [],
     hypernym_index: 1,
     difficulty: 4,
-    difficultyLvl: 4,
+    difficultyLvl: 7,
     difficulties: [
       {value: 1, icon:'1️⃣', tooltip:'Wanderer', keymap:{'7':0,'g':0,'u':0,'4':0,'h':0,'j':0}},
       {value: 2, icon:'2️⃣', tooltip:'Picnic', keymap:{'7':0,'g':0,'u':0,'8':0,'c':0,'i':0,'4':1,'h':1,'j':1,'5':1,'t':1,'k':1}},
       {value: 3, icon:'3️⃣', tooltip:'Casual', keymap:{'7':0,'g':0,'u':0,'8':0,'c':0,'i':0,'4':1,'h':1,'j':1,'5':1,'t':1,'k':1,'1':2,'m':2,'2':2,'w':2,',':2}},
       {value: 4, icon:'4️⃣', tooltip:'Simple', keymap:{'7':0,'g':0,'u':0,'8':1,'c':1,'i':1,'4':2,'h':2,'j':2,'5':3,'t':3,'k':3}},
-      {value: 6, icon:'6️⃣', tooltip:'Moderate', keymap:{'7':0,'g':0,'u':0,'8':1,'c':1,'i':1,'4':2,'h':2,'j':2,'5':3,'t':3,'k':3,'1':4,'m':4,'2':5,'w':5,',':5}},
-      {value: 8, icon:'8️⃣', tooltip:'Intricate', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3,'1':4,'h':4,'j':4,'2':5,'t':5,'k':5,'0':6,'m':6,'.':7,'w':7,',':7}},
-      {value: 9, icon:'9️⃣', tooltip:'Devious', keymap:{'7':0,'g':0,'u':0,'8':1,'c':1,'i':1,'9':2,'r':2,'o':2,'4':3,'h':3,'j':3,'5':4,'t':4,'k':4,'6':5,'n':5,'l':5,'1':6,'m':6,'2':7,'w':7,',':7,'3':8,'v':8,'.':8}},
-      {value:12, icon:'1️⃣2️⃣', tooltip:'Fiendish', keymap:{'7':0,'8':1,'9':2,'4':3,'g':3,'u':3,'5':4,'c':4,'i':4,'6':5,'r':5,'o':5,'1':6,'h':6,'j':6,'2':7,'t':7,'k':7,'3':8,'n':8,'l':8,'0':9,'m':9,'.':10,'w':10,',':10,'v':11,'Enter':11}},
-      {value:16, icon:'1️⃣6️⃣', tooltip:'Nightmare', keymap:{'7':0,'8':1,'9':2,'0':3,'g':4,'u':4,'c':5,'i':5,'r':6,'o':6,'l':7,'p':7,'h':8,'j':8,'t':9,'k':9,'n':10,'s':11,';':11,'m':12,'w':13,',':13,'v':14,'.':14,'z':15,}},
+      {value: 6, icon:'6️⃣', tooltip:'Mild', keymap:{'7':0,'g':0,'u':0,'8':1,'c':1,'i':1,'4':2,'h':2,'j':2,'5':3,'t':3,'k':3,'1':4,'m':4,'2':5,'w':5,',':5}},
+      {value: 8, icon:'8️⃣', tooltip:'Moderate', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3,'1':4,'h':4,'j':4,'2':5,'t':5,'k':5,'0':6,'m':6,'.':7,'w':7,',':7}},
+      {value: 9, icon:'9️⃣', tooltip:'Intricate', keymap:{'7':0,'g':0,'u':0,'8':1,'c':1,'i':1,'9':2,'r':2,'o':2,'4':3,'h':3,'j':3,'5':4,'t':4,'k':4,'6':5,'n':5,'l':5,'1':6,'m':6,'2':7,'w':7,',':7,'3':8,'v':8,'.':8}},
+      {value:12, icon:'1️⃣2️⃣', tooltip:'Devious', keymap:{'7':0,'8':1,'9':2,'4':3,'g':3,'u':3,'5':4,'c':4,'i':4,'6':5,'r':5,'o':5,'1':6,'h':6,'j':6,'2':7,'t':7,'k':7,'3':8,'n':8,'l':8,'0':9,'m':9,'.':10,'w':10,',':10,'v':11,'Enter':11}},
+      {value:16, icon:'1️⃣6️⃣', tooltip:'Fiendish', keymap:{'7':0,'8':1,'9':2,'0':3,'g':4,'u':4,'c':5,'i':5,'r':6,'o':6,'l':7,'p':7,'h':8,'j':8,'t':9,'k':9,'n':10,'s':11,';':11,'m':12,'w':13,',':13,'v':14,'.':14,'z':15,}},
       {value:24, icon:'2️⃣4️⃣', tooltip:'Mephistophelian', keymap:{}},
       {value:36, icon:'3️⃣6️⃣', tooltip:'Diabolical', keymap:{}},
       {value:54, icon:'5️⃣4️⃣', tooltip:'Maelstrom', keymap:{}},
@@ -134,6 +134,9 @@ new Vue({
     qlangOpt() {
       return this.qlang_options.find(l => l.value === this.qlang) || { label_a: '', label_q: '', label_s: '', label_t: ''}
     },
+    quotelangOpt() {
+      return this.qlang_options.find(l => l.value === this.quoteLang)
+    },
     labelQuestion() {
       return this.alangOpt.label_q || this.alang_options[0].label_q
     },
@@ -160,7 +163,7 @@ new Vue({
           if (i===0 && this.difficultyLvl<=this.difficulties.length-0) {
             dd.disabled = true
             dd.icon = '??'
-            dd.hide = this.difficultyLvl<this.difficulties.length-4
+            dd.hide = this.difficultyLvl<this.difficulties.length
             dd.tooltip = `Finish the last difficulty to unlock`
           }
           return dd 
@@ -210,10 +213,11 @@ new Vue({
         Key: v.map(k=>k.length==1 ? k.toUpperCase() : k), 
         Description: `choose "${this.choices[k]}"`,
       }))
+
       return [
         {Key: ['A'], Description: `toggle menu collapse`},
         {Key: ['*','D'], Description: `toggle image display`},
-        {Key: ['/','Q'], Description: `speak quote in ${this.qlang_options.find(l => l.value===this.quoteLang)?.text}`},
+        {Key: ['/','Q'], Description: `speak quote in ${this.quotelangOpt ? this.quotelangOpt.text : this.alangOpt.text }`},
         {Key: ['-','Y'], Description: `speak "${this.q_title}" in ${this.qlangOpt.text}`},
         {Key: ['+','F'], Description: `lookup "${this.q_title}" on ${this.qlang}.wikipedia.org`},
         ...gt
@@ -274,22 +278,6 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       const data = await resp.json()
       this.qlang_options = data
       return data.filter(l => l.coord_x > 0)
-    },
-    async pageTitle() {
-      if (this.quizStarted) return ''
-
-      const title = 'Knowledge bomb'
-      const resp = await fetch("https://translate.api.skitzen.com/translate", {
-        method: "POST",
-        body: JSON.stringify({
-          q: title,
-          source: "en",
-          target: this.alang,
-          format: "text"
-        }),
-        headers: { "Content-Type": "application/json" }
-      })
-      return (await resp.json()).translatedText || title
     },
   },
   methods: {

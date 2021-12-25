@@ -9,7 +9,7 @@ Source of quizes of this application is data mined from Wikipedia.
 
 ### Qualified Wikidata items
 
-A qualified article ([examples](data/sample-titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these criteria:
+A qualified article ([examples](data/sample_titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these criteria:
 
 - With more than *20* languages versions.
 - Not a Onomatology (Anthroponymy, Taxon, Toponomastics, Hydronym, etc.), which is not a particular person, place, biota, event, chemical, astronomical object, company, product, publication, team, sport match, song, year, decade, day, unicode, etc. [exclusion criteria](src/wikiroamer.js)
