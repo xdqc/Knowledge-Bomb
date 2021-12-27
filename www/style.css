@@ -14,6 +14,9 @@ body {
     -webkit-user-select: none; /* Safari */
             user-select: none;
 }
+header {
+  display: none;
+}
 #app {
   position: relative;
   min-height: 100vh;

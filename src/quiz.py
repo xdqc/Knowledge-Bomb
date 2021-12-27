@@ -112,11 +112,12 @@ class Quiz:
         return res
 
     @classmethod
-    def get_item_by_level(cls, lvl, board, qlang, alang, hypernym=None):
+    def get_item_by_level(cls, lvl, board, qlang, alang, hypernyms=[]):
         level = cls.ladder[lvl-1]
         played_correct = [str(k) for sl in list(board.values()) for k in sl if k > 0]
         if len(played_correct) == 0:
               played_correct.extend(['0'])
+        hypernyms = [str(h) for h in hypernyms if h > 0]
         sqlstr = f"""
         SELECT TOP(1) i.[id], i.hypernym, q.title, q_en.title, a.title ,a.title_latin
         FROM (
@@ -124,8 +125,8 @@ class Quiz:
             FROM [wiki].[item]
             WHERE lang_count >= ?
                 AND lang_count <  ?
-                AND id NOT IN ({','.join(played_correct)})
-                {('AND hypernym IN('+ ",".join([str(h) for h in hypernym if h>0])+')') if hypernym else 'AND hypernym is NULL'}
+                AND id NOT IN ({",".join(played_correct)})
+                {'AND hypernym IN ('+",".join(hypernyms) +')' if len(hypernyms)>0 else ''}
         ) i
         CROSS APPLY (
             SELECT item, title FROM wiki.article
@@ -153,7 +154,6 @@ class Quiz:
         if difficulty not in [1,2,3,4,6,8,9,12,16,24,36,54]:
             difficulty = 4
         num = difficulty
-        alang = alang.replace('--', '')
         sqlstr = f"""
         SELECT title, r FROM (
           SELECT title, r FROM (
@@ -191,7 +191,7 @@ class Quiz:
 
     @classmethod
     def run_level(cls, lvl, board, qlang, alang, hypernym, difficulty, recurr=0):
-        if len(alang) > 12 or len(qlang) > 12:
+        if '--' in alang or '--' in qlang or len(alang) > 12 or len(qlang) > 12:
             return cls.final_score(board)
         level = cls.get_item_by_level(lvl, board, qlang, alang, hypernym)
         # when run out of current level, run next level; circle the ladder, stop when done a circle

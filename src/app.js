@@ -150,26 +150,6 @@ new Vue({
       if (this.quizStarted) return ''
       return this.alangOpt.label_t || this.alang_options[0].label_t
     },
-    showDifficulties() {
-      return this.difficulties
-        .slice(0, this.difficultyLvl+1)
-        .map((d,i) => {
-          const dd = JSON.parse(JSON.stringify(d))
-          if (i===this.difficultyLvl && i!==this.difficulties.length) {
-            dd.disabled = true
-            dd.icon = '️??'
-            dd.tooltip = 'Reach all levels in the previous difficulty to unlock'
-          }
-          if (i===0 && this.difficultyLvl<=this.difficulties.length-0) {
-            dd.disabled = true
-            dd.icon = '??'
-            dd.hide = this.difficultyLvl<this.difficulties.length
-            dd.tooltip = `Finish the last difficulty to unlock`
-          }
-          return dd 
-        })
-        .sort((a,b) => a.value-b.value)
-    },
     difficultyIndex() {
       return this.difficulties.findIndex(d => d.value == this.difficulty)+1
     },
@@ -203,6 +183,29 @@ new Vue({
       let width =  window.getComputedStyle(row).width.slice(0, -2)
       return Math.ceil(width / 10 / Math.sqrt(this.difficulty) * (1+(Math.sqrt(this.difficulty)-1)/12))
     },
+    showBottomAlert() {
+      return !this.getCookieValue('lang')
+    },
+    showDifficulties() {
+      return this.difficulties
+        .slice(0, this.difficultyLvl+1)
+        .map((d,i) => {
+          const dd = JSON.parse(JSON.stringify(d))
+          if (i===this.difficultyLvl && i!==this.difficulties.length) {
+            dd.disabled = true
+            dd.icon = '️??'
+            dd.tooltip = 'Reach all levels in the previous difficulty to unlock'
+          }
+          if (i===0 && this.difficultyLvl<=this.difficulties.length-0) {
+            dd.disabled = true
+            dd.icon = '??'
+            dd.hide = this.difficultyLvl<this.difficulties.length
+            dd.tooltip = `Finish the last difficulty to unlock`
+          }
+          return dd 
+        })
+        .sort((a,b) => a.value-b.value)
+    },
     hotkeyTable() {
       const groupBy = (xs, k, f) => xs.reduce((r,x) => {
         (r[x[k]] = r[x[k]] || []).push(f(x))
@@ -223,9 +226,6 @@ new Vue({
         ...gt
       ]
     },
-    showBottomAlert() {
-      return !this.getCookieValue('lang')
-    }
   },
   asyncComputed: {
     async titleImageUrl() {
@@ -281,7 +281,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
     },
   },
   methods: {
-    /** Basic Game Actions BEGIN */
+    //#region Game Actions
     setDifficulty: function(df) {
       this.difficulty = df
       this.newGame()
@@ -397,7 +397,9 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         }, 10);
       })
     },
+    //#endregion
 
+    //#region Game Actions Helper
     packPayload: function(lvl, qid, board, is_correct) {
       return {
         lvl: lvl,
@@ -449,9 +451,9 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         body: JSON.stringify({difficultyLvl: this.difficultyLvl})
       })
     },
-    /** Basic Game Actions END */
+    //#endregion
 
-    /** Game Scores BEGIN */
+    //#region Game Scores
     scoreBar: function(v) {
       // fold list of int to subgroup of consecutive pos/neg count
       return JSON.parse(JSON.stringify(v)).reduce((arr,next) => {
@@ -461,9 +463,9 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         return arr
       }, [])
     },
-    /** Game Scores END */
+    //#endregion Game Scores
 
-    /** Language picker BEGIN */
+    //#region Language picker
     onClickLeximapBtnAlang: function(e, lexi) {
       this.alang = lexi.value
       e.target.parentElement.previousSibling.click()
@@ -472,9 +474,9 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       this.qlang = lexi.value
       e.target.parentElement.previousSibling.click()
     },
-    /** Language picker END */
+    //#endregion Language picker
 
-    /** Question Title interactions BEGIN */
+    //#region Question Title interactions
     speakTitle: function(e,i) {
       let text = i >=0 ? this.choices[i] : this.q_title
       let lang = i >=0 ? this.alang : this.qlang
@@ -506,9 +508,9 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
     toggleDisplayTitleImg: function() {
       this.displayTitleImage = !this.displayTitleImage
     },
-    /** Question Title interactions END */
+    //#endregion Question Title interactions
 
-    /** Hypernym options BEGIN */
+    //#region Hypernym options
     popHypernym: function(onMount) {
       fetch(`${window.location.origin}/hypernym?ql=${this.qlang}&al=${this.alang}`)
       .then(resp => resp.json())
@@ -541,9 +543,9 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         .map(h => h.value)
         .filter(v => this.hypernyms.indexOf(v)<0)
     },
-    /** Hypernym options END */
+    //#endregion Hypernym options
 
-    /** Wikiquote START */
+    //#region Wikiquote
     fetchLeadQuote: function(topics, isMatch) {
       if (!!topics) topics = topics.filter(t => !!t).map(t => t.replace(/\(/m, '|').replace(/\)/m, ''))
       // onclick(for match), use existing quoteLang
@@ -590,7 +592,9 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       speechSynthesis.cancel()
       speechSynthesis.speak(sp)
     },
+    //#endregion Wikiquote
 
+    //#region Utils
     toMajorLang: function(lang, isSpeaking) {
       const MAJOR_LANG = {
         'nl': ['fy', 'frr', 'af', 'nds-nl', 'li', 'vls'],
@@ -604,7 +608,6 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         'zh': ['zh-yue', 'hak', 'cdo', 'wuu', 'gan', 'zh-classical'],
         'id': ['ms', 'jv', 'su', 'mg']
       }
-      //TODO make it adaptive to available voices on browser and OS
       if (isSpeaking) {
         MAJOR_LANG.es.push('ca', 'eu')
         MAJOR_LANG.pt.push('gl')
@@ -615,15 +618,16 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         MAJOR_LANG['zh-CN'] = ['zh', 'wuu', 'gan', 'zh-classical']
         MAJOR_LANG['zh-HK'] = ['zh-yue', 'hak']
         MAJOR_LANG['zh-TW'] = ['zh-min-nan', 'cdo']
+        const voiceLangs = new Set(speechSynthesis.getVoices().map(v => v.lang.slice(0,2)))
+        for (let k of Object.keys(MAJOR_LANG)){
+          MAJOR_LANG[k] = MAJOR_LANG[k].filter(l => !voiceLangs.has(l))
+        } 
       }
       for (let e of Object.entries(MAJOR_LANG)){
         if (e[1].indexOf(lang) >= 0) return e[0]
       }
       return lang || 'en'
     },
-    /** Wikiquote END */
-
-    /** Utils START */
     getSpeechSynthesisVoices: function(lang) {
       const sliceLen = lang.startsWith('zh-') ? 5 : 2
       let langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,sliceLen) == lang)
@@ -636,6 +640,6 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
       return m ? m.pop()||'' : ''
     },
-    /** Utils END */
+    //#endregion Utils
   },
 })
