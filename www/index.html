@@ -154,10 +154,10 @@
         <nav role="menubar">
           <b-row v-show="quizStarted">
               <!-- style="position:absolute;top:0;left:0;padding:3px;"  -->
-              <b-btn variant="outline-light" size="lg" style="font-size: x-large;" class="d-none d-sm-inline" id="popover-hotkeys" title="hotkeys">⌨</b-btn>
-              <b-btn variant="outline-light" size="lg" style="font-size: x-large;" id="btn-toggle-image" title="hide image" @click="toggleDisplayTitleImg">🖼</b-btn>
-              <b-btn variant="outline-light" style="font-size: large;" id="btn-toggle-quote" title="If you can't keep quiet, shut up!" @click="toggleDisplayQuote($event)">🧙💬</b-btn>
-              <b-btn variant="outline-light" size="lg" style="font-size: x-large;" id="btn-bomb" v-b-toggle.collapse-hypernyms  @click="toggleCollapseBomb" >💣</b-btn>
+              <b-btn variant="outline-light" class="btn-menu-s" id="btn-bomb" v-b-toggle.collapse-hypernyms  @click="toggleCollapseBomb" >💣</b-btn>
+              <b-btn variant="outline-light" class="btn-menu-d" id="btn-toggle-quote" title="If you can't keep quiet, shut up!" @click="toggleDisplayQuote($event)">🧙💬</b-btn>
+              <b-btn variant="outline-light" class="btn-menu-s" id="btn-toggle-image" title="hide image" @click="toggleDisplayTitleImg">🖼</b-btn>
+              <b-btn variant="outline-light" class="btn-menu-s d-none d-sm-inline" id="popover-hotkeys" title="hotkeys">⌨</b-btn>
               <b-popover target="popover-hotkeys" title="Hotkeys" trigger="hover focus" placement="bottom">
                 <b-table borderless :items="hotkeyTable">
                   <template #cell(Key)="data"><kbd v-for="k in data.item.Key" :key="k">{{ k }}</kbd></template>

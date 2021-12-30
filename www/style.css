@@ -52,6 +52,13 @@ h1 {
 .bg-steel-blue-hover:hover {
   background-color: var(--steel-wiki-blue);
 }
+.btn-menu-s {
+  width: 50px;
+  font-size: x-large;
+}
+.btn-menu-d {
+  width: 70px;
+}
 .btn-choice {
   border: none;
   padding: 0.15rem;
@@ -143,9 +150,12 @@ a.title-link {
 #quote-title {
   font-style: oblique;
 }
+.tree-hypernyms {
+  column-count: 2;
+}
 .list-hypernyms {
   column-count: 5;
-} 
+}
 .custom-switch {
   min-width: 12rem;
 }
@@ -218,6 +228,9 @@ a.title-link {
   }
   .list-hypernyms {
     column-count: 2;
+  }
+  .tree-hypernyms {
+    column-count: 1;
   }
 }
 @media (max-width: 455px) {

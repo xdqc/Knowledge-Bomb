@@ -19,69 +19,132 @@ A qualified article ([examples](data/sample_titles.csv)) should be a general, un
 All Wikidata items / Wikipedia articles are categorized in the following buckets. The design principle is to achieve balanced number of items/articles per node for gameplay, classifying as a decision tree, instead of networking as an ontologically precise semantic graph.
 
 ```
-Node          Path                                                                 Monospaced
------------------------------------------------------------------------------------------------
-151885        /Concept                                                             道
-.17737        /Concept/Theory                                                      ├─論
-..41719       /Concept/Theory/Hypothesis                                           │ └─設
-.468777       /Concept/Existence                                                   ├─有
-..12827256    /Concept/Existence/Myth                                              │ ├─神
-..7257        /Concept/Existence/Ideology                                          │ └─意
-...9174       /Concept/Existence/Ideology/Religion                                 │   └─教
-.395          /Concept/Mathematics                                                 ├─學
-..17736       /Concept/Mathematics/Axiom                                           │ ├─理
-..65943       /Concept/Mathematics/Theorem                                         │ ├─則
-..207961      /Concept/Mathematics/Shape                                           │ └─形
-.35120        /Concept/Entity                                                      └─實
-..11471       /Concept/Entity/Time                                                   ├─時
-...483247     /Concept/Entity/Time/Phenomenon                                        │ ├─象
-...309        /Concept/Entity/Time/History                                           │ ├─史
-...4026292    /Concept/Entity/Time/Action                                            │ ├─為
-....9332      /Concept/Entity/Time/Action/Behavior                                   │ │ ├─行
-.....11042    /Concept/Entity/Time/Action/Behavior/Culture                           │ │ │ ├─文
-.....349      /Concept/Entity/Time/Action/Behavior/Sport                             │ │ │ ├─健
-.....11410    /Concept/Entity/Time/Action/Behavior/Game                              │ │ │ ├─戲
-.....735      /Concept/Entity/Time/Action/Behavior/Art                               │ │ │ └─藝
-......483394  /Concept/Entity/Time/Action/Behavior/Art/Genre                         │ │ │   └─風
-....2695280   /Concept/Entity/Time/Action/Technique                                  │ │ └─技
-...1150070    /Concept/Entity/Time/Change                                            │ └─變
-....12136     /Concept/Entity/Time/Change/Disease                                    │   └─疾
-..7239        /Concept/Entity/Organism                                               ├─生
-...514        /Concept/Entity/Organism/Anatomy                                       │ └─解
-..6671777     /Concept/Entity/Structure                                              ├─構
-...58778      /Concept/Entity/Structure/System                                       │ └─系
-....16887380  /Concept/Entity/Structure/System/Group                                 │   └─群
-.....43229    /Concept/Entity/Structure/System/Group/Organization                    │     ├─組
-.....41710    /Concept/Entity/Structure/System/Group/Ethnic_group                    │     └─族
-..937228      /Concept/Entity/Property                                               ├─性
-...1207505    /Concept/Entity/Property/Quality                                       │ ├─品
-....315       /Concept/Entity/Property/Quality/Language                              │ │ └─語
-...47574      /Concept/Entity/Property/Unit_of_measurement                           │ ├─衡
-...4373292    /Concept/Entity/Property/Physical_property                             │ └─質
-....2221906   /Concept/Entity/Property/Physical_property/Location                    │   └─輿
-..488383      /Concept/Entity/Object                                                 └─彼
-...187931     /Concept/Entity/Object/Phrase                                            ├─言
-...11028      /Concept/Entity/Object/Information                                       ├─信
-....3695082   /Concept/Entity/Object/Information/Sign                                  │ ├─記
-....49848     /Concept/Entity/Object/Information/Document                              │ ├─書
-....9081      /Concept/Entity/Object/Information/Knowledge                             │ └─知
-.....80083    /Concept/Entity/Object/Information/Knowledge/Humanities                  │   ├─伦
-.....336      /Concept/Entity/Object/Information/Knowledge/Science                     │   └─格
-......11016   /Concept/Entity/Object/Information/Knowledge/Science/Technology          │     ├─工
-......21198   /Concept/Entity/Object/Information/Knowledge/Science/Computer_science    │     └─計
-...223557     /Concept/Entity/Object/Physical_object                                   └─物
-....35758     /Concept/Entity/Object/Physical_object/Matter                              ├─粒
-....79529     /Concept/Entity/Object/Physical_object/Chemical_substance                  ├─素
-....6999      /Concept/Entity/Object/Physical_object/Astronomical_object                 ├─星
-....28877     /Concept/Entity/Object/Physical_object/Goods                               └─貨
-.....121359   /Concept/Entity/Object/Physical_object/Goods/Infrastructure                  ├─建
-.....39546    /Concept/Entity/Object/Physical_object/Goods/Tool                            ├─具
-......11019   /Concept/Entity/Object/Physical_object/Goods/Tool/Machine                    │ ├─械
-......34379   /Concept/Entity/Object/Physical_object/Goods/Tool/Instrument                 │ └─器
-.....11460    /Concept/Entity/Object/Physical_object/Goods/Clothing                        ├─衣
-.....2095     /Concept/Entity/Object/Physical_object/Goods/Food                            └─食
-......40050   /Concept/Entity/Object/Physical_object/Goods/Food/Drink                        └─飲
+Node          Path
+-----------------------------------------------------------------------------------
+151885        /Concept                                                             
+.17737        /Concept/Theory                                                      
+..41719       /Concept/Theory/Hypothesis                                           
+.468777       /Concept/Existence                                                   
+..12827256    /Concept/Existence/Myth                                              
+..7257        /Concept/Existence/Ideology                                          
+...9174       /Concept/Existence/Ideology/Religion                                 
+.395          /Concept/Mathematics                                                 
+..17736       /Concept/Mathematics/Axiom                                           
+..65943       /Concept/Mathematics/Theorem                                         
+..207961      /Concept/Mathematics/Shape                                           
+.35120        /Concept/Entity                                                      
+..11471       /Concept/Entity/Time                                                 
+...483247     /Concept/Entity/Time/Phenomenon                                      
+...309        /Concept/Entity/Time/History                                         
+...4026292    /Concept/Entity/Time/Action                                          
+....9332      /Concept/Entity/Time/Action/Behavior                                 
+.....11042    /Concept/Entity/Time/Action/Behavior/Culture                         
+.....349      /Concept/Entity/Time/Action/Behavior/Sport                           
+.....11410    /Concept/Entity/Time/Action/Behavior/Game                            
+.....735      /Concept/Entity/Time/Action/Behavior/Art                             
+......483394  /Concept/Entity/Time/Action/Behavior/Art/Genre                       
+....2695280   /Concept/Entity/Time/Action/Technique                                
+...1150070    /Concept/Entity/Time/Change                                          
+....12136     /Concept/Entity/Time/Change/Disease                                  
+..7239        /Concept/Entity/Organism                                             
+...514        /Concept/Entity/Organism/Anatomy                                     
+..6671777     /Concept/Entity/Structure                                            
+...58778      /Concept/Entity/Structure/System                                     
+....16887380  /Concept/Entity/Structure/System/Group                               
+.....43229    /Concept/Entity/Structure/System/Group/Organization                  
+.....41710    /Concept/Entity/Structure/System/Group/Ethnic_group                  
+..937228      /Concept/Entity/Property                                             
+...1207505    /Concept/Entity/Property/Quality                                     
+....315       /Concept/Entity/Property/Quality/Language                            
+...47574      /Concept/Entity/Property/Unit_of_measurement                         
+...4373292    /Concept/Entity/Property/Physical_property                           
+....2221906   /Concept/Entity/Property/Physical_property/Location                  
+..488383      /Concept/Entity/Object                                               
+...187931     /Concept/Entity/Object/Phrase                                        
+...11028      /Concept/Entity/Object/Information                                   
+....3695082   /Concept/Entity/Object/Information/Sign                              
+....49848     /Concept/Entity/Object/Information/Document                          
+....9081      /Concept/Entity/Object/Information/Knowledge                         
+.....80083    /Concept/Entity/Object/Information/Knowledge/Humanities              
+.....336      /Concept/Entity/Object/Information/Knowledge/Science                 
+......11016   /Concept/Entity/Object/Information/Knowledge/Science/Technology      
+......21198   /Concept/Entity/Object/Information/Knowledge/Science/Computer_science
+...223557     /Concept/Entity/Object/Physical_object                               
+....35758     /Concept/Entity/Object/Physical_object/Matter                        
+....79529     /Concept/Entity/Object/Physical_object/Chemical_substance            
+....6999      /Concept/Entity/Object/Physical_object/Astronomical_object           
+....28877     /Concept/Entity/Object/Physical_object/Goods                         
+.....121359   /Concept/Entity/Object/Physical_object/Goods/Infrastructure          
+.....39546    /Concept/Entity/Object/Physical_object/Goods/Tool                    
+......11019   /Concept/Entity/Object/Physical_object/Goods/Tool/Machine            
+......34379   /Concept/Entity/Object/Physical_object/Goods/Tool/Instrument         
+.....11460    /Concept/Entity/Object/Physical_object/Goods/Clothing                
+.....2095     /Concept/Entity/Object/Physical_object/Goods/Food                    
+......40050   /Concept/Entity/Object/Physical_object/Goods/Food/Drink              
 ```
+`Monospaced`[`Path`](https://en.wiktionary.org/wiki/道#Definitions)　[道](https://www.wikidata.org/wiki/Q151885)  
+　　　　　　　　　├[─](https://en.wiktionary.org/wiki/論#Definitions)[論](https://www.wikidata.org/wiki/Q17737)  
+　　　　　　　　　│　└[─](https://en.wiktionary.org/wiki/設#Definitions)[設](https://www.wikidata.org/wiki/Q41719)  
+　　　　　　　　　├[─](https://en.wiktionary.org/wiki/有#Definitions)[有](https://www.wikidata.org/wiki/Q468777)  
+　　　　　　　　　│　├[─](https://en.wiktionary.org/wiki/神#Definitions)[神](https://www.wikidata.org/wiki/Q12827256)  
+　　　　　　　　　│　└[─](https://en.wiktionary.org/wiki/意#Definitions)[意](https://www.wikidata.org/wiki/Q7257)  
+　　　　　　　　　│　　　└[─](https://en.wiktionary.org/wiki/教#Definitions)[教](https://www.wikidata.org/wiki/Q9174)  
+　　　　　　　　　├[─](https://en.wiktionary.org/wiki/學#Definitions)[學](https://www.wikidata.org/wiki/Q395)  
+　　　　　　　　　│　├[─](https://en.wiktionary.org/wiki/理#Definitions)[理](https://www.wikidata.org/wiki/Q17736)  
+　　　　　　　　　│　├[─](https://en.wiktionary.org/wiki/則#Definitions)[則](https://www.wikidata.org/wiki/Q65943)  
+　　　　　　　　　│　└[─](https://en.wiktionary.org/wiki/形#Definitions)[形](https://www.wikidata.org/wiki/Q207961)  
+　　　　　　　　　└[─](https://en.wiktionary.org/wiki/實#Definitions)[實](https://www.wikidata.org/wiki/Q35120)  
+　　　　　　　　　　├[─](https://en.wiktionary.org/wiki/時#Definitions)[時](https://www.wikidata.org/wiki/Q11471)  
+　　　　　　　　　　│　├[─](https://en.wiktionary.org/wiki/象#Definitions)[象](https://www.wikidata.org/wiki/Q483247)  
+　　　　　　　　　　│　├[─](https://en.wiktionary.org/wiki/史#Definitions)[史](https://www.wikidata.org/wiki/Q309)  
+　　　　　　　　　　│　├[─](https://en.wiktionary.org/wiki/為#Definitions)[為](https://www.wikidata.org/wiki/Q4026292)  
+　　　　　　　　　　│　│　├[─](https://en.wiktionary.org/wiki/行#Definitions)[行](https://www.wikidata.org/wiki/Q9332)  
+　　　　　　　　　　│　│　│　├[─](https://en.wiktionary.org/wiki/文#Definitions)[文](https://www.wikidata.org/wiki/Q11042)  
+　　　　　　　　　　│　│　│　├[─](https://en.wiktionary.org/wiki/健#Definitions)[健](https://www.wikidata.org/wiki/Q349)  
+　　　　　　　　　　│　│　│　├[─](https://en.wiktionary.org/wiki/戲#Definitions)[戲](https://www.wikidata.org/wiki/Q11410)  
+　　　　　　　　　　│　│　│　└[─](https://en.wiktionary.org/wiki/藝#Definitions)[藝](https://www.wikidata.org/wiki/Q735)  
+　　　　　　　　　　│　│　│　　　└[─](https://en.wiktionary.org/wiki/風#Definitions)[風](https://www.wikidata.org/wiki/Q483394)  
+　　　　　　　　　　│　│　└[─](https://en.wiktionary.org/wiki/技#Definitions)[技](https://www.wikidata.org/wiki/Q2695280)  
+　　　　　　　　　　│　└[─](https://en.wiktionary.org/wiki/變#Definitions)[變](https://www.wikidata.org/wiki/Q1150070)  
+　　　　　　　　　　│　　　└[─](https://en.wiktionary.org/wiki/疾#Definitions)[疾](https://www.wikidata.org/wiki/Q12136)  
+　　　　　　　　　　├[─](https://en.wiktionary.org/wiki/生#Definitions)[生](https://www.wikidata.org/wiki/Q7239)  
+　　　　　　　　　　│　└[─](https://en.wiktionary.org/wiki/解#Definitions)[解](https://www.wikidata.org/wiki/Q514)  
+　　　　　　　　　　├[─](https://en.wiktionary.org/wiki/構#Definitions)[構](https://www.wikidata.org/wiki/Q6671777)  
+　　　　　　　　　　│　└[─](https://en.wiktionary.org/wiki/系#Definitions)[系](https://www.wikidata.org/wiki/Q58778)  
+　　　　　　　　　　│　　　└[─](https://en.wiktionary.org/wiki/群#Definitions)[群](https://www.wikidata.org/wiki/Q16887380)  
+　　　　　　　　　　│　　　　　├[─](https://en.wiktionary.org/wiki/組#Definitions)[組](https://www.wikidata.org/wiki/Q43229)  
+　　　　　　　　　　│　　　　　└[─](https://en.wiktionary.org/wiki/族#Definitions)[族](https://www.wikidata.org/wiki/Q41710)  
+　　　　　　　　　　├[─](https://en.wiktionary.org/wiki/性#Definitions)[性](https://www.wikidata.org/wiki/Q937228)  
+　　　　　　　　　　│　├[─](https://en.wiktionary.org/wiki/品#Definitions)[品](https://www.wikidata.org/wiki/Q1207505)  
+　　　　　　　　　　│　│　└[─](https://en.wiktionary.org/wiki/語#Definitions)[語](https://www.wikidata.org/wiki/Q315)  
+　　　　　　　　　　│　├[─](https://en.wiktionary.org/wiki/衡#Definitions)[衡](https://www.wikidata.org/wiki/Q47574)  
+　　　　　　　　　　│　└[─](https://en.wiktionary.org/wiki/質#Definitions)[質](https://www.wikidata.org/wiki/Q4373292)  
+　　　　　　　　　　│　　　└[─](https://en.wiktionary.org/wiki/輿#Definitions)[輿](https://www.wikidata.org/wiki/Q2221906)  
+　　　　　　　　　　└[─](https://en.wiktionary.org/wiki/彼#Definitions)[彼](https://www.wikidata.org/wiki/Q488383)  
+　　　　　　　　　　　├[─](https://en.wiktionary.org/wiki/言#Definitions)[言](https://www.wikidata.org/wiki/Q187931)  
+　　　　　　　　　　　├[─](https://en.wiktionary.org/wiki/信#Definitions)[信](https://www.wikidata.org/wiki/Q11028)  
+　　　　　　　　　　　│　├[─](https://en.wiktionary.org/wiki/記#Definitions)[記](https://www.wikidata.org/wiki/Q3695082)  
+　　　　　　　　　　　│　├[─](https://en.wiktionary.org/wiki/書#Definitions)[書](https://www.wikidata.org/wiki/Q49848)  
+　　　　　　　　　　　│　└[─](https://en.wiktionary.org/wiki/知#Definitions)[知](https://www.wikidata.org/wiki/Q9081)  
+　　　　　　　　　　　│　　├[─](https://en.wiktionary.org/wiki/伦#Definitions)[伦](https://www.wikidata.org/wiki/Q80083)  
+　　　　　　　　　　　│　　└[─](https://en.wiktionary.org/wiki/格#Definitions)[格](https://www.wikidata.org/wiki/Q336)  
+　　　　　　　　　　　│　　　　├[─](https://en.wiktionary.org/wiki/工#Definitions)[工](https://www.wikidata.org/wiki/Q11016)  
+　　　　　　　　　　　│　　　　└[─](https://en.wiktionary.org/wiki/計#Definitions)[計](https://www.wikidata.org/wiki/Q21198)  
+　　　　　　　　　　　└[─](https://en.wiktionary.org/wiki/物#Definitions)[物](https://www.wikidata.org/wiki/Q223557)  
+　　　　　　　　　　　　 ├[─](https://en.wiktionary.org/wiki/粒#Definitions)[粒](https://www.wikidata.org/wiki/Q35758)  
+　　　　　　　　　　　　 ├[─](https://en.wiktionary.org/wiki/素#Definitions)[素](https://www.wikidata.org/wiki/Q79529)  
+　　　　　　　　　　　　 ├[─](https://en.wiktionary.org/wiki/星#Definitions)[星](https://www.wikidata.org/wiki/Q6999)  
+　　　　　　　　　　　　 └[─](https://en.wiktionary.org/wiki/貨#Definitions)[貨](https://www.wikidata.org/wiki/Q28877)  
+　　　　　　　　　　　　　　├[─](https://en.wiktionary.org/wiki/建#Definitions)[建](https://www.wikidata.org/wiki/Q121359)  
+　　　　　　　　　　　　　　├[─](https://en.wiktionary.org/wiki/具#Definitions)[具](https://www.wikidata.org/wiki/Q39546)  
+　　　　　　　　　　　　　　│　├[─](https://en.wiktionary.org/wiki/械#Definitions)[械](https://www.wikidata.org/wiki/Q11019)  
+　　　　　　　　　　　　　　│　└[─](https://en.wiktionary.org/wiki/器#Definitions)[器](https://www.wikidata.org/wiki/Q34379)  
+　　　　　　　　　　　　　　├[─](https://en.wiktionary.org/wiki/衣#Definitions)[衣](https://www.wikidata.org/wiki/Q11460)  
+　　　　　　　　　　　　　　└[─](https://en.wiktionary.org/wiki/食#Definitions)[食](https://www.wikidata.org/wiki/Q2095)  
+　　　　　　　　　　　　　　　　└[─](https://en.wiktionary.org/wiki/飲#Definitions)[飲](https://www.wikidata.org/wiki/Q40050)  　
+
+
+
 
 ### 2D Language picker based on lexical distance map
 
