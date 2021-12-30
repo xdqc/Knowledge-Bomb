@@ -88,27 +88,24 @@ class Quiz:
     @classmethod
     def get_hypernyms(cls, qlang, alang):
         sqlstr = """SELECT  DISTINCT 
-            hypernym ,e.title ,a.title ,q.title
+            i.hypernym ,e.title ,a.title ,q.title ,c.depth ,c.place
         FROM [wiki].[item] i
-        OUTER APPLY (
-            SELECT title FROM wiki.article
-            WHERE language = 'en' AND item = i.hypernym
-        ) e
-        OUTER APPLY (
-            SELECT title FROM wiki.article
-            WHERE language = ? AND item = i.hypernym
-        ) a
-        OUTER APPLY (
-            SELECT title FROM wiki.article
-            WHERE language = ? AND item = i.hypernym
-        ) q
-        ORDER BY e.title"""
+        LEFT JOIN wiki.article e
+            ON e.item = i.hypernym AND e.language = 'en'
+        LEFT JOIN wiki.article a
+            ON a.item = i.hypernym AND a.language = ?
+        LEFT JOIN wiki.article q
+            ON q.item = i.hypernym AND q.language = ?
+        JOIN wiki.category c
+			ON c.item = i.hypernym
+        WHERE e.title is not null
+		ORDER BY c.place"""
         cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
         res = []
         for h in cursor.execute(sqlstr, [alang, qlang]).fetchall():
             if h[0]:
-                res.append({'value':h[0], 'texts': [h[1],h[2],h[3]]})
+                res.append({'value':h[0], 'texts': [h[1],h[2],h[3]], 'depth':h[4], 'place':h[5]})
         return res
 
     @classmethod

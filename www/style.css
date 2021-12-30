@@ -101,7 +101,7 @@ a.title-link {
   position: fixed!important;
   transform: translate(0%, 0%)!important;
   left: 1%!important;
-  top: 38%!important;
+  top: 30%!important;
   width: 98%;
   min-height: 680px;
   max-height: 750px;
@@ -143,21 +143,22 @@ a.title-link {
 #quote-title {
   font-style: oblique;
 }
-.group-hypernyms {
+.list-hypernyms {
   column-count: 5;
 } 
 .custom-switch {
-  width: 12.25rem;
+  min-width: 12rem;
 }
 .custom-control-input:checked~.custom-control-label::before {
   background-color: var(--steel-wiki-blue)!important;
+  border-color: var(--steel-wiki-blue)!important;
 }
 .progress {
   border-radius: 0%;
   background-color: #e9ecef8f;
 }
 .popover {
-  max-width: 360px;
+  max-width: 400px;
   transform: translateY(-0.2rem);
   box-shadow: 0 0.5rem 0.5rem -0.6rem var(--japanese-indigo);
 }
@@ -175,19 +176,16 @@ a.title-link {
 }
 @media (max-height: 950px) {
   .dropdown-lang .dropdown-menu {
-    top: 5%!important;
+    top: 2%!important;
   }
 }
 @media (max-width: 1200px) {
-  .dropdown-lang .dropdown-menu {
-    top: 5%!important;
-  }
-  .group-hypernyms {
+  .list-hypernyms {
     column-count: 4;
   }
 }
 @media (max-width: 992px) {
-  .group-hypernyms {
+  .list-hypernyms {
     column-count: 3;
   }
   .title-link {
@@ -195,7 +193,7 @@ a.title-link {
   }
 }
 @media (max-width: 768px) {
-  .group-hypernyms {
+  .list-hypernyms {
     column-count: 3;
   }
   .title-link {
@@ -218,11 +216,8 @@ a.title-link {
   .mobile-w-0 {
     max-width: 0%;
   }
-  .group-hypernyms {
+  .list-hypernyms {
     column-count: 2;
-  }
-  #wikiquote {
-    padding-left: 1rem;
   }
 }
 @media (max-width: 455px) {

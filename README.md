@@ -16,80 +16,85 @@ A qualified article ([examples](data/sample_titles.csv)) should be a general, un
 
 ### Hypernym Hierarchy
 
-Wikidata items / Wikipedia articles are categorized in the following buckets. The design principle is to achieve balanced number of items/articles per node for gameplay, simplify as a tree, rather than building an ontologically precise semantic network graph.
+All Wikidata items / Wikipedia articles are categorized in the following buckets. The design principle is to achieve balanced number of items/articles per node for gameplay, classifying as a decision tree, instead of networking as an ontologically precise semantic graph.
 
 ```
-Node          Path                                                                       Monospaced Path
-----------------------------------------------------------------------------------------------------------
-151885        /Concept                                                                   名
-.17737        /Concept/Theory                                                            名論
-.395          /Concept/Mathematics                                                       名學
-..41719       /Concept/Mathematics/Hypothesis                                            名學設
-..17736       /Concept/Mathematics/Axiom                                                 名學理
-..65943       /Concept/Mathematics/Theorem                                               名學則
-..207961      /Concept/Mathematics/Shape                                                 名學形
-.35120        /Concept/Entity                                                            名物
-..483247      /Concept/Entity/Phenomenon                                                 名物象
-..6671777     /Concept/Entity/Structure                                                  名物構
-...58778      /Concept/Entity/Structure/System                                           名物構制
-...43229      /Concept/Entity/Structure/Organization                                     名物構組
-..1190554     /Concept/Entity/Occurrence                                                 名物事
-...309        /Concept/Entity/Occurrence/History                                         名物事史
-...4026292    /Concept/Entity/Occurrence/Action                                          名物事為
-....9332      /Concept/Entity/Occurrence/Action/Behavior                                 名物事為行
-.....11042    /Concept/Entity/Occurrence/Action/Behavior/Culture                         名物事為行化
-.....735      /Concept/Entity/Occurrence/Action/Behavior/Art                             名物事為行藝
-......483394  /Concept/Entity/Occurrence/Action/Behavior/Art/Genre                       名物事為行藝风
-.....349      /Concept/Entity/Occurrence/Action/Behavior/Sport                           名物事為行健
-.....11410    /Concept/Entity/Occurrence/Action/Behavior/Game                            名物事為行戲
-...1150070    /Concept/Entity/Occurrence/Change                                          名物事変
-....12136     /Concept/Entity/Occurrence/Change/Disease                                  名物事変疾
-..937228      /Concept/Entity/Property                                                   名物性
-...47574      /Concept/Entity/Property/Unit_of_measurement                               名物性衡
-...4373292    /Concept/Entity/Property/Physical_property                                 名物性質
-....2221906   /Concept/Entity/Property/Physical_property/Location                        名物性質地
-...1207505    /Concept/Entity/Property/Quality                                           名物性品
-....315       /Concept/Entity/Property/Quality/Language                                  名物性品語
-..488383      /Concept/Entity/Object                                                     名物客
-...187931     /Concept/Entity/Object/Phrase                                              名物客言
-...11028      /Concept/Entity/Object/Information                                         名物客信
-....3695082   /Concept/Entity/Object/Information/Sign                                    名物客信記
-....49848     /Concept/Entity/Object/Information/Document                                名物客信書
-....9081      /Concept/Entity/Object/Information/Knowledge                               名物客信識
-.....336      /Concept/Entity/Object/Information/Knowledge/Science                       名物客信識科
-......11016   /Concept/Entity/Object/Information/Knowledge/Science/Technology            名物客信識科術
-......21198   /Concept/Entity/Object/Information/Knowledge/Science/Computer_science      名物客信識科計
-.....80083    /Concept/Entity/Object/Information/Knowledge/Humanities                    名物客信識人
-......12827256/Concept/Entity/Object/Information/Knowledge/Humanities/Myth               名物客信識人神
-......7257    /Concept/Entity/Object/Information/Knowledge/Humanities/Ideology           名物客信識人念
-.......9174   /Concept/Entity/Object/Information/Knowledge/Humanities/Ideology/Religion  名物客信識人念教
-...223557     /Concept/Entity/Object/Physical_object                                     名物客体
-....35758     /Concept/Entity/Object/Physical_object/Matter                              名物客体粒
-....79529     /Concept/Entity/Object/Physical_object/Chemical_substance                  名物客体素
-....6999      /Concept/Entity/Object/Physical_object/Astronomical_object                 名物客体星
-....28877     /Concept/Entity/Object/Physical_object/Goods                               名物客体貨
-.....39546    /Concept/Entity/Object/Physical_object/Goods/Tool                          名物客体貨具
-......11019   /Concept/Entity/Object/Physical_object/Goods/Tool/Machine                  名物客体貨具機
-.....121359   /Concept/Entity/Object/Physical_object/Goods/Infrastructure                名物客体貨基
-.....2095     /Concept/Entity/Object/Physical_object/Goods/Food                          名物客体貨食
-.....11460    /Concept/Entity/Object/Physical_object/Goods/Clothing                      名物客体貨服
-..7239        /Concept/Entity/Organism                                                   名物生
-...514        /Concept/Entity/Organism/Anatomy                                           名物生解
-..41710       /Concept/Entity/Ethnic_group                                               名物族
+Node          Path                                                                 Monospaced
+-----------------------------------------------------------------------------------------------
+151885        /Concept                                                             道
+.17737        /Concept/Theory                                                      ├─論
+..41719       /Concept/Theory/Hypothesis                                           │ └─設
+.468777       /Concept/Existence                                                   ├─有
+..12827256    /Concept/Existence/Myth                                              │ ├─神
+..7257        /Concept/Existence/Ideology                                          │ └─意
+...9174       /Concept/Existence/Ideology/Religion                                 │   └─教
+.395          /Concept/Mathematics                                                 ├─學
+..17736       /Concept/Mathematics/Axiom                                           │ ├─理
+..65943       /Concept/Mathematics/Theorem                                         │ ├─則
+..207961      /Concept/Mathematics/Shape                                           │ └─形
+.35120        /Concept/Entity                                                      └─實
+..11471       /Concept/Entity/Time                                                   ├─時
+...483247     /Concept/Entity/Time/Phenomenon                                        │ ├─象
+...309        /Concept/Entity/Time/History                                           │ ├─史
+...4026292    /Concept/Entity/Time/Action                                            │ ├─為
+....9332      /Concept/Entity/Time/Action/Behavior                                   │ │ ├─行
+.....11042    /Concept/Entity/Time/Action/Behavior/Culture                           │ │ │ ├─文
+.....349      /Concept/Entity/Time/Action/Behavior/Sport                             │ │ │ ├─健
+.....11410    /Concept/Entity/Time/Action/Behavior/Game                              │ │ │ ├─戲
+.....735      /Concept/Entity/Time/Action/Behavior/Art                               │ │ │ └─藝
+......483394  /Concept/Entity/Time/Action/Behavior/Art/Genre                         │ │ │   └─風
+....2695280   /Concept/Entity/Time/Action/Technique                                  │ │ └─技
+...1150070    /Concept/Entity/Time/Change                                            │ └─變
+....12136     /Concept/Entity/Time/Change/Disease                                    │   └─疾
+..7239        /Concept/Entity/Organism                                               ├─生
+...514        /Concept/Entity/Organism/Anatomy                                       │ └─解
+..6671777     /Concept/Entity/Structure                                              ├─構
+...58778      /Concept/Entity/Structure/System                                       │ └─系
+....16887380  /Concept/Entity/Structure/System/Group                                 │   └─群
+.....43229    /Concept/Entity/Structure/System/Group/Organization                    │     ├─組
+.....41710    /Concept/Entity/Structure/System/Group/Ethnic_group                    │     └─族
+..937228      /Concept/Entity/Property                                               ├─性
+...1207505    /Concept/Entity/Property/Quality                                       │ ├─品
+....315       /Concept/Entity/Property/Quality/Language                              │ │ └─語
+...47574      /Concept/Entity/Property/Unit_of_measurement                           │ ├─衡
+...4373292    /Concept/Entity/Property/Physical_property                             │ └─質
+....2221906   /Concept/Entity/Property/Physical_property/Location                    │   └─輿
+..488383      /Concept/Entity/Object                                                 └─彼
+...187931     /Concept/Entity/Object/Phrase                                            ├─言
+...11028      /Concept/Entity/Object/Information                                       ├─信
+....3695082   /Concept/Entity/Object/Information/Sign                                  │ ├─記
+....49848     /Concept/Entity/Object/Information/Document                              │ ├─書
+....9081      /Concept/Entity/Object/Information/Knowledge                             │ └─知
+.....80083    /Concept/Entity/Object/Information/Knowledge/Humanities                  │   ├─伦
+.....336      /Concept/Entity/Object/Information/Knowledge/Science                     │   └─格
+......11016   /Concept/Entity/Object/Information/Knowledge/Science/Technology          │     ├─工
+......21198   /Concept/Entity/Object/Information/Knowledge/Science/Computer_science    │     └─計
+...223557     /Concept/Entity/Object/Physical_object                                   └─物
+....35758     /Concept/Entity/Object/Physical_object/Matter                              ├─粒
+....79529     /Concept/Entity/Object/Physical_object/Chemical_substance                  ├─素
+....6999      /Concept/Entity/Object/Physical_object/Astronomical_object                 ├─星
+....28877     /Concept/Entity/Object/Physical_object/Goods                               └─貨
+.....121359   /Concept/Entity/Object/Physical_object/Goods/Infrastructure                  ├─建
+.....39546    /Concept/Entity/Object/Physical_object/Goods/Tool                            ├─具
+......11019   /Concept/Entity/Object/Physical_object/Goods/Tool/Machine                    │ ├─械
+......34379   /Concept/Entity/Object/Physical_object/Goods/Tool/Instrument                 │ └─器
+.....11460    /Concept/Entity/Object/Physical_object/Goods/Clothing                        ├─衣
+.....2095     /Concept/Entity/Object/Physical_object/Goods/Food                            └─食
+......40050   /Concept/Entity/Object/Physical_object/Goods/Food/Drink                        └─飲
 ```
 
 ### 2D Language picker based on lexical distance map
 
-Hit the 🗺 button to popup the [2D language picker](docs/lexi_map.PNG). This language picker keeps the constant position of each language no matter showing in which language. It solves the problem of one dimentional language pickers ordering the same language alphabetically (even non alphabetical writing system) on variable positions at different languages settings that hard to find: **B**elanda, **D**utch, **F**elemenkçe, **H**ollandees, **N**ederlands, **Ο**λλανδική, **[O]オ**ランダ語, **[H]荷**蘭語, (**T**he Netherlands)...
+This 🗺 [2D language picker](docs/lexi_map.PNG) keeps the constant position of each language no matter showing in which language setting. It solves the problem of one dimentional language pickers (re)ordering languages alphabetically (even non alphabetical writing system) on various positions that hard to find: **A**leman, **I**naleman, **L**ialémani, **B**ich'ahii, **C**eruman, **D**uits, **E**leman, **F**rangikos, **G**erman,  **J**erman, **K**rzyżacki, **M**jymjecko, **Н**емецкий, **N**émet, **O**lmon, **P**reisen, **R**ajch, **S**aksa, **𐌸**𐌹𐌿𐌳𐌹𐍃𐌺𐌰𐍂𐌰𐌶𐌳𐌰, **Þ**ýska, **T**ysk, **U**budage, **V**ācu, **W**eimar, **Y**oeraman, **Z**ėm, **独**逸, **德**意志 ...
 
 Design principles:
 
   1. Easy to pick - align to grid
-  2. Based on lexical distance - Afrikaans, ייִדיש are European while Malti, Magyar are not
-  3. Respect geolocation - Tajik and Pashto are switched vertically though Tajik is closer to Persian
-  4. Isolated languages look isolated - Basque, Greek, Albanian, Armenian, Chuvash
-  5. Major languages on edge of blob - Dutch, German, Spanish, Portuguese, French, Italian
-  6. Extinct languages next to major - Classical Chinese, Sanskrit, Aramaic, Latin, Gothic, Ænglisc
+  2. Based on lexical distance - Afrikaans, ייִדיש are placed at West Germanic of Indo-European
+  5. Major languages on top or bottom of their blobs that quick to be found
+  3. Respect relative geolocation and culture similarity within blob
+  6. Extinct languages next to major languages - Classical Chinese, Sanskrit, Aramaic, Latin, Gothic, Ænglisc
+  4. Isolated languages look isolated - Basque, Greek, Albanian, Armenian, Chuvash, etc.
   7. Screen real estate - no overlapping in most languages on 1300px minimum width
   8. Background image is only for decoration
 

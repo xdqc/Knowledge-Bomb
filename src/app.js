@@ -24,25 +24,28 @@ new Vue({
     isCollapsingBomb: true,
     displayTitleImage: true,
     displayTopQuote: true,
+    displayHypernymTree: false,
     startBtnDisabled: false,
     progressAnimate: false,
     touchTimer: null,
     touchTimerLong: null,
     hypernyms: [],
-    hypernym_options: [],
+    hypernym_list: [],
+    hypernym_tree: [],
+    hypernym_lang: [],
     hypernym_index: 1,
     difficulty: 4,
     difficultyLvl: 7,
     difficulties: [
-      {value: 1, icon:'1️⃣', tooltip:'Wanderer', keymap:{'7':0,'g':0,'u':0,'4':0,'h':0,'j':0}},
-      {value: 2, icon:'2️⃣', tooltip:'Picnic', keymap:{'7':0,'g':0,'u':0,'8':0,'c':0,'i':0,'4':1,'h':1,'j':1,'5':1,'t':1,'k':1}},
-      {value: 3, icon:'3️⃣', tooltip:'Casual', keymap:{'7':0,'g':0,'u':0,'8':0,'c':0,'i':0,'4':1,'h':1,'j':1,'5':1,'t':1,'k':1,'1':2,'m':2,'2':2,'w':2,',':2}},
-      {value: 4, icon:'4️⃣', tooltip:'Simple', keymap:{'7':0,'g':0,'u':0,'8':1,'c':1,'i':1,'4':2,'h':2,'j':2,'5':3,'t':3,'k':3}},
-      {value: 6, icon:'6️⃣', tooltip:'Mild', keymap:{'7':0,'g':0,'u':0,'8':1,'c':1,'i':1,'4':2,'h':2,'j':2,'5':3,'t':3,'k':3,'1':4,'m':4,'2':5,'w':5,',':5}},
+      {value: 1, icon:'1️⃣', tooltip:'Wanderer', keymap:{'7':0,'8':0,'9':0}},
+      {value: 2, icon:'2️⃣', tooltip:'Picnic', keymap:{'7':0,'8':0,'9':0,'4':1,'5':1,'6':1,'g':1,'u':1,'c':1,'i':1,'r':1,'o':1}},
+      {value: 3, icon:'3️⃣', tooltip:'Casual', keymap:{'7':0,'8':0,'9':0,'4':1,'5':1,'6':1,'g':1,'u':1,'c':1,'i':1,'r':1,'o':1,'1':2,'2':2,'3':2,'h':2,'j':2,'t':2,'k':2,'n':2,'l':2}},
+      {value: 4, icon:'4️⃣', tooltip:'Simple', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3}},
+      {value: 6, icon:'6️⃣', tooltip:'Mild', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3,'1':4,'h':4,'j':4,'2':5,'t':5,'k':5}},
       {value: 8, icon:'8️⃣', tooltip:'Moderate', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3,'1':4,'h':4,'j':4,'2':5,'t':5,'k':5,'0':6,'m':6,'.':7,'w':7,',':7}},
-      {value: 9, icon:'9️⃣', tooltip:'Intricate', keymap:{'7':0,'g':0,'u':0,'8':1,'c':1,'i':1,'9':2,'r':2,'o':2,'4':3,'h':3,'j':3,'5':4,'t':4,'k':4,'6':5,'n':5,'l':5,'1':6,'m':6,'2':7,'w':7,',':7,'3':8,'v':8,'.':8}},
-      {value:12, icon:'1️⃣2️⃣', tooltip:'Devious', keymap:{'7':0,'8':1,'9':2,'4':3,'g':3,'u':3,'5':4,'c':4,'i':4,'6':5,'r':5,'o':5,'1':6,'h':6,'j':6,'2':7,'t':7,'k':7,'3':8,'n':8,'l':8,'0':9,'m':9,'.':10,'w':10,',':10,'v':11,'Enter':11}},
-      {value:16, icon:'1️⃣6️⃣', tooltip:'Fiendish', keymap:{'7':0,'8':1,'9':2,'0':3,'g':4,'u':4,'c':5,'i':5,'r':6,'o':6,'l':7,'p':7,'h':8,'j':8,'t':9,'k':9,'n':10,'s':11,';':11,'m':12,'w':13,',':13,'v':14,'.':14,'z':15,}},
+      {value: 9, icon:'9️⃣', tooltip:'Intricate', keymap:{'7':0,'8':1,'9':2,'4':3,'g':3,'u':3,'5':4,'c':4,'i':4,'6':5,'r':5,'o':5,'1':6,'h':6,'j':6,'2':7,'t':7,'k':7,'3':8,'n':8,'l':8}},
+      {value:12, icon:'1️⃣2️⃣', tooltip:'Devious', keymap:{}},
+      {value:16, icon:'1️⃣6️⃣', tooltip:'Fiendish', keymap:{}},
       {value:24, icon:'2️⃣4️⃣', tooltip:'Mephistophelian', keymap:{}},
       {value:36, icon:'3️⃣6️⃣', tooltip:'Diabolical', keymap:{}},
       {value:54, icon:'5️⃣4️⃣', tooltip:'Maelstrom', keymap:{}},
@@ -75,7 +78,7 @@ new Vue({
           coord_y: d.coord_y,
         }))
         // show leximap on large screen
-        if (this.windowWidth>1200 && this.windowHeight>960) {
+        if (this.windowWidth>1200 && this.windowHeight>950) {
           document.querySelector('.dropdown-lang .dropdown-toggle').click()
         }
       })
@@ -84,7 +87,7 @@ new Vue({
     })(this.getCookieValue('lang').split('+'))
 
     ;((cdl) => {
-      if (cdl) this.difficultyLvl = parseInt(cdl.slice(cdl.length-1),16)
+      if (cdl) this.difficultyLvl = parseInt(cdl.slice(cdl.length-1),16) || this.difficultyLvl
     })(this.getCookieValue('d'))
 
     window.addEventListener('keydown', (e) => {
@@ -95,10 +98,10 @@ new Vue({
         const c = btnC(btnIdx(e.key))
         if (c) c.click()
         
-        if (e.key == 'a') document.getElementById('btn-bomb').click()
-        if (e.key == '-' || e.key == 'y') this.speakTitle()
-        if (e.key == '/' || e.key == 'q') this.speakQuote()
-        if (e.key == '*' || e.key == 'd') this.toggleDisplayTitleImg()
+        if (e.key == 'a' || e.key == 'Escape') document.getElementById('btn-bomb').click()
+        if (e.key == '*' || e.key == 'y') this.speakTitle()
+        if (e.key == '/' || e.key == 's') this.speakQuote()
+        if (e.key == '-' || e.key == 'd') this.toggleDisplayTitleImg()
         if (e.key == '+' || e.key == 'f') document.getElementsByClassName('title-link')[0].click()
       }
     })
@@ -166,8 +169,9 @@ new Vue({
       return Object.values(this.board).reduce((s,v) => s+v.filter(u=>u>0).length, 0)
     },
     qHypernymTexts() {
+      // The hypernyme of current question as topics for quote search 
       // hypernym_option.texts [0]:English, [1]:<Answer Language>, [2]<Question Language>
-      const hypernym = this.hypernym_options.find(h=>h.value === this.q_hypernym)
+      const hypernym = this.hypernym_list.find(h=>h.value === this.q_hypernym)
       if (hypernym) return hypernym.texts
       else return [null,null,null]
     },
@@ -218,11 +222,11 @@ new Vue({
       }))
 
       return [
-        {Key: ['A'], Description: `toggle menu collapse`},
-        {Key: ['*','D'], Description: `toggle image display`},
-        {Key: ['/','Q'], Description: `speak quote in ${this.quotelangOpt ? this.quotelangOpt.text : this.alangOpt.text }`},
-        {Key: ['-','Y'], Description: `speak "${this.q_title}" in ${this.qlangOpt.text}`},
-        {Key: ['+','F'], Description: `lookup "${this.q_title}" on ${this.qlang}.wikipedia.org`},
+        {Key: ['A','Esc'], Description: `toggle category selector`},
+        {Key: ['-','D'], Description: `dispaly or hide image`},
+        {Key: ['/','S'], Description: `say <quote> in ${this.quotelangOpt ? this.quotelangOpt.text : this.alangOpt.text }`},
+        {Key: ['*','Y'], Description: `yell "${this.q_title}" in ${this.qlangOpt.text}`},
+        {Key: ['+','F'], Description: `find "${this.q_title}" on ${this.qlang}.wikipedia.org`},
         ...gt
       ]
     },
@@ -423,10 +427,9 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
 
     gameStart: function() {
       if (this.windowWidth <= 576) {
-        document.getElementById('btn-toggle-display-quote').click()
+        document.getElementById('btn-toggle-quote').click()
       }
       document.getElementById('page-header').classList.add('py-0','mb-0')
-      document.getElementById('wikiquote').classList.remove('justify-content-center')
     },
     gameOver: function(score) {
       this.score = score
@@ -436,7 +439,6 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       this.q_title_en = ''
       this.q_hypernym = ''
       document.getElementById('page-header').classList.remove('py-0', 'mb-0')
-      document.getElementById('wikiquote').classList.add('justify-content-center')
       this.displayTopQuote = true
 
       // recalculate available difficulties
@@ -504,46 +506,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       clearTimeout(this.touchTimer)
       clearTimeout(this.touchTimerLong)
     },
-    
-    toggleDisplayTitleImg: function() {
-      this.displayTitleImage = !this.displayTitleImage
-    },
     //#endregion Question Title interactions
-
-    //#region Hypernym options
-    popHypernym: function(onMount) {
-      fetch(`${window.location.origin}/hypernym?ql=${this.qlang}&al=${this.alang}`)
-      .then(resp => resp.json())
-      .then(data => {
-        this.hypernym_options = data
-          .filter(h => h.texts[0])
-          .map(h => ({
-            value: h.value,
-            texts: h.texts.map(t => t ? t : h.texts[0]).map(t => t.replace(/ *\([^)]*\) */g, '')),
-          }))
-          .map(h => ({
-            value: h.value,
-            texts: h.texts,
-            text: h.texts[this.hypernym_index]
-          }))
-          .sort((h1,h2) => h1.text.localeCompare(h2.text, this.toMajorLang(this.alang)))
-        if (onMount) {
-          // by default fill-in all hypernyms, excluding language==315
-          this.hypernyms = data.filter(h=>h.value!==315).map(h=>h.value)
-        }
-      })
-    },
-    switchHypernymLang: function() {
-      this.hypernym_index = (this.hypernym_index+1)%3
-      this.hypernym_options.forEach(h => h.text=h.texts[this.hypernym_index])
-      this.hypernym_options.sort((h1,h2) => h1.text.localeCompare(h2.text, this.toMajorLang(this.hypernym_index==2?this.qlang:this.alang)))
-    },
-    reverseHypernymSelect: function() {
-      this.hypernyms = this.hypernym_options
-        .map(h => h.value)
-        .filter(v => this.hypernyms.indexOf(v)<0)
-    },
-    //#endregion Hypernym options
 
     //#region Wikiquote
     fetchLeadQuote: function(topics, isMatch) {
@@ -571,19 +534,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       }
       Wikiquote(quoteLang).getRandomQuote(topics, resolve, reject, isMatch)
     },
-
-    toggleDisplayQuote: function(e) {
-      this.displayTopQuote = !this.displayTopQuote
-      e.target.textContent = this.displayTopQuote ? '🧙💬' : '🧙🔇'
-      e.target.title = this.displayTopQuote ? 'Mute me, improve your performance (less network traffic, less laggy)' : "I'll be back"
-    },
-
-    toggleCollapseBomb: function(e) {
-      this.isCollapsingBomb = !this.isCollapsingBomb
-      e.target.textContent = this.isCollapsingBomb ? '💣' : '💥'
-      e.target.title = this.isCollapsingBomb ? 'Detonator' : `B${'o'.repeat(Math.max(2,this.quizCorrect))}m!`
-    },
-
+    
     speakQuote: function() {
       const sp = new SpeechSynthesisUtterance(this.quoteQuote)
       const lang = this.toMajorLang(this.quoteLang=='en'?'en':this.alang, true)
@@ -593,8 +544,95 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       speechSynthesis.speak(sp)
     },
     //#endregion Wikiquote
+  
+    //#region Hypernym options
+    popHypernym: function(onMount) {
+      fetch(`${window.location.origin}/hypernym?al=${this.alang}&ql=${this.qlang}`)
+      .then(resp => resp.json())
+      .then(data => {
+        data.forEach(h => {
+          h.texts = h.texts.map(t => t ? t : h.texts[0]).map(t => t.replace(/ *\([^)]*\) */g, ''))
+          // add "text" property as ViewModel of checkbox options group
+          h.text = h.texts[this.hypernym_index]
+        })
+        this.hypernym_lang = ['en', this.alang, this.qlang]
+        this.hypernym_tree = data
+        this.hypernym_list = data.map(h => ({
+          value: h.value,
+          texts: h.texts,
+          text: h.text,
+        }))
+        this.sortHypernymTree()
+        
+        if (onMount) {
+          // by default fill-in all hypernyms, excluding language==315
+          this.hypernyms = data.filter(h=>h.value!==315).map(h=>h.value)
+        } else {
+          this.sortHypernymList()
+        }
+      })
+    },
+    sortHypernymList: function() {
+      this.hypernym_list.sort((h1,h2) => h1.text.localeCompare(h2.text, this.toMajorLang(this.hypernym_index==2?this.qlang:this.alang)))
+    },
+    sortHypernymTree: function() {
+      this.hypernym_tree.sort((h1,h2) => h1.place-h2.place)
+      setTimeout(() => {
+        this.hypernym_tree.forEach(h => {
+          const node = document.querySelector(`.tree-hypernyms input[value="${h.value}"]`)
+          node.parentElement.style['margin-left'] = h.depth*1 + 'rem'
+        })
+      }, 1);
+    },
+    switchHypernymLang: function() {
+      this.hypernym_index = (this.hypernym_index+1)%3
+      this.hypernym_list.forEach(h => h.text=h.texts[this.hypernym_index])
+      this.hypernym_tree.forEach(h => h.text=h.texts[this.hypernym_index])
+      if (!this.quizStarted && 
+          !(this.hypernym_lang[1] == this.alang && this.hypernym_lang[2] == this.qlang)) {
+        this.popHypernym()
+      } else if (!this.displayHypernymTree) {
+         this.sortHypernymList()
+      }
+    },
+    reverseHypernymSelect: function() {
+      this.hypernyms = this.hypernym_list
+      .map(h => h.value)
+      .filter(v => this.hypernyms.indexOf(v)<0)
+    },
+    toggleDisplayHypernymTree: function() {
+      this.displayHypernymTree = !this.displayHypernymTree
+      document.getElementById('btn-toggle-hypernym-tree').textContent = this.displayHypernymTree ? '🎄' : '🌲'
+      document.getElementById('btn-toggle-hypernym-tree').title = this.displayHypernymTree ? 'to list' : 'to tree'
+      this.displayHypernymTree || this.sortHypernymList()
+    },
+    //#endregion Hypernym options
+
+    //#region Menu interactions
+    toggleDisplayQuote: function(e) {
+      this.displayTopQuote = !this.displayTopQuote
+      document.getElementById('btn-toggle-quote').textContent = this.displayTopQuote ? '🧙💬' : '🧙🔇'
+      document.getElementById('btn-toggle-quote').title = this.displayTopQuote ? "If you can't keep quiet, shut up!" : "shut up and shine"
+    },
+
+    toggleCollapseBomb: function(e) {
+      this.isCollapsingBomb = !this.isCollapsingBomb
+      document.getElementById('btn-bomb').textContent = this.isCollapsingBomb ? '💣' : '💥'
+      document.getElementById('btn-bomb').title = this.isCollapsingBomb ? 'detonator' : `B${'o'.repeat(Math.max(2,this.quizCorrect))}m!`
+    },
+        
+    toggleDisplayTitleImg: function() {
+      this.displayTitleImage = !this.displayTitleImage
+      document.getElementById('btn-toggle-image').textContent = this.displayTitleImage ? '🖼' : '⬜'
+      document.getElementById('btn-toggle-image').title = this.displayTitleImage ? 'hide image' : 'hint image'
+    },
+    //#endregion Menu interactions
 
     //#region Utils
+    getCookieValue: function(name) {
+      const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
+      return m ? m.pop()||'' : '7'
+    },
     toMajorLang: function(lang, isSpeaking) {
       const MAJOR_LANG = {
         'nl': ['fy', 'frr', 'af', 'nds-nl', 'li', 'vls'],
@@ -635,10 +673,6 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == 'en')
       }
       return langVoices
-    },
-    getCookieValue: function(name) {
-      const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
-      return m ? m.pop()||'' : ''
     },
     //#endregion Utils
   },

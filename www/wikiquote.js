@@ -1,6 +1,8 @@
 /**
  * Random multilingual qoutes from WikiQuotes api
- * extended functions on github.com/natetyler/wikiquotes-api
+ *  extended functionalities of multilingual support and sections/quotes filter
+ *  on github.com/natetyler/wikiquotes-api
+ *  MIT License  Copyright (c) 2013 Nate Tyler
  */
 var Wikiquote = function (lang) {
 

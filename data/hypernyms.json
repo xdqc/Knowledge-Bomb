@@ -17,6 +17,41 @@
     ]
   },
   {
+    "hypernym": "Existence",
+    "queries":[
+      {
+        "label": "existence",
+        "item": 468777,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "state",
+        "item": 3505845,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "state",
+        "item": 3505845,
+        "or_instance": true,
+        "subclass_deep": 6
+      },
+      {
+        "label": "condition",
+        "item": 813912,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "problem",
+        "item": 621184,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
     "hypernym": "Something (concept)",
     "queries": [
       {
@@ -42,18 +77,6 @@
         "item": 28813620,
         "or_instance": true,
         "subclass_deep": 1
-      },
-      {
-        "label": "group",
-        "item": 16887380,
-        "or_instance": false,
-        "subclass_deep": 4
-      },
-      {
-        "label": "group",
-        "item": 16887380,
-        "or_instance": true,
-        "subclass_deep": 2
       },
       {
         "label": "class",
@@ -84,8 +107,7 @@
         "item": 21146257,
         "or_instance": true,
         "subclass_deep": null
-      },
-      { "label": "human", "item": 5, "or_instance": false, "subclass_deep": null }
+      }
     ]
   },
   {
@@ -183,19 +205,13 @@
     ]
   },
   {
-    "hypernym": "Action (philosophy)",
+    "hypernym": "Time",
     "queries": [
       {
-        "label": "action",
-        "item": 4026292,
-        "or_instance": false,
-        "subclass_deep": null
-      },
-      {
-        "label": "action",
-        "item": 4026292,
+        "label": "time",
+        "item": 11471,
         "or_instance": true,
-        "subclass_deep": 3
+        "subclass_deep": null
       },
       {
         "label": "occurrence",
@@ -210,20 +226,8 @@
         "subclass_deep": 2
       },
       {
-        "label": "activity",
-        "item": 1914636,
-        "or_instance": true,
-        "subclass_deep": 3
-      },
-      {
         "label": "event",
         "item": 1656682,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "interaction",
-        "item": 52948,
         "or_instance": true,
         "subclass_deep": null
       },
@@ -244,6 +248,76 @@
         "item": 23009459,
         "or_instance": true,
         "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Action (philosophy)",
+    "queries": [
+      {
+        "label": "action",
+        "item": 4026292,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "action",
+        "item": 4026292,
+        "or_instance": true,
+        "subclass_deep": 3
+      },
+      {
+        "label": "activity",
+        "item": 1914636,
+        "or_instance": true,
+        "subclass_deep": 3
+      },
+      {
+        "label": "interaction",
+        "item": 52948,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Change (philosophy)",
+    "queries": [
+      {
+        "label": "change",
+        "item": 1150070,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "change",
+        "item": 1150070,
+        "or_instance": true,
+        "subclass_deep": 4
+      },
+      {
+        "label": "emotion",
+        "item": 9415,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "prediction",
+        "item": 748250,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "process",
+        "item": 67518233,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "natural process",
+        "item": 13878858,
+        "or_instance": true,
+        "subclass_deep": 6
       }
     ]
   },
@@ -310,18 +384,6 @@
         "subclass_deep": 2
       },
       {
-        "label": "quality",
-        "item": 1207505,
-        "or_instance": true,
-        "subclass_deep": 4
-      },
-      {
-        "label": "value",
-        "item": 878143,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
         "label": "direction",
         "item": 2151613,
         "or_instance": true,
@@ -340,45 +402,93 @@
         "subclass_deep": 1
       }
     ]
-  },  
+  },
+
   {
-    "hypernym": "Change (philosophy)",
-    "queries": [
+    "hypernym": "Quality",
+    "queries":[
       {
-        "label": "change",
-        "item": 1150070,
+        "label": "quality",
+        "item": 1207505,
+        "or_instance": true,
+        "subclass_deep": 3
+      },
+      {
+        "label": "quality",
+        "item": 1207505,
         "or_instance": false,
         "subclass_deep": null
       },
       {
-        "label": "change",
-        "item": 1150070,
-        "or_instance": true,
-        "subclass_deep": 4
-      },
-      {
-        "label": "emotion",
-        "item": 9415,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "prediction",
-        "item": 748250,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "process",
-        "item": 67518233,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "natural process",
-        "item": 13878858,
+        "label": "aptitude",
+        "item": 1347367,
         "or_instance": true,
         "subclass_deep": 6
+      },
+      {
+        "label": "value",
+        "item": 878143,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Organism",
+    "queries": [
+      {
+        "label": "organism",
+        "item": 7239,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "organism",
+        "item": 7239,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "taxon",
+        "item": 16521,
+        "or_instance": true,
+        "subclass_deep": 0
+      },
+      {
+        "label": "group of living things",
+        "item": 16334298,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "group of living things",
+        "item": 16334298,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "animal",
+        "item": 729,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "plant",
+        "item": 756,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "microorganism",
+        "item": 39833,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "organisms known by a particular common name",
+        "item": 55983715,
+        "or_instance": true,
+        "subclass_deep": null
       }
     ]
   },
@@ -482,6 +592,47 @@
       {
         "label": "hypothetical entity",
         "item": 18706315,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Phrase",
+    "queries": [
+      {
+        "label": "phrase",
+        "item": 187931,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "word class",
+        "item": 82042,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "morpheme",
+        "item": 43249,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "form",
+        "item": 4423888,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "linguistic norm",
+        "item": 1759988,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "language device",
+        "item": 12767945,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -606,17 +757,6 @@
     ]
   },
   {
-    "hypernym": "Knowledge",
-    "queries": [
-      {
-        "label": "knowledge",
-        "item": 9081,
-        "or_instance": true,
-        "subclass_deep": null
-      }
-    ]
-  },
-  {
     "hypernym": "Structure",
     "queries": [
       {
@@ -657,6 +797,45 @@
     ]
   },
   {
+    "hypernym": "Group",
+    "queries": [
+      {
+      "label": "group",
+      "item": 16887380,
+      "or_instance": false,
+      "subclass_deep": 4
+      },
+      {
+        "label": "group",
+        "item": 16887380,
+        "or_instance": true,
+        "subclass_deep": 2
+      }
+    ]
+  },
+  {
+    "hypernym": "Knowledge",
+    "queries": [
+      {
+        "label": "knowledge",
+        "item": 9081,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Science",
+    "queries": [
+      {
+        "label": "science",
+        "item": 336,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
     "hypernym": "Location",
     "queries": [
       {
@@ -669,7 +848,7 @@
         "label": "geographic location",
         "item": 2221906,
         "or_instance": true,
-        "subclass_deep": 0
+        "subclass_deep": 1
       },
       {
         "label": "geographic entity",
@@ -850,6 +1029,12 @@
         "subclass_deep": null
       },
       {
+        "label": "philosophy",
+        "item": 5891,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
         "label": "fictional entity",
         "item": 14897293,
         "or_instance": true,
@@ -886,17 +1071,22 @@
     ]
   },
   {
+    "hypernym": "Technique",
+    "queries": [
+      {
+        "label": "technique",
+        "item": 2695280,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
     "hypernym": "Technology ",
     "queries": [
       {
         "label": "technology",
         "item": 11016,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "technique",
-        "item": 2695280,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -968,65 +1158,6 @@
       {
         "label": "circumstellar disk",
         "item": 3235978,
-        "or_instance": true,
-        "subclass_deep": null
-      }
-    ]
-  },
-  {
-    "hypernym": "Organism",
-    "queries": [
-      {
-        "label": "organism",
-        "item": 7239,
-        "or_instance": false,
-        "subclass_deep": null
-      },
-      {
-        "label": "organism",
-        "item": 7239,
-        "or_instance": true,
-        "subclass_deep": 2
-      },
-      {
-        "label": "taxon",
-        "item": 16521,
-        "or_instance": true,
-        "subclass_deep": 0
-      },
-      {
-        "label": "group of living things",
-        "item": 16334298,
-        "or_instance": false,
-        "subclass_deep": null
-      },
-      {
-        "label": "group of living things",
-        "item": 16334298,
-        "or_instance": true,
-        "subclass_deep": 2
-      },
-      {
-        "label": "animal",
-        "item": 729,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "plant",
-        "item": 756,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "microorganism",
-        "item": 39833,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "organisms known by a particular common name",
-        "item": 55983715,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -1218,47 +1349,6 @@
       {
         "label": "languoid",
         "item": 17376908,
-        "or_instance": true,
-        "subclass_deep": null
-      }
-    ]
-  },
-  {
-    "hypernym": "Phrase",
-    "queries": [
-      {
-        "label": "phrase",
-        "item": 187931,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "word class",
-        "item": 82042,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "morpheme",
-        "item": 43249,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "form",
-        "item": 4423888,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "linguistic norm",
-        "item": 1759988,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "language device",
-        "item": 12767945,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -1598,6 +1688,17 @@
     ]
   },
   {
+    "hypernym": "Drink",
+    "queries": [
+      {
+        "label": "drink",
+        "item": 40050,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
     "hypernym": "Clothing",
     "queries": [
       {
@@ -1655,6 +1756,17 @@
       {
         "label": "game equipment",
         "item": 17638008,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Musical instrument",
+    "queries": [
+      {
+        "label": "musical instrument",
+        "item": 34379,
         "or_instance": true,
         "subclass_deep": null
       }
