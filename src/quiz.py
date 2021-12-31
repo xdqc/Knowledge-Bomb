@@ -65,8 +65,7 @@ class Quiz:
 
     @classmethod
     def get_language_names(cls, lang):
-        sqlstr = """DECLARE @langfix AS nvarchar(max)
-            = (SELECT TOP(1) langfix FROM wiki.language WHERE code = ?)
+        sqlstr = """DECLARE @langfix AS nvarchar(max) = (SELECT TOP(1) langfix FROM wiki.language WHERE code = ?)
         SELECT code, TRIM(REPLACE(REPLACE(COALESCE(a.title, l.name), @langfix, ''), '()', '')) as title,
             CASE WHEN title IS NULL THEN NULL ELSE coord_x END, 
             CASE WHEN title IS NULL THEN NULL ELSE coord_y END
@@ -87,7 +86,7 @@ class Quiz:
 
     @classmethod
     def get_hypernyms(cls, qlang, alang):
-        sqlstr = """SELECT  DISTINCT 
+        sqlstr = """SELECT DISTINCT 
             i.hypernym ,e.title ,a.title ,q.title ,c.depth ,c.place
         FROM [wiki].[item] i
         LEFT JOIN wiki.article e
@@ -97,9 +96,9 @@ class Quiz:
         LEFT JOIN wiki.article q
             ON q.item = i.hypernym AND q.language = ?
         JOIN wiki.category c
-			ON c.item = i.hypernym
+            ON c.item = i.hypernym
         WHERE e.title is not null
-		ORDER BY c.place"""
+        ORDER BY c.place"""
         cls.conn = pyodbc.connect(conn_str)
         cursor = cls.conn.cursor()
         res = []
@@ -110,10 +109,8 @@ class Quiz:
 
     @classmethod
     def get_item_by_level(cls, lvl, board, qlang, alang, hypernyms=[]):
-        level = cls.ladder[lvl-1]
-        played_correct = [str(k) for sl in list(board.values()) for k in sl if k > 0]
-        if len(played_correct) == 0:
-              played_correct.extend(['0'])
+        lv = cls.ladder[lvl-1]
+        played_correct = cls.played_correct(board)
         hypernyms = [str(h) for h in hypernyms if h > 0]
         sqlstr = f"""
         SELECT TOP(1) i.[id], i.hypernym, q.title, q_en.title, a.title ,a.title_latin
@@ -134,22 +131,23 @@ class Quiz:
         CROSS APPLY (
             SELECT item, title, title_latin FROM wiki.article 
             WHERE language = '{alang}' AND item = i.id) a
-        ORDER BY CHECKSUM(NEWID())
+        ORDER BY NEWID()
         """
-        params = [level[1], level[2]]
+        params = [lv[1], lv[2]]
+        result = None
         cursor = None
-        while cursor is None:
-            try:
-                cursor = cls.conn.cursor()
-            except:
-                cls.conn = pyodbc.connect(conn_str)
+        try:
+            cursor = cls.conn.cursor()
+            result = cursor.execute(sqlstr, params).fetchall()
+        except:
+            cls.conn = pyodbc.connect(conn_str)
+            cursor = cls.conn.cursor()
+            result = cursor.execute(sqlstr, params).fetchall()
         result = cursor.execute(sqlstr, params).fetchall()
         return result[0] if len(result) > 0 else None
 
     @classmethod
     def get_similar_titles(cls, item, a_title_latin, alang, difficulty):
-        if difficulty not in [1,2,3,4,6,8,9,12,16,24,36,54]:
-            difficulty = 4
         num = difficulty
         sqlstr = f"""
         SELECT title, r FROM (
@@ -187,16 +185,98 @@ class Quiz:
         return result[:num]
 
     @classmethod
-    def run_level(cls, lvl, board, qlang, alang, hypernym, difficulty, recurr=0):
-        if '--' in alang or '--' in qlang or len(alang) > 12 or len(qlang) > 12:
-            return cls.final_score(board)
-        level = cls.get_item_by_level(lvl, board, qlang, alang, hypernym)
+    def get_fuzzy_level(cls, lvl, board, qlang, alang, hypernym, difficulty):
+        lv = cls.ladder[lvl-1]
+        played_correct = cls.played_correct(board)
+        sqlstr = f"""
+        SELECT id ,hypernym ,qt ,qt_en ,at ,pos
+        FROM (
+            SELECT TOP(1) i.[id]
+                ,i.hypernym --c.title_monos hypernym
+                ,q.title qt ,q_en.title qt_en ,'' at 
+                ,-1 pos
+            FROM (
+                SELECT [id], hypernym
+                FROM [wiki].[item]
+                WHERE hypernym IN (?)
+                    AND lang_count >= ?
+                    AND lang_count <  ?
+                    AND id NOT IN ({",".join(played_correct)})
+            ) i
+            -- JOIN wiki.category c on c.item=i.hypernym
+            CROSS APPLY (
+                SELECT item, title FROM wiki.article
+                WHERE language = '{qlang}' AND item = i.id) q
+            OUTER APPLY (
+                SELECT item, title FROM wiki.article
+                WHERE language = 'en' AND item = i.id) q_en
+            ORDER BY NEWID()
+        ) q
+        UNION ALL
+        SELECT id ,hypernym ,qt ,qt_en ,at ,pos
+        FROM (
+            SELECT TOP(1) i.[id]
+                ,i.hypernym --c.title_monos hypernym
+                ,'' qt ,'' qt_en ,a.title at
+                ,0 pos
+            FROM (
+                SELECT [id], hypernym
+                FROM [wiki].[item]
+                WHERE hypernym IN (?)
+                    AND lang_count >= ?
+                    AND lang_count <  ?
+            ) i
+            -- JOIN wiki.category c on c.item=i.hypernym
+            CROSS APPLY (
+                SELECT item, title FROM wiki.article 
+                WHERE language = '{alang}' AND item = i.id) a
+            ORDER BY NEWID()
+        ) a
+        UNION ALL
+        SELECT id ,hypernym ,qt ,qt_en ,at ,pos
+        FROM (
+            SELECT TOP({difficulty-1}) i.[id]
+                ,i.hypernym --c.title_monos hypernym
+                ,'' qt ,'' qt_en ,a.title at
+                ,1 pos
+            FROM (
+                SELECT [id], hypernym
+                FROM [wiki].[item]
+                WHERE hypernym NOT IN (?)
+                    AND lang_count >= ?
+                    AND lang_count <  ?
+            ) i
+            -- JOIN wiki.category c on c.item=i.hypernym
+            CROSS APPLY (
+                SELECT item, title FROM wiki.article 
+                WHERE language = '{alang}' AND item = i.id) a
+            ORDER BY NEWID()
+        ) c
+        ORDER BY pos
+        """ #TODO: optimize true randomization performance on heterogeneous index
+        params = [hypernym, lv[1], lv[2], hypernym, int(lv[1]*0.5), int(lv[2]*1.5), hypernym, int(lv[1]*0.3), int(lv[2]*2),]
+        result = None
+        cursor = None
+        try:
+            cursor = cls.conn.cursor()
+            result = cursor.execute(sqlstr, params).fetchall()
+        except:
+            cls.conn = pyodbc.connect(conn_str)
+            cursor = cls.conn.cursor()
+            result = cursor.execute(sqlstr, params).fetchall()
+        # validate (q,a) exist @pos (-1,0)
+        return result if len(result)>1 and result[0][5]==-1 and result[1][5]==0 else None
+
+
+    @classmethod
+    def run_exact_level(cls, lvl, board, qlang, alang, hypernyms, difficulty, recurr=0):
+        level = cls.get_item_by_level(lvl, board, qlang, alang, hypernyms)
         # when run out of current level, run next level; circle the ladder, stop when done a circle
         if level is None:
             recurr += 1
             if recurr > len(cls.ladder):
                 return cls.final_score(board)
-            return cls.run_level(1 if lvl == len(cls.ladder) else lvl+1, board, qlang, alang, hypernym, difficulty, recurr)
+            return cls.run_exact_level(1 if lvl == len(cls.ladder) else lvl+1, board, qlang, alang, hypernyms, difficulty, recurr)
         
         q_id,q_hypernym,q_title,q_title_en,a_title,a_title_latin = level
         # find items with similar sound
@@ -214,11 +294,52 @@ class Quiz:
             'answer': correct_choice,
             'board': board
         }
+    
+    @classmethod
+    def run_fuzzy_level(cls, lvl, board, qlang, alang, hypernyms, difficulty, recurr=0):
+        hypernyms = [h for h in hypernyms if h > 0]
+        if len(hypernyms) == 0:
+            return cls.final_score(board)
+        hypernym = random.choice(hypernyms)
+        # pick one and only one hypernym for fuzzy match
+        #TODO: explore fuzzier on many hypernyms
+        level = cls.get_fuzzy_level(lvl, board, qlang, alang, hypernym, difficulty)
+        # when run out of current level, run next level; circle the ladder, stop when done a circle
+        #NOTE: hypernym will be randomized on each recursive run, possible premature termination
+        if level is None:
+            recurr += 1
+            if recurr > len(cls.ladder):
+                return cls.final_score(board)
+            return cls.run_fuzzy_level(1 if lvl == len(cls.ladder) else lvl+1, board, qlang, alang, hypernyms, difficulty, recurr)
+
+        q_id, q_hypernym, q_title, q_title_en = level[0][:4]
+        a_title = level[1][4]
+        # print(*level, sep='\n')
+        choices = [row[4] for row in level[1:]]
+        random.shuffle(choices)
+        correct_choice = choices.index(a_title)
+        return {
+            'lvl': lvl, 
+            'q_id': q_id, 
+            'q_hypernym': q_hypernym, 
+            'q_title': q_title,
+            'q_title_en': q_title_en,
+            'a_title': a_title, 
+            'choices': choices, 
+            'answer': correct_choice,
+            'board': board
+        }
 
     @classmethod
     def next_quiz(cls, data):
-        lvl, board, qid, qlang, alang, hypernym, is_correct, difficulty =  \
-        data['lvl'], data['board'], data['qid'], data['qlang'], data['alang'], data['hypernym'], data['is_correct'], data['difficulty']
+        lvl, board, qid, qlang, alang, hypernyms, is_correct, difficulty, match_mode =  \
+        data['lvl'], data['board'], data['qid'], data['qlang'], data['alang'], data['hypernym'], data['is_correct'], data['difficulty'], data['match_mode']
+        if (not isinstance(qlang, str) or not isinstance(alang, str) 
+            or '--' in alang or '--' in qlang or len(alang) > 12 or len(qlang) > 12 
+            or difficulty not in [1,2,3,4,6,8,9,12,16,24,36,54]
+            or match_mode not in [0,1]):
+            return cls.final_score(board)
+
         if lvl < 0: # start quiz
             lvl = 1
             for l in cls.ladder:
@@ -227,7 +348,10 @@ class Quiz:
             lvl, board = cls.level_up(lvl, board, qid) if is_correct else cls.level_down(lvl, board, qid)
         if lvl == 0: # end quiz
             return cls.final_score(board)
-        return cls.run_level(lvl, board, qlang, alang, hypernym, difficulty)
+        if match_mode == 0:
+            return cls.run_exact_level(lvl, board, qlang, alang, hypernyms, difficulty)
+        if match_mode == 1:
+            return cls.run_fuzzy_level(lvl, board, qlang, alang, hypernyms, difficulty)
 
     @classmethod
     def final_score(cls, board):
@@ -295,3 +419,10 @@ class Quiz:
         for l in cls.ladder:
               total += len(board[str(l[0])])
         return total
+
+    @classmethod
+    def played_correct(cls, board):
+        played_correct = [str(k) for sl in list(board.values()) for k in sl if k > 0]
+        if len(played_correct) == 0:
+              played_correct.extend(['0'])
+        return played_correct

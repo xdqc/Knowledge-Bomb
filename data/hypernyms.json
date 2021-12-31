@@ -107,6 +107,12 @@
         "item": 21146257,
         "or_instance": true,
         "subclass_deep": null
+      },
+      {
+        "label": "fictional entity",
+        "item": 14897293,
+        "or_instance": true,
+        "subclass_deep": null
       }
     ]
   },
@@ -136,7 +142,12 @@
         "item": 7184903,
         "or_instance": true,
         "subclass_deep": 2
-      },
+      }
+    ]
+  },
+  {
+    "hypernym": "Relation (philosophy)",
+    "queries": [
       {
         "label": "relation",
         "item": 930933,
@@ -148,6 +159,24 @@
         "item": 930933,
         "or_instance": true,
         "subclass_deep": 5
+      },
+      {
+        "label": "social relation",
+        "item": 853725,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "agreement",
+        "item": 321839,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "rights",
+        "item": 780687,
+        "or_instance": true,
+        "subclass_deep": null
       }
     ]
   },
@@ -224,6 +253,17 @@
         "item": 1190554,
         "or_instance": true,
         "subclass_deep": 2
+      }
+    ]
+  },
+  {
+    "hypernym": "Event",
+    "queries": [ 
+      {
+        "label": "event",
+        "item": 100235738,
+        "or_instance": true,
+        "subclass_deep": null
       },
       {
         "label": "event",
@@ -244,8 +284,8 @@
         "subclass_deep": null
       },
       {
-        "label": "connection",
-        "item": 23009459,
+        "label": "prediction",
+        "item": 748250,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -277,6 +317,12 @@
         "item": 52948,
         "or_instance": true,
         "subclass_deep": null
+      },
+      {
+        "label": "connection",
+        "item": 23009459,
+        "or_instance": true,
+        "subclass_deep": null
       }
     ]
   },
@@ -294,18 +340,23 @@
         "item": 1150070,
         "or_instance": true,
         "subclass_deep": 4
-      },
+      }
+    ]
+  },
+  {
+    "hypernym": "Process (science)",
+    "queries": [      
       {
-        "label": "emotion",
-        "item": 9415,
-        "or_instance": true,
+        "label": "process",
+        "item": 3249551,
+        "or_instance": false,
         "subclass_deep": null
       },
       {
-        "label": "prediction",
-        "item": 748250,
+        "label": "process",
+        "item": 3249551,
         "or_instance": true,
-        "subclass_deep": null
+        "subclass_deep": 3
       },
       {
         "label": "process",
@@ -318,6 +369,12 @@
         "item": 13878858,
         "or_instance": true,
         "subclass_deep": 6
+      },
+      {
+        "label": "emotion",
+        "item": 9415,
+        "or_instance": true,
+        "subclass_deep": null
       }
     ]
   },
@@ -359,12 +416,6 @@
         "item": 602884,
         "or_instance": true,
         "subclass_deep": null
-      },
-      {
-        "label": "state",
-        "item": 3505845,
-        "or_instance": true,
-        "subclass_deep": null
       }
     ]
   },
@@ -403,7 +454,6 @@
       }
     ]
   },
-
   {
     "hypernym": "Quality",
     "queries":[
@@ -469,8 +519,14 @@
       {
         "label": "animal",
         "item": 729,
-        "or_instance": true,
+        "or_instance": false,
         "subclass_deep": null
+      },
+      {
+        "label": "animal",
+        "item": 729,
+        "or_instance": true,
+        "subclass_deep": 2
       },
       {
         "label": "plant",
@@ -520,10 +576,33 @@
         "subclass_deep": 6
       },
       {
+        "label": "lifestyle",
+        "item": 32090 ,
+        "or_instance": true,
+        "subclass_deep": 6
+      }
+    ]
+  },
+  {
+    "hypernym": "Social behavior",
+    "queries": [
+      {
+        "label": "social behavior",
+        "item": 921513,
+        "or_instance": true,
+        "subclass_deep": 4
+      },
+      {
         "label": "communication",
         "item": 11024,
         "or_instance": true,
         "subclass_deep": 3
+      },
+      {
+        "label": "service",
+        "item": 7406919,
+        "or_instance": true,
+        "subclass_deep": null
       }
     ]
   },
@@ -654,6 +733,23 @@
         "subclass_deep": 1
       },
       {
+        "label": "data",
+        "item": 42848,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "logical form",
+        "item": 6667497,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "message",
+    "queries": [
+      {
         "label": "message",
         "item": 628523,
         "or_instance": true,
@@ -664,12 +760,6 @@
         "item": 1151067,
         "or_instance": true,
         "subclass_deep": 5
-      },
-      {
-        "label": "data",
-        "item": 42848,
-        "or_instance": true,
-        "subclass_deep": null
       },
       {
         "label": "law",
@@ -686,12 +776,6 @@
       {
         "label": "command",
         "item": 1665268,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "logical form",
-        "item": 6667497,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -753,6 +837,29 @@
         "item": 2751586,
         "or_instance": true,
         "subclass_deep": null
+      },
+      {
+        "label": "declaration",
+        "item": 62662439,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Goods",
+    "queries": [
+      {
+        "label": "goods",
+        "item": 28877,
+        "or_instance": false,
+        "subclass_deep": 6
+      },
+      {
+        "label": "goods",
+        "item": 28877,
+        "or_instance": true,
+        "subclass_deep": 2
       }
     ]
   },
@@ -770,12 +877,6 @@
         "item": 6671777,
         "or_instance": true,
         "subclass_deep": 2
-      },
-      {
-        "label": "architectural structure",
-        "item": 811979,
-        "or_instance": false,
-        "subclass_deep": null
       }
     ]
   },
@@ -793,6 +894,12 @@
         "item": 58778,
         "or_instance": true,
         "subclass_deep": 3
+      },
+      {
+        "label": "social system",
+        "item": 1639378,
+        "or_instance": true,
+        "subclass_deep": null
       }
     ]
   },
@@ -1011,32 +1118,8 @@
         "subclass_deep": null
       },
       {
-        "label": "social relation",
-        "item": 853725,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "rights",
-        "item": 780687,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "service",
-        "item": 7406919,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
         "label": "philosophy",
         "item": 5891,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "fictional entity",
-        "item": 14897293,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -1054,6 +1137,12 @@
       {
         "label": "cultural heritage",
         "item": 210272,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "meme",
+        "item": 978,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -1087,6 +1176,41 @@
       {
         "label": "technology",
         "item": 11016,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Matter",
+    "queries": [
+      {
+        "label": "matter",
+        "item": 35758,
+        "or_instance": false,
+        "subclass_deep": 6
+      },
+      {
+        "label": "matter",
+        "item": 35758,
+        "or_instance": true,
+        "subclass_deep": 5
+      },
+      {
+        "label": "fermion",
+        "item": 44363,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "quantum particle",
+        "item": 28693603,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "subatomic particle",
+        "item": 177013,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -1245,40 +1369,7 @@
       }
     ]
   },
-  {
-    "hypernym": "Goods",
-    "queries": [
-      {
-        "label": "goods",
-        "item": 28877,
-        "or_instance": false,
-        "subclass_deep": null
-      },
-      {
-        "label": "goods",
-        "item": 28877,
-        "or_instance": true,
-        "subclass_deep": 2
-      }
-    ]
-  },
-  {
-    "hypernym": "Matter",
-    "queries": [
-      {
-        "label": "matter",
-        "item": 35758,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "subatomic particle",
-        "item": 177013,
-        "or_instance": true,
-        "subclass_deep": null
-      }
-    ]
-  },
+
   {
     "hypernym": "Physical property",
     "queries": [
@@ -1399,9 +1490,25 @@
     ]
   },
   {
+    "hypernym": "Infrastructure",
+    "queries": [
+      {
+        "label": "infrastructure",
+        "item": 121359,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
     "hypernym": "Art",
     "queries": [
-      { "label": "art", "item": 735, "or_instance": true, "subclass_deep": null },
+      { 
+        "label": "art",
+        "item": 735,
+        "or_instance": true,
+        "subclass_deep": null
+      },
       {
         "label": "work of art",
         "item": 838948,
@@ -1534,6 +1641,41 @@
     ]
   },
   {
+    "hypernym": "Architectural structure",
+    "queries": [
+      {
+        "label": "architectural structure",
+        "item": 811979,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "architectural structure",
+        "item": 811979,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "civil engineering construction",
+        "item": 1411945,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "facility",
+        "item": 13226383,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "building",
+        "item": 41176,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
     "hypernym": "Tool",
     "queries": [
       {
@@ -1559,21 +1701,10 @@
         "item": 31807746,
         "or_instance": true,
         "subclass_deep": null
-      }
-    ]
-  },
-  {
-    "hypernym": "Infrastructure",
-    "queries": [
-      {
-        "label": "infrastructure",
-        "item": 121359,
-        "or_instance": true,
-        "subclass_deep": null
       },
       {
-        "label": "civil engineering construction",
-        "item": 1411945,
+        "label": "machine element",
+        "item": 839546,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -1585,12 +1716,6 @@
       {
         "label": "machine",
         "item": 11019,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "machine element",
-        "item": 839546,
         "or_instance": true,
         "subclass_deep": null
       }

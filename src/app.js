@@ -34,6 +34,11 @@ new Vue({
     hypernym_tree: [],
     hypernym_lang: [],
     hypernym_index: 1,
+    match_mode: 0,
+    match_mode_options: [
+      { text: 'Default - exact match', value: 0 },
+      { text: 'Pro - fuzzy match (⚠Beta test💣)', value: 1 }
+    ],
     difficulty: 4,
     difficultyLvl: 7,
     difficulties: [
@@ -126,7 +131,7 @@ new Vue({
       return this.choices && this.choices.length > 0 && this.score < 0
     },
     qlangOptions() {
-      return this.qlang_options.filter(l => l.value != this.alang)
+      return this.match_mode === 1 ? this.qlang_options : this.qlang_options.filter(l => l.value != this.alang)
     },
     alangOptions() {
       return this.alang_options
@@ -414,6 +419,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         hypernym: this.hypernyms,
         is_correct: is_correct,
         difficulty: this.difficulty,
+        match_mode: this.match_mode,
       }
     },
     unpackRespData: function(data) {

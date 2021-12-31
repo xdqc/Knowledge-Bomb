@@ -171,19 +171,19 @@
               <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" id="btn-toggle-hypernym-tree" title="tree" @click="toggleDisplayHypernymTree">🌲</b-btn>
               <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" title="switch language" @click="switchHypernymLang">🔡</b-btn>
               <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" title="reverse selection" @click="reverseHypernymSelect">🔛</b-btn>
-              <b-form-group  label=" " v-slot="{ hypernymOptions }">
+              <b-form-group  label=" " v-slot="{ ariaHypernymOptions }">
                 <b-form-checkbox-group v-show="!displayHypernymTree"
                   class="list-hypernyms"
                   v-model="hypernyms"
                   :options="hypernym_list"
-                  aria-describedby="hypernymOptions"
+                  aria-describedby="ariaHypernymOptions"
                   stacked switches size="sm">
                 </b-form-checkbox-group>
                 <b-form-checkbox-group v-show="displayHypernymTree"
                   class="tree-hypernyms"
                   v-model="hypernyms"
                   :options="hypernym_tree"
-                  aria-describedby="hypernymOptions"
+                  aria-describedby="ariaHypernymOptions"
                   stacked size="sm">
               </b-form-checkbox-group>
               </b-form-group>
@@ -231,7 +231,24 @@
               </div>
             </b-form-group>
             <b-form-group 
-              v-if="!quizStarted&&qlang&&alang&&qlang!==alang"
+              v-show="!quizStarted&&qlang&&alang"
+              v-slot="{ ariaMatchMode }"
+              class="mt-4 mb-2"
+              horizontal
+              label-cols-sm="5"
+              label-cols-md="4"
+              label="">
+              <b-form-radio-group
+                id="radio-match-mode"
+                v-model="match_mode"
+                :options="match_mode_options"
+                :aria-describedby="ariaMatchMode"
+                name="match-mode-options"
+                button-variant="secondary"
+              ></b-form-radio-group>
+            </b-form-group>
+            <b-form-group 
+              v-show="!quizStarted&&qlang&&alang&&(match_mode!==0||qlang!==alang)"
               horizontal
               label-cols-sm="5"
               label-cols-md="4"
