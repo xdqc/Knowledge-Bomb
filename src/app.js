@@ -35,12 +35,8 @@ new Vue({
     hypernym_lang: [],
     hypernym_index: 1,
     match_mode: 0,
-    match_mode_options: [
-      { text: '🤓 Lay', value: 0 },
-      { text: '😎 Pro', value: 1 }
-    ],
     difficulty: 4,
-    difficultyLvl: 7,
+    difficultyLvl: 4,
     difficulties: [
       {value: 1, icon:'1️⃣', tooltip:'Wanderer', keymap:{'7':0,'8':0,'9':0}},
       {value: 2, icon:'2️⃣', tooltip:'Picnic', keymap:{'7':0,'8':0,'9':0,'4':1,'5':1,'6':1,'g':1,'u':1,'c':1,'i':1,'r':1,'o':1}},
@@ -137,10 +133,10 @@ new Vue({
       return this.alang_options
     },
     alangOpt() {
-      return this.alang_options.find(l => l.value === this.alang) || { label_a: '', label_q: '', label_s: '', label_t: ''}
+      return this.alang_options.find(l => l.value === this.alang) || { value: '', text: '', label_a: '', label_q: '', label_s: '', label_t: '', label_m0: '', label_m1: ''}
     },
     qlangOpt() {
-      return this.qlang_options.find(l => l.value === this.qlang) || { label_a: '', label_q: '', label_s: '', label_t: ''}
+      return this.qlang_options.find(l => l.value === this.qlang) || { value: '', text: '', label_a: '', label_q: '', label_s: '', label_t: '', label_m0: '', label_m1: ''}
     },
     quotelangOpt() {
       return this.qlang_options.find(l => l.value === this.quoteLang)
@@ -157,6 +153,12 @@ new Vue({
     labelPageTitle() {
       if (this.quizStarted) return ''
       return this.alangOpt.label_t || this.alang_options[0].label_t
+    },
+    match_mode_options() {
+      return [
+        { text: `🤓　${this.alangOpt.label_m0 || this.alang_options[0].label_m0 || ''} ${this.alangOpt.text} >> ${this.qlangOpt.text}`, value: 0 },
+        { text: `😎Pro　${this.alangOpt.label_m1 || this.alang_options[0].label_m1 || ''} ${this.qlangOpt.text}`, value: 1 },
+      ]
     },
     difficultyIndex() {
       return this.difficulties.findIndex(d => d.value == this.difficulty)+1
@@ -637,7 +639,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
     //#region Utils
     getCookieValue: function(name) {
       const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
-      return m ? m.pop()||'' : '7'
+      return m ? m.pop()||'' : '4'
     },
     toMajorLang: function(lang, isSpeaking) {
       const MAJOR_LANG = {

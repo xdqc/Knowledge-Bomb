@@ -200,7 +200,6 @@
               :label="labelAnswer"
             >
               <div style="display: flex;">
-                <b-form-select v-model="alang" :options="alangOptions" label="alang"></b-form-select>
                 <b-dropdown variant="outline-light" class="dropdown-lang alang-leximap" text="🗺" no-caret>
                   <b-btn v-for="(l,i) in aLeximap" :key="i" 
                     class="btn-dropdown-lang" variant="outline-light" :size="i>0?'sm':''" 
@@ -209,6 +208,7 @@
                     {{ l.text }}
                   </b-btn>
                 </b-dropdown>
+                <b-form-select v-model="alang" :options="alangOptions" label="alang"></b-form-select>
               </div>
             </b-form-group>
             <b-form-group
@@ -219,7 +219,6 @@
               :label="labelQuestion"
             >
               <div style="display: flex;">
-                <b-form-select v-model="qlang" :options="qlangOptions" label="qlang" class=""></b-form-select>
                 <b-dropdown variant="outline-light" class="dropdown-lang qlang-leximap" text="🗺" no-caret>
                   <b-btn v-for="(l,i) in qLeximap" :key="i" 
                     class="btn-dropdown-lang" variant="outline-light" size="sm"
@@ -228,6 +227,7 @@
                     {{ l.text.replace(/ *\([^)]*\) */g, '') }}
                   </b-btn>
                 </b-dropdown>
+                <b-form-select v-model="qlang" :options="qlangOptions" label="qlang" class=""></b-form-select>
               </div>
             </b-form-group>
             <b-form-group 

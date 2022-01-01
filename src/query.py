@@ -12,7 +12,7 @@ class Query:
 
     @classmethod
     def get_languages(cls):
-        sqlstr = """SELECT TOP(320) code,name_local,label_question,label_answer,label_difficulty,label_gametitle,coord_x,coord_y 
+        sqlstr = """SELECT TOP(320) code,name_local,label_question,label_answer,label_difficulty,label_gametitle,label_m0,label_m1,coord_x,coord_y 
         FROM wiki.language ORDER BY [rank]"""
         cls.conn = pyodbc.connect(cls.conn_str)
         cursor = cls.conn.cursor()
@@ -21,7 +21,8 @@ class Query:
             res.append({'value':lang[0], 'text':lang[1], 
                 'label_q':lang[2], 'label_a':lang[3],
                 'label_s':lang[4], 'label_t':lang[5],
-                'coord_x':lang[6], 'coord_y':lang[7]})
+                'label_m0':lang[6], 'label_m1':lang[7],
+                'coord_x':lang[8], 'coord_y':lang[9]})
         return res
 
     @classmethod
