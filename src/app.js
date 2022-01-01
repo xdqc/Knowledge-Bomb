@@ -36,8 +36,8 @@ new Vue({
     hypernym_index: 1,
     match_mode: 0,
     match_mode_options: [
-      { text: 'Default - exact match', value: 0 },
-      { text: 'Pro - fuzzy match (⚠Beta test💣)', value: 1 }
+      { text: '🤓 Lay', value: 0 },
+      { text: '😎 Pro', value: 1 }
     ],
     difficulty: 4,
     difficultyLvl: 7,
@@ -346,7 +346,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
     selectChoice: function(e, index) {
       e.preventDefault()
       e.target.classList.remove('btn-secondary')
-      e.target.classList.add('disabled')
+      document.querySelectorAll('.btn-choice').forEach(b => b.disabled = true)
       if (this.difficulty > 1) {
         e.target.classList.add(this.answer === index ? 'btn-success' : 'btn-danger')
       }
@@ -392,8 +392,8 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       .finally(() => {
         let intervalF = setInterval(() => {
           if(waitflag == 1) {
+            document.querySelectorAll('.btn-choice').forEach(b => b.disabled = false)
             e.target.classList.add('btn-secondary')
-            e.target.classList.remove('disabled')
             if (this.difficulty > 1) {
               e.target.classList.remove('btn-success')
               e.target.classList.remove('btn-danger')

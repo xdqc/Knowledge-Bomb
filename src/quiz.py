@@ -1,59 +1,22 @@
-import pyodbc
 import math, random
+import pyodbc
+import json
+import time
+import requests
 from environs import Env
 
 
-env = Env()
-env.read_env()
-
-conn_str = env('SQL_READ')
-
-class Quiz:
+class Query:
+    env = Env()
+    env.read_env()
+    conn_str = env('SQL_READ')
     conn = pyodbc.connect(conn_str)
-    ladder = [ # lvl,lo_langcount,hi_langcount,num_of_items
-        (1,120,320,643),
-        (2,100,150,886),
-        (3,90,120,1012),
-        (4,85,110,1102),
-        (5,80,100,1175),
-        (6,76,92,1215),
-        (7,72,85,1296),
-        (8,69,80,1267),
-        (9,66,75,1236),
-        (10,62,70,1347),
-        (11,58,66,1557),
-        (12,54,62,1721),
-        (13,51,58,1830),
-        (14,48,54,2025),
-        (15,46,51,1908),
-        (16,43,48,2190),
-        (17,42,46,1926),
-        (18,39,43,2272),
-        (19,38,41,1859),
-        (20,36,39,2150),
-        (21,34,37,2417),
-        (22,33,35,1827),
-        (23,32,34,1889),
-        (24,31,33,1986),
-        (25,30,32,2153),
-        (26,29,31,2310),
-        (27,28,30,2483),
-        (28,27,29,2756),
-        (29,27,28,1478),
-        (30,26,27,1456),
-        (31,25,26,1579),
-        (32,24,25,1788),
-        (33,23,24,1929),
-        (34,22,23,2080),
-        (35,21,22,2275),
-        (36,20,21,2459),
-    ]
 
     @classmethod
     def get_languages(cls):
         sqlstr = """SELECT TOP(320) code,name_local,label_question,label_answer,label_difficulty,label_gametitle,coord_x,coord_y 
         FROM wiki.language ORDER BY [rank]"""
-        cls.conn = pyodbc.connect(conn_str)
+        cls.conn = pyodbc.connect(cls.conn_str)
         cursor = cls.conn.cursor()
         res = []
         for lang in cursor.execute(sqlstr).fetchall():
@@ -76,11 +39,11 @@ class Quiz:
             AND a.language = ?
         ) a
         ORDER BY CASE WHEN a.title IS NULL THEN 1 ELSE 0 END, title, l.name"""
-        cls.conn = pyodbc.connect(conn_str)
+        cls.conn = pyodbc.connect(cls.conn_str)
         cursor = cls.conn.cursor()
         res = []
         for lang in cursor.execute(sqlstr, [lang,lang]).fetchall():
-            res.append({'value':lang[0], 'text':lang[1][:1].upper()+lang[1][1:], 
+            res.append({'value':lang[0], 'text':lang[1].capitalize(), 
                 'coord_x':lang[2], 'coord_y':lang[3]})
         return res
 
@@ -99,7 +62,7 @@ class Quiz:
             ON c.item = i.hypernym
         WHERE e.title is not null
         ORDER BY c.place"""
-        cls.conn = pyodbc.connect(conn_str)
+        cls.conn = pyodbc.connect(cls.conn_str)
         cursor = cls.conn.cursor()
         res = []
         for h in cursor.execute(sqlstr, [alang, qlang]).fetchall():
@@ -108,9 +71,7 @@ class Quiz:
         return res
 
     @classmethod
-    def get_item_by_level(cls, lvl, board, qlang, alang, hypernyms=[]):
-        lv = cls.ladder[lvl-1]
-        played_correct = cls.played_correct(board)
+    def get_item_by_level(cls, lv, played_correct, qlang, alang, hypernyms=[]):
         hypernyms = [str(h) for h in hypernyms if h > 0]
         sqlstr = f"""
         SELECT TOP(1) i.[id], i.hypernym, q.title, q_en.title, a.title ,a.title_latin
@@ -140,7 +101,7 @@ class Quiz:
             cursor = cls.conn.cursor()
             result = cursor.execute(sqlstr, params).fetchall()
         except:
-            cls.conn = pyodbc.connect(conn_str)
+            cls.conn = pyodbc.connect(cls.conn_str)
             cursor = cls.conn.cursor()
             result = cursor.execute(sqlstr, params).fetchall()
         result = cursor.execute(sqlstr, params).fetchall()
@@ -185,14 +146,13 @@ class Quiz:
         return result[:num]
 
     @classmethod
-    def get_fuzzy_level(cls, lvl, board, qlang, alang, hypernym, difficulty):
-        lv = cls.ladder[lvl-1]
-        played_correct = cls.played_correct(board)
+    def get_fuzzy_level(cls, lv, played_correct, qlang, alang, hypernym, difficulty):
         sqlstr = f"""
         SELECT id ,hypernym ,qt ,qt_en ,at ,pos
+            ,ht
         FROM (
             SELECT TOP(1) i.[id]
-                ,i.hypernym --c.title_monos hypernym
+                ,i.hypernym ,c.title_monos ht
                 ,q.title qt ,q_en.title qt_en ,'' at 
                 ,-1 pos
             FROM (
@@ -203,7 +163,7 @@ class Quiz:
                     AND lang_count <  ?
                     AND id NOT IN ({",".join(played_correct)})
             ) i
-            -- JOIN wiki.category c on c.item=i.hypernym
+             JOIN wiki.category c on c.item=i.hypernym
             CROSS APPLY (
                 SELECT item, title FROM wiki.article
                 WHERE language = '{qlang}' AND item = i.id) q
@@ -214,29 +174,10 @@ class Quiz:
         ) q
         UNION ALL
         SELECT id ,hypernym ,qt ,qt_en ,at ,pos
-        FROM (
-            SELECT TOP(1) i.[id]
-                ,i.hypernym --c.title_monos hypernym
-                ,'' qt ,'' qt_en ,a.title at
-                ,0 pos
-            FROM (
-                SELECT [id], hypernym
-                FROM [wiki].[item]
-                WHERE hypernym IN (?)
-                    AND lang_count >= ?
-                    AND lang_count <  ?
-            ) i
-            -- JOIN wiki.category c on c.item=i.hypernym
-            CROSS APPLY (
-                SELECT item, title FROM wiki.article 
-                WHERE language = '{alang}' AND item = i.id) a
-            ORDER BY NEWID()
-        ) a
-        UNION ALL
-        SELECT id ,hypernym ,qt ,qt_en ,at ,pos
+            ,ht
         FROM (
             SELECT TOP({difficulty-1}) i.[id]
-                ,i.hypernym --c.title_monos hypernym
+                ,i.hypernym, c.title_monos ht
                 ,'' qt ,'' qt_en ,a.title at
                 ,1 pos
             FROM (
@@ -246,7 +187,7 @@ class Quiz:
                     AND lang_count >= ?
                     AND lang_count <  ?
             ) i
-            -- JOIN wiki.category c on c.item=i.hypernym
+             JOIN wiki.category c on c.item=i.hypernym
             CROSS APPLY (
                 SELECT item, title FROM wiki.article 
                 WHERE language = '{alang}' AND item = i.id) a
@@ -254,23 +195,230 @@ class Quiz:
         ) c
         ORDER BY pos
         """ #TODO: optimize true randomization performance on heterogeneous index
-        params = [hypernym, lv[1], lv[2], hypernym, int(lv[1]*0.5), int(lv[2]*1.5), hypernym, int(lv[1]*0.3), int(lv[2]*2),]
+        params = [hypernym, lv[1], lv[2], hypernym, int(lv[1]*0.3), int(lv[2]*3)]
         result = None
         cursor = None
+        t0 = time.time()
         try:
             cursor = cls.conn.cursor()
             result = cursor.execute(sqlstr, params).fetchall()
         except:
-            cls.conn = pyodbc.connect(conn_str)
+            cls.conn = pyodbc.connect(cls.conn_str)
             cursor = cls.conn.cursor()
             result = cursor.execute(sqlstr, params).fetchall()
-        # validate (q,a) exist @pos (-1,0)
-        return result if len(result)>1 and result[0][5]==-1 and result[1][5]==0 else None
+        t1 = time.time()
+        print('\t\t\t\tget_fuzzy_choice cost:', t1-t0)
+        # validate q(result[0]) exist @pos (-1)
+        if len(result) == 0 or result[0][5] != -1:
+            return None
 
+        def trans_lang_code(lang):
+            # resolve diff b/w WMF & IETF
+            trans = {
+                'be-x-old': 'be-tarask',
+                'bh': 'bho',
+                'cbk-sam': 'cbk',
+                'fiu-vro': 'vro',
+                'zh-min-nan': 'nan',
+                'zh-yue': 'yue',
+            }
+            return trans[lang] if lang in trans else lang
+        # get siblings of the q
+        a_id, a_title = cls.get_fuzzy_answer(result[0][0], trans_lang_code(alang))
+        t2 = time.time()
+        print('\t\t\t\tget_fuzzy_answer cost:', t2-t1)
+        if a_id > 0 and a_title:
+            result[1:1] = [(a_id, hypernym, '', '', a_title.capitalize(), 0, '??')]
+            return result
+        else:
+            return None
+
+    @classmethod
+    def get_fuzzy_answer(cls, q_id, alang):
+        def sparql_get_siblings(item, lang, upscope='wdt:P31?', downscope='wdt:P31?', related=False):
+            a_id = 0
+            a_title = ''
+            sparql = ''
+            if related:
+                #Possible related items P361 P366 P527 P1535 P1659 P2283 
+                # excluding P31?/P279*
+                # dropped canditates P1552 has_quality, P1889 different_from
+                sparql = """
+                SELECT DISTINCT * WHERE {
+                {
+                    SELECT DISTINCT
+                    ?sibling ?siblingLabelA
+                            WHERE 
+                            {
+                            wd:Q"""+str(item)+""" wdt:P361? ?whole .
+                            ?sibling wdt:P361? ?whole .
+                            ?sibling rdfs:label ?siblingLabelA filter (lang(?siblingLabelA) = """+f'"{lang}"'+""").
+                            }
+                }
+                UNION
+                {
+                    SELECT DISTINCT
+                    ?sibling ?siblingLabelA
+                            WHERE 
+                            {
+                            wd:Q"""+str(item)+""" wdt:P527? ?part .
+                            ?sibling wdt:P527? ?part .
+                            ?sibling rdfs:label ?siblingLabelA filter (lang(?siblingLabelA) = """+f'"{lang}"'+""").
+                            }
+                }
+                UNION
+                {
+                    SELECT DISTINCT
+                    ?sibling ?siblingLabelA
+                            WHERE 
+                            {
+                            wd:Q"""+str(item)+""" wdt:P366? ?use .
+                            ?sibling wdt:P366? ?use .
+                            ?sibling rdfs:label ?siblingLabelA filter (lang(?siblingLabelA) = """+f'"{lang}"'+""").
+                            }
+                }
+                UNION
+                {
+                    SELECT DISTINCT
+                    ?sibling ?siblingLabelA
+                            WHERE 
+                            {
+                            wd:Q"""+str(item)+""" wdt:P1535? ?useby .
+                            ?sibling wdt:P1535? ?useby .
+                            ?sibling rdfs:label ?siblingLabelA filter (lang(?siblingLabelA) = """+f'"{lang}"'+""").
+                            }
+                }
+                UNION
+                {
+                    SELECT DISTINCT
+                    ?sibling ?siblingLabelA
+                            WHERE 
+                            {
+                            wd:Q"""+str(item)+""" wdt:P2283? ?uses .
+                            ?sibling wdt:P2283? ?uses .
+                            ?sibling rdfs:label ?siblingLabelA filter (lang(?siblingLabelA) = """+f'"{lang}"'+""").
+                            }
+                }
+                UNION
+                {
+                    SELECT DISTINCT
+                    ?sibling ?siblingLabelA
+                            WHERE 
+                            {
+                            wd:Q"""+str(item)+""" wdt:P1659? ?see .
+                            ?sibling wdt:P1659? ?see .
+                            ?sibling rdfs:label ?siblingLabelA filter (lang(?siblingLabelA) = """+f'"{lang}"'+""").
+                            }
+                }
+                }
+                ORDER BY UUID() 
+                LIMIT 2
+                """
+            else:
+                #NOTE: Because the `?` after upscope P31, directchild is also possible, so sibling actually means children and their uncles
+                #exclude classes of concept, term, blanket terminology, technical term
+                sparql = """
+                SELECT DISTINCT ?sibling ?siblingLabelA
+                WHERE
+                {
+                    wd:Q"""+str(item)+""" """+upscope+""" ?class.
+                    FILTER (?class not in (wd:Q151885, wd:Q1969448, wd:Q4925178, wd:Q12812139))
+                    ?sibling """+downscope+""" ?class .
+                    ?sibling rdfs:label ?siblingLabelA filter (lang(?siblingLabelA) = """+f'"{lang}"'+""").
+                }
+                ORDER BY uuid()
+                LIMIT 2 
+                """
+            headers = {'Accept':'application/json'}
+            r = requests.get('https://query.wikidata.org/sparql?query='+sparql, headers=headers)
+            try:
+                res = r.json()
+                for b in res['results']['bindings']:
+                    a_id = int(b['sibling']['value'].split('Q')[1])
+                    a_title = b['siblingLabelA']['value']
+                    if a_id != q_id:
+                        return a_id, a_title, True
+            except Exception as e:
+                print(q_id, alang, e, sep='\n')
+            return a_id, a_title, False
+            
+        a_id, a_title, is_fuzzy = sparql_get_siblings(q_id, alang, related=True)
+        if is_fuzzy:
+            return a_id,  a_title
+        print('Expand Class...', q_id, alang)
+        a_id, a_title, is_fuzzy = sparql_get_siblings(q_id, alang, 'wdt:P31?', 'wdt:P31?')
+        if is_fuzzy:
+            return a_id,  a_title
+        print('Expand SubClass...',  q_id, alang)
+        a_id, a_title, is_fuzzy = sparql_get_siblings(q_id, alang, 'wdt:P31?', 'wdt:P31?/wdt:P279')
+        if is_fuzzy:
+            return a_id,  a_title
+        print('Expand SubClasses...',  q_id, alang)
+        a_id, a_title, is_fuzzy = sparql_get_siblings(q_id, alang, 'wdt:P31?', 'wdt:P31?/wdt:P279+')
+        if is_fuzzy:
+            return a_id,  a_title
+        print('Expand SuperClass...',  q_id, alang)
+        a_id, a_title, is_fuzzy = sparql_get_siblings(q_id, alang, 'wdt:P31?/wdt:P279', 'wdt:P31?/wdt:P279?')
+        if is_fuzzy:
+            return a_id, a_title
+        print('Expand SuperSuperClass...',  q_id, alang)
+        a_id, a_title, is_fuzzy = sparql_get_siblings(q_id, alang, 'wdt:P31?/wdt:P279/wdt:P279', 'wdt:P31?/wdt:P279?')
+        if not is_fuzzy:
+            print('Expand Scopes failure...',  q_id, alang)
+        return a_id, a_title
+
+
+class Quiz:
+    ladder = [ # lvl,lo_langcount,hi_langcount,num_of_items
+        (1,120,320,643),
+        (2,100,150,886),
+        (3,90,120,1012),
+        (4,85,110,1102),
+        (5,80,100,1175),
+        (6,76,92,1215),
+        (7,72,85,1296),
+        (8,69,80,1267),
+        (9,66,75,1236),
+        (10,62,70,1347),
+        (11,58,66,1557),
+        (12,54,62,1721),
+        (13,51,58,1830),
+        (14,48,54,2025),
+        (15,46,51,1908),
+        (16,43,48,2190),
+        (17,42,46,1926),
+        (18,39,43,2272),
+        (19,38,41,1859),
+        (20,36,39,2150),
+        (21,34,37,2417),
+        (22,33,35,1827),
+        (23,32,34,1889),
+        (24,31,33,1986),
+        (25,30,32,2153),
+        (26,29,31,2310),
+        (27,28,30,2483),
+        (28,27,29,2756),
+        (29,27,28,1478),
+        (30,26,27,1456),
+        (31,25,26,1579),
+        (32,24,25,1788),
+        (33,23,24,1929),
+        (34,22,23,2080),
+        (35,21,22,2275),
+        (36,20,21,2459),
+    ]
+
+    @classmethod
+    def get_languages(cls, lang):
+        return Query.get_language_names(lang) if lang else Query.get_languages()
+
+    @classmethod
+    def get_hypernyms(cls, qlang, alang):
+        return Query.get_hypernyms(qlang, alang)
 
     @classmethod
     def run_exact_level(cls, lvl, board, qlang, alang, hypernyms, difficulty, recurr=0):
-        level = cls.get_item_by_level(lvl, board, qlang, alang, hypernyms)
+        level = Query.get_item_by_level(cls.ladder[lvl-1], cls.played_correct(board), qlang, alang, hypernyms)
         # when run out of current level, run next level; circle the ladder, stop when done a circle
         if level is None:
             recurr += 1
@@ -280,7 +428,7 @@ class Quiz:
         
         q_id,q_hypernym,q_title,q_title_en,a_title,a_title_latin = level
         # find items with similar sound
-        similar_titles = cls.get_similar_titles(q_id, a_title_latin, alang, difficulty)
+        similar_titles = Query.get_similar_titles(q_id, a_title_latin, alang, difficulty)
         random.shuffle(similar_titles)
         correct_choice = similar_titles.index(a_title)
         return {
@@ -303,7 +451,7 @@ class Quiz:
         hypernym = random.choice(hypernyms)
         # pick one and only one hypernym for fuzzy match
         #TODO: explore fuzzier on many hypernyms
-        level = cls.get_fuzzy_level(lvl, board, qlang, alang, hypernym, difficulty)
+        level = Query.get_fuzzy_level(cls.ladder[lvl-1], cls.played_correct(board), qlang, alang, hypernym, difficulty)
         # when run out of current level, run next level; circle the ladder, stop when done a circle
         #NOTE: hypernym will be randomized on each recursive run, possible premature termination
         if level is None:
@@ -314,7 +462,7 @@ class Quiz:
 
         q_id, q_hypernym, q_title, q_title_en = level[0][:4]
         a_title = level[1][4]
-        # print(*level, sep='\n')
+        print(*level, sep='\n')
         choices = [row[4] for row in level[1:]]
         random.shuffle(choices)
         correct_choice = choices.index(a_title)

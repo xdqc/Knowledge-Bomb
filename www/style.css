@@ -69,6 +69,11 @@ h1 {
   background-color: var(--body-background);
   color: var(--jelly-bean-blue);
 }
+.btn-secondary:disabled {
+  background-color: var(--body-background);
+  color: var(--jelly-bean-blue);
+  opacity: 0.5;
+}
 .btn-secondary:not(:disabled):not(.disabled).active {
   background-color: var(--jelly-bean-blue);
   color: white;

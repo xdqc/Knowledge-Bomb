@@ -15,7 +15,7 @@ def root(path):
 @limiter.limit('2/second', error_message='chill, knowledge bomber!')
 def language():
     lang = request.args.get('lang')
-    resp = jsonify(Quiz.get_language_names(lang) if lang else Quiz.get_languages())
+    resp = jsonify(Quiz.get_languages(lang))
     return resp
 
 @app.route('/hypernym')
@@ -24,7 +24,7 @@ def hypernym():
     return jsonify(Quiz.get_hypernyms(request.args.get('ql'),request.args.get('al')))
 
 @app.route('/next', methods=['POST'])
-@limiter.limit('1/second, 1000/hour', error_message='chill, knowledge bomber!')
+@limiter.limit('2/second, 1000/hour', error_message='chill, knowledge bomber!')
 @limiter.limit('9000/day', error_message="It's Over 9000!!")
 def next():
     return jsonify(Quiz.next_quiz(request.get_json()))

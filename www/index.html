@@ -317,10 +317,10 @@
 
             <b-row>
               <b-col sm="12" :md="Math.max(7,difficultyIndex+2)" :lg="Math.max(5,difficultyIndex+2)" :xl="Math.max(4,difficultyIndex+2)" class="choices p-0">
-                <b-button secondary class="btn-choice" 
+                <b-button secondary
                 v-for="(choice,index) in choices" :key="index"
                   :style="`height: ${choiceHeight}px; font-size: ${choiceFontSize}px`"
-                  :class="`col-${Math.ceil(12/Math.floor(Math.sqrt(difficulty)))} choice-d-${difficulty}`"
+                  :class="`col-${Math.ceil(12/Math.floor(Math.sqrt(difficulty)))} choice-d-${difficulty} btn-choice`"
                   :id="`choice-${index}`"
                   @click="selectChoice($event,index)"
                   @touchstart="touchStart($event,index)"
