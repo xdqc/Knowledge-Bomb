@@ -41,7 +41,7 @@ new Vue({
       {value: 1, icon:'1️⃣', tooltip:'Wanderer', keymap:{'7':0,'8':0,'9':0}},
       {value: 2, icon:'2️⃣', tooltip:'Picnic', keymap:{'7':0,'8':0,'9':0,'4':1,'5':1,'6':1,'g':1,'u':1,'c':1,'i':1,'r':1,'o':1}},
       {value: 3, icon:'3️⃣', tooltip:'Casual', keymap:{'7':0,'8':0,'9':0,'4':1,'5':1,'6':1,'g':1,'u':1,'c':1,'i':1,'r':1,'o':1,'1':2,'2':2,'3':2,'h':2,'j':2,'t':2,'k':2,'n':2,'l':2}},
-      {value: 4, icon:'4️⃣', tooltip:'Simple', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3}},
+      {value: 4, icon:'4️⃣', tooltip:'Easy', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3}},
       {value: 6, icon:'6️⃣', tooltip:'Mild', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3,'1':4,'h':4,'j':4,'2':5,'t':5,'k':5}},
       {value: 8, icon:'8️⃣', tooltip:'Moderate', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3,'1':4,'h':4,'j':4,'2':5,'t':5,'k':5,'0':6,'m':6,'.':7,'w':7,',':7}},
       {value: 9, icon:'9️⃣', tooltip:'Intricate', keymap:{'7':0,'8':1,'9':2,'4':3,'g':3,'u':3,'5':4,'c':4,'i':4,'6':5,'r':5,'o':5,'1':6,'h':6,'j':6,'2':7,'t':7,'k':7,'3':8,'n':8,'l':8}},
@@ -53,11 +53,12 @@ new Vue({
     ]
   },
   mounted: function() {
-    ;((cookieLangs) => {
+    ;((saveState) => {
       // Set languages based on cookie, otherwise use browser languages
-      if (cookieLangs.length >= 2) {
-        this.alang = cookieLangs[0]
-        this.qlang = cookieLangs[1]
+      if (saveState.length >= 3) {
+        this.alang = saveState[0]
+        this.qlang = saveState[1]
+        this.match_mode = saveState[2]
       } else {
         let browserLangs = [...window.navigator.languages.reduce((s,a)=>{s.add(a.slice(0,2));return s},new Set())]
         this.alang = browserLangs[0] ? browserLangs[0] : ''
@@ -84,8 +85,8 @@ new Vue({
         }
       })
       .then(() => { this.popHypernym(true) })
-      .catch((err) => { console.log(err) })
-    })(this.getCookieValue('lang').split('+'))
+      .catch((err) => { console.error(err) })
+    })(this.getCookieValue('l').split('+'))
 
     ;((cdl) => {
       if (cdl) this.difficultyLvl = parseInt(cdl.slice(cdl.length-1),16) || this.difficultyLvl
@@ -156,8 +157,8 @@ new Vue({
     },
     match_mode_options() {
       return [
-        { text: `🤓　${this.alangOpt.label_m0 || this.alang_options[0].label_m0 || ''} ${this.alangOpt.text} >> ${this.qlangOpt.text}`, value: 0 },
-        { text: `😎Pro　${this.alangOpt.label_m1 || this.alang_options[0].label_m1 || ''} ${this.qlangOpt.text}`, value: 1 },
+        { text: `🙂 ${this.alangOpt.label_m0 || this.alang_options[0].label_m0 || ''} ${this.qlangOpt.text}`, value: 0 },
+        { text: `😎 ${this.alangOpt.label_m1 || this.alang_options[0].label_m1 || ''} ${this.qlangOpt.text}`, value: 1 },
       ]
     },
     difficultyIndex() {
@@ -298,86 +299,87 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       this.newGame()
     },
 
-    newGame: function() {
+    newGame: async function() {
       if (!this.qlang || !this.alang) {
         alert('no language selected')
       }
+      this.score = -1
       this.startBtnDisabled = true
-      fetch(`${window.location.origin}/next`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(this.packPayload(-1, 0, {}, true))
-      })
-      .then(resp => resp.json())
-      .then(data => {
+
+      try {
+        const resp = await fetch(`${window.location.origin}/next`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(this.packPayload(-1, 0, {}, true))
+        })
+        const data = await resp.json()
         this.lvl = data.lvl
         this.board = data.board
-        this.unpackRespData(data)
-        this.gameStart()
         if (data.score >= 0) {
-          this.gameOver(data.score)
+          this.gameOverAction(data.score)
         } else {
           this.popHypernym()
+          if (this.match_mode == 0) {
+            this.unpackRespData(data)
+            this.gameStartAction()
+          } else if (this.match_mode == 1) {
+            await this.fetchFuzzyAnswer(data);
+            this.gameStartAction()
+          }
         }
-      })
-      .finally(() => { this.startBtnDisabled = false })
-      this.score = -1
-
-      fetch(`${window.location.origin}/save-languages`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({alang: this.alang, qlang: this.qlang})
-      })
+      } catch (error) {
+        console.error(error)
+      } finally {
+        this.startBtnDisabled = false
+        fetch(`${window.location.origin}/save-languages`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({alang: this.alang, qlang: this.qlang, mode: this.match_mode})
+        })
+      }
     },
 
-    endGame: function() {
-      fetch(`${window.location.origin}/next`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(this.packPayload(0, 0, this.board, false))
-      })
-      .then(resp => resp.json())
-      .then(data => {
+    endGame: async function() {
+      try {
+        const resp = await fetch(`${window.location.origin}/next`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(this.packPayload(0, 0, this.board, false))
+        })
+        const data = await resp.json()
         setTimeout(() => {
           this.board = data.board
-          this.gameOver(data.score)
+          this.gameOverAction(data.score)
         }, 200);
-      })
+      } catch (error) {
+        console.error(error)
+      }
     },
 
-    selectChoice: function(e, index) {
+    selectChoice: async function(e, index) {
       e.preventDefault()
       e.target.classList.remove('btn-secondary')
-      document.querySelectorAll('.btn-choice').forEach(b => b.disabled = true)
       if (this.difficulty > 1) {
         e.target.classList.add(this.answer === index ? 'btn-success' : 'btn-danger')
       }
-
+      document.querySelectorAll('.btn-choice').forEach(b => b.disabled = true)
       this.progressAnimate = true
-      // wait short period of time showing green/red for user choice correctness
-      let waitflag = 0
-      setTimeout(() => {
-        waitflag = 1
-      }, 200);
 
-      fetch(`${window.location.origin}/next`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(this.packPayload(this.lvl, this.q_id, this.board, this.answer===index))
-      })
-      .then(resp => resp.json())
-      .then(data => {
+      try {
+        const resp = await fetch(`${window.location.origin}/next`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(this.packPayload(this.lvl, this.q_id, this.board, this.answer===index))
+        })
+        const data = await resp.json()
         this.lvl = data.lvl
         this.board = data.board
         if (data.score >= 0) {
-          this.gameOver(data.score)
-        } else {
-          let intervalP = setInterval(() => {
-            if(waitflag == 1) {
-              this.unpackRespData(data)
-              clearInterval(intervalP)
-            }
-          }, 10);
+          this.gameOverAction(data.score)
+        } else if (this.match_mode == 0) {
+          this.unpackRespData(data)
+        } else if (this.match_mode == 1) {
+          await this.fetchFuzzyAnswer(data);
         }
 
         if (this.displayTopQuote) {
@@ -389,29 +391,182 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
             this.qHypernymTexts[0]
           ])
         }
-      })
-      .catch((err) => { console.log(err) })
-      .finally(() => {
-        let intervalF = setInterval(() => {
-          if(waitflag == 1) {
-            document.querySelectorAll('.btn-choice').forEach(b => b.disabled = false)
-            e.target.classList.add('btn-secondary')
-            if (this.difficulty > 1) {
-              e.target.classList.remove('btn-success')
-              e.target.classList.remove('btn-danger')
-            }
-            e.target.blur() // Desktop browser: remove focus on anchor; TODO: blur on iOS safari
-            e.handled = true
-            this.progressAnimate = false
-            clearInterval(intervalF)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        document.querySelectorAll('.btn-choice').forEach(b => b.disabled = false)
+        e.target.classList.add('btn-secondary')
+        if (this.difficulty > 1) {
+          e.target.classList.remove('btn-success')
+          e.target.classList.remove('btn-danger')
+        }
+        e.target.blur() // Desktop browser: remove focus on anchor; TODO: blur on iOS safari
+        e.handled = true
+        this.progressAnimate = false
+      }
+    },
+    //#endregion
+    
+    //#region Fuzzy answer
+    fetchFuzzyAnswer: async function(fqdata) {
+      const ans = await this.queryFuzzyAnswer(fqdata.q_id, this.alang);
+      console.log(fqdata.q_id,fqdata.q_title,ans);
+      if (!ans.aid || !ans.atitle) {
+        //TODO: fail to fetch fuzzy answer, retry another q_id
+      }
+      this.unpackRespData(fqdata);
+      this.choices = [ans.atitle, ...fqdata.choices];
+      this.shuffleArray(this.choices);
+      this.answer = this.choices.indexOf(ans.atitle);
+    },
+
+    queryFuzzyAnswer: async function(item, lang) {
+      let ans = await this.sparqlGetSiblings(item, lang, '', '', true)
+      if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
+      console.info('Expand Class...', item, lang, ans)
+      ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?', 'wdt:P31?')
+      if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
+      console.info('Expand SubClass...', item, lang, ans)
+      ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?', 'wdt:P31?/wdt:P279')
+      if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
+      console.info('Expand SuperClass...', item, lang, ans)
+      ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?/wdt:P279', 'wdt:P31?/wdt:P279?')
+      if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
+      console.info('Expand SuperSuperClass...', item, lang, ans)
+      ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?/wdt:P279/wdt:P279', 'wdt:P31?/wdt:P279?')
+      if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
+      console.info('Expand scopes failure...', item, lang, ans)
+      return { aid: ans.aid, atitle: ans.atitle }
+    },
+
+    sparqlGetSiblings: async function(item, lang, upscope='wdt:P31?', downscope='wdt:P31?', related=false) {
+      let aid = 0
+      let atitle = ''
+      let isFuzzy = false
+      const sparqalQuery = related
+//Possible related items P171 P361 P366 P373 P527 P1535 P1659 P2283 P4969
+// excluding P31?/P279*
+// dropped canditates P1552 has_quality, P1889 different_from, P373 common_category
+?`SELECT DISTINCT * WHERE {
+{
+  SELECT DISTINCT
+  ?sim ?simLabelA  
+    WHERE {
+    wd:Q${item} wdt:P361? ?whole .
+    ?sim wdt:P361? ?whole .
+    ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
+    }
+}
+UNION
+{
+  SELECT DISTINCT
+  ?sim ?simLabelA 
+    WHERE {
+    wd:Q${item} wdt:P527? ?part .
+    ?sim wdt:P527? ?part .
+    ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
+    }
+}
+UNION
+{
+  SELECT DISTINCT
+  ?sim ?simLabelA 
+    WHERE {
+    wd:Q${item} wdt:P366? ?use .
+    ?sim wdt:P366? ?use .
+    ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
+    }
+}
+UNION
+{
+  SELECT DISTINCT
+  ?sim ?simLabelA 
+    WHERE {
+    wd:Q${item} wdt:P1535? ?useby .
+    ?sim wdt:P1535? ?useby .
+    ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
+    }
+}
+UNION
+{
+  SELECT DISTINCT
+  ?sim ?simLabelA 
+    WHERE {
+    wd:Q${item} wdt:P2283? ?uses .
+    ?sim wdt:P2283? ?uses .
+    ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
+    }
+}
+UNION
+{
+  SELECT DISTINCT
+  ?sim ?simLabelA 
+    WHERE {
+    wd:Q${item} wdt:P171? ?ptax .
+    ?sim wdt:P171? ?ptax .
+    ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
+    }
+}
+UNION
+{
+  SELECT DISTINCT
+  ?sim ?simLabelA 
+    WHERE {
+    wd:Q${item} wdt:P4969? ?deriv .
+    ?sim wdt:P4969? ?deriv .
+    ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
+    }
+}
+UNION
+{
+  SELECT DISTINCT
+  ?sim ?simLabelA 
+    WHERE {
+    wd:Q${item} wdt:P1659? ?see .
+    ?sim wdt:P1659? ?see .
+    ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
+    }
+}
+}
+ORDER BY UUID() 
+LIMIT 2`
+//NOTE: Because the `?` after upscope P31, directchild is also possible, so sim actually means children and their uncles
+// exclude classes of concept, term, blanket terminology, technical term
+:`SELECT DISTINCT ?sim ?simLabelA 
+WHERE
+{
+    wd:Q${item} ${upscope} ?class.
+    FILTER (?class not in (wd:Q151885, wd:Q1969448, wd:Q4925178, wd:Q12812139))
+    ?sim ${downscope} ?class .
+    ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
+}
+ORDER BY uuid()
+LIMIT 2`
+      try {
+        const resp = await fetch(`https://query.wikidata.org/sparql?query=${sparqalQuery}`, {
+          headers: {'Accept':'application/json'},
+        })
+        const data = await resp.json()
+        for(let b of data['results']['bindings']) {
+          aid = parseInt(b['sim']['value'].split('Q')[1]) || aid
+          atitle = b['simLabelA']['value'] || atitle
+          if (aid != item) {
+            isFuzzy = true
+            break
           }
-        }, 10);
-      })
+        }
+      } catch (err) {
+        console.error(item,lang,err,sparqalQuery)
+      } finally {
+        atitle = atitle ? atitle.charAt(0).toUpperCase()+atitle.substring(1) : atitle
+        return { aid, atitle, isFuzzy }
+      }
     },
     //#endregion
 
     //#region Game Actions Helper
     packPayload: function(lvl, qid, board, is_correct) {
+      //good DRY, bad DRY?
       return {
         lvl: lvl,
         board: board,
@@ -433,13 +588,13 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       this.answer = data.answer
     },
 
-    gameStart: function() {
+    gameStartAction: function() {
       if (this.windowWidth <= 576) {
         document.getElementById('btn-toggle-quote').click()
       }
       document.getElementById('page-header').classList.add('py-0','mb-0')
     },
-    gameOver: function(score) {
+    gameOverAction: function(score) {
       this.score = score
       this.choices = []
       this.q_id = 0
@@ -674,6 +829,18 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       }
       return lang || 'en'
     },
+    transLangCode: function(lang) {
+      // resolve diff b/w WMF & IETF
+      const TRANS = {
+        'be-x-old': 'be-tarask',
+        'bh': 'bho',
+        'cbk-sam': 'cbk',
+        'fiu-vro': 'vro',
+        'zh-min-nan': 'nan',
+        'zh-yue': 'yue',
+      }
+      return TRANS[lang] || lang
+    },
     getSpeechSynthesisVoices: function(lang) {
       const sliceLen = lang.startsWith('zh-') ? 5 : 2
       let langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,sliceLen) == lang)
@@ -681,6 +848,13 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == 'en')
       }
       return langVoices
+    },
+    /** Randomize array in-place using Durstenfeld shuffle algorithm */
+    shuffleArray: function(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
     },
     //#endregion Utils
   },

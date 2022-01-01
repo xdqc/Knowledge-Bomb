@@ -40,7 +40,7 @@ def save_difficulty_level():
 def save_languages():
     payload = request.get_json()
     resp = jsonify(payload)
-    resp.set_cookie('lang', f"{payload['alang']}+{payload['qlang']}", max_age=3600*24*300)
+    resp.set_cookie('l', f"{payload['alang']}+{payload['qlang']}+{payload['mode']}", max_age=3600*24*300)
     return resp
 
 @app.route('/heartbeat')

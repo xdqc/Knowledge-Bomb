@@ -94,20 +94,21 @@ class Quiz:
             return cls.run_fuzzy_level(1 if lvl == len(cls.ladder) else lvl+1, board, qlang, alang, hypernyms, difficulty, recurr)
 
         q_id, q_hypernym, q_title, q_title_en = level[0][:4]
-        a_title = level[1][4]
-        print(*level, sep='\n')
-        choices = [row[4] for row in level[1:]]
-        random.shuffle(choices)
-        correct_choice = choices.index(a_title)
+        wrong_choices = [row[4] for row in level[1:]]
+        #NOTE: the fuzzy answer search is passed on clientside
+        # a_title = level[1][4]
+        # choices = [row[4] for row in level[1:]]
+        # random.shuffle(choices)
+        # correct_choice = choices.index(a_title)
         return {
             'lvl': lvl, 
             'q_id': q_id, 
             'q_hypernym': q_hypernym, 
             'q_title': q_title,
             'q_title_en': q_title_en,
-            'a_title': a_title, 
-            'choices': choices, 
-            'answer': correct_choice,
+            'a_title': None, 
+            'choices': wrong_choices, 
+            'answer': -1,
             'board': board
         }
 

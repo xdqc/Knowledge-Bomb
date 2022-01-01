@@ -197,7 +197,6 @@ class Query:
         params = [hypernym, lv[1], lv[2], hypernym, int(lv[1]*0.3), int(lv[2]*3)]
         result = None
         cursor = None
-        t0 = time.time()
         try:
             cursor = cls.conn.cursor()
             result = cursor.execute(sqlstr, params).fetchall()
@@ -205,12 +204,14 @@ class Query:
             cls.conn = pyodbc.connect(cls.conn_str)
             cursor = cls.conn.cursor()
             result = cursor.execute(sqlstr, params).fetchall()
-        t1 = time.time()
-        print('\t\t\t\tget_fuzzy_choice cost:', t1-t0)
         # validate q(result[0]) exist @pos (-1)
         if len(result) == 0 or result[0][5] != -1:
             return None
+        return result
 
+
+        #The following jobs are passed on clientside to reduce server resp time
+        pass
         def trans_lang_code(lang):
             # resolve diff b/w WMF & IETF
             trans = {
@@ -223,6 +224,7 @@ class Query:
             }
             return trans[lang] if lang in trans else lang
         # get siblings of the q
+        t1 = time.time()
         a_id, a_title = cls.get_fuzzy_answer(result[0][0], trans_lang_code(alang))
         t2 = time.time()
         print('\t\t\t\tget_fuzzy_answer cost:', t2-t1)

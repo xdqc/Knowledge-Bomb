@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="A random wiki roamer minigame, a vocabulary test tool, a quiz generator vis-à-vis Wikipedia, available in 300+ languages" />
+    <meta name="description" content="A 'random wiki roamer' minigame, a 'vocabulary test' tool, a 'quiz generator' vis-à-vis Wikipedia in numerous knowledge domains, available 300+ languages🌍🌏🌎" />
     <meta name="keywords" content="wikipedia, wikidata, wikiquote, quiz, language, vocabulary">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <title>KnB.wiki 🌍🌏🌎</title>
+    <title>Knowledge Bomb 🌍🌏🌎 - KnB.wiki</title>
 
     <link type="image/x-icon" rel="icon" href="https://icons.iconarchive.com/icons/sykonist/popular-sites/32/Wikipedia-globe-icon.png"/>
     <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
@@ -200,7 +200,10 @@
               :label="labelAnswer"
             >
               <div style="display: flex;">
-                <b-dropdown variant="outline-light" class="dropdown-lang alang-leximap" text="🗺" no-caret>
+                <b-dropdown variant="outline-light"
+                  :disabled="startBtnDisabled"
+                  class="dropdown-lang alang-leximap"
+                  text="🗺" no-caret>
                   <b-btn v-for="(l,i) in aLeximap" :key="i" 
                     class="btn-dropdown-lang" variant="outline-light" :size="i>0?'sm':''" 
                     :style="`top:${l.coord_y-130}px;left:${l.coord_x*Math.max(1,windowWidth/1440)-100}px;`"
@@ -208,7 +211,12 @@
                     {{ l.text }}
                   </b-btn>
                 </b-dropdown>
-                <b-form-select v-model="alang" :options="alangOptions" label="alang"></b-form-select>
+                <b-form-select
+                  v-model="alang"
+                  :options="alangOptions"
+                  :disabled="startBtnDisabled"
+                  label="alang">
+                </b-form-select>
               </div>
             </b-form-group>
             <b-form-group
@@ -219,7 +227,10 @@
               :label="labelQuestion"
             >
               <div style="display: flex;">
-                <b-dropdown variant="outline-light" class="dropdown-lang qlang-leximap" text="🗺" no-caret>
+                <b-dropdown variant="outline-light"
+                :disabled="startBtnDisabled"
+                class="dropdown-lang qlang-leximap"
+                text="🗺" no-caret>
                   <b-btn v-for="(l,i) in qLeximap" :key="i" 
                     class="btn-dropdown-lang" variant="outline-light" size="sm"
                     :style="`top:${l.coord_y-130}px;left:${l.coord_x*Math.max(1,windowWidth/1440)-100}px;color:${l.value==alang?'var(--blue)':'var(--japanese-indigo)'};`"
@@ -227,7 +238,12 @@
                     {{ l.text.replace(/ *\([^)]*\) */g, '') }}
                   </b-btn>
                 </b-dropdown>
-                <b-form-select v-model="qlang" :options="qlangOptions" label="qlang" class=""></b-form-select>
+                <b-form-select
+                  v-model="qlang"
+                  :options="qlangOptions"
+                  :disabled="startBtnDisabled"
+                  label="qlang">
+                </b-form-select>
               </div>
             </b-form-group>
             <b-form-group 
@@ -243,6 +259,7 @@
                 v-model="match_mode"
                 :options="match_mode_options"
                 :aria-describedby="ariaMatchMode"
+                :disabled="startBtnDisabled"
                 name="match-mode-options"
                 button-variant="secondary"
               ></b-form-radio-group>
