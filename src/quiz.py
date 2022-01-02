@@ -95,11 +95,6 @@ class Quiz:
 
         q_id, q_hypernym, q_title, q_title_en = level[0][:4]
         wrong_choices = [row[4] for row in level[1:]]
-        #NOTE: the fuzzy answer search is passed on clientside
-        # a_title = level[1][4]
-        # choices = [row[4] for row in level[1:]]
-        # random.shuffle(choices)
-        # correct_choice = choices.index(a_title)
         return {
             'lvl': lvl, 
             'q_id': q_id, 
@@ -176,7 +171,7 @@ class Quiz:
             else:
                 score += avg_rate * cls.level_items_count(lvl) * (len(cls.ladder)-lvl+reached_level)/(len(cls.ladder)+lvl-reached_level)
             total += cls.level_items_count(lvl)
-        return score / total * 100
+        return score / total * 100 if total > 0 else 0
 
     @classmethod
     def correct_rate(cls, lvl, board, final=False):

@@ -30,6 +30,7 @@ def next():
     return jsonify(Quiz.next_quiz(request.get_json()))
 
 @app.route('/save-difficulty-level', methods=['POST'])
+@limiter.limit('1/second', error_message='chill, knowledge bomber!')
 def save_difficulty_level():
     payload = request.get_json()
     resp = jsonify(payload)
@@ -37,6 +38,7 @@ def save_difficulty_level():
     return resp
 
 @app.route('/save-languages', methods=['POST'])
+@limiter.limit('1/second', error_message='chill, knowledge bomber!')
 def save_languages():
     payload = request.get_json()
     resp = jsonify(payload)

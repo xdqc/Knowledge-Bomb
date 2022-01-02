@@ -22,8 +22,9 @@ new Vue({
     windowWidth: window.innerWidth,
     windowHeight: window.innerHeight,
     isCollapsingBomb: true,
-    displayTitleImage: true,
     displayTopQuote: true,
+    displayTitleImage: true,
+    displayScoreChart: false,
     displayHypernymTree: false,
     startBtnDisabled: false,
     progressAnimate: false,
@@ -58,7 +59,7 @@ new Vue({
       if (saveState.length >= 3) {
         this.alang = saveState[0]
         this.qlang = saveState[1]
-        this.match_mode = saveState[2]
+        this.match_mode = parseInt(saveState[2])
       } else {
         let browserLangs = [...window.navigator.languages.reduce((s,a)=>{s.add(a.slice(0,2));return s},new Set())]
         this.alang = browserLangs[0] ? browserLangs[0] : ''
@@ -176,6 +177,9 @@ new Vue({
     quizCorrect() {
       return Object.values(this.board).reduce((s,v) => s+v.filter(u=>u>0).length, 0)
     },
+    quizIncorrect() {
+      return Object.values(this.board).reduce((s,v) => s+v.filter(u=>u<0).length, 0)
+    },
     qHypernymTexts() {
       // The hypernyme of current question as topics for quote search 
       // hypernym_option.texts [0]:English, [1]:<Answer Language>, [2]<Question Language>
@@ -272,13 +276,13 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       // if (imgUrls.find(i=>i)){
       //   setTimeout(() => {
       //     document.getElementById('choice-'+this.answer).click()
-      //   }, 300);
+      //   }, 300)
       // } else {
       //   document.getElementsByClassName('title-link')[0].click()
       //   window.open(data.results.bindings[0].item.value, '_blank')
       //   // setTimeout(() => {
       //   //   document.getElementById('choice-'+Math.floor(Math.random()*0+this.answer)%9).click()
-      //   // }, 100);
+      //   // }, 100)
       // }
       // return '#'
       //END_DEBUG
@@ -294,8 +298,11 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
   },
   methods: {
     //#region Game Actions
-    setDifficulty: function(df) {
+    startGameAtDifficulty: function(df) {
       this.difficulty = df
+      this.score = -1
+      this.startBtnDisabled = true
+      this.displayScoreChart = false
       this.newGame()
     },
 
@@ -303,8 +310,6 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       if (!this.qlang || !this.alang) {
         alert('no language selected')
       }
-      this.score = -1
-      this.startBtnDisabled = true
 
       try {
         const resp = await fetch(`${window.location.origin}/next`, {
@@ -323,7 +328,9 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
             this.unpackRespData(data)
             this.gameStartAction()
           } else if (this.match_mode == 1) {
-            await this.fetchFuzzyAnswer(data);
+            if (!await this.fetchFuzzyAnswer(data)) {
+              await this.selectChoice(null,  -1)
+            }
             this.gameStartAction()
           }
         }
@@ -350,17 +357,23 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         setTimeout(() => {
           this.board = data.board
           this.gameOverAction(data.score)
-        }, 200);
+        }, 200)
       } catch (error) {
         console.error(error)
       }
     },
 
-    selectChoice: async function(e, index) {
-      e.preventDefault()
-      e.target.classList.remove('btn-secondary')
-      if (this.difficulty > 1) {
-        e.target.classList.add(this.answer === index ? 'btn-success' : 'btn-danger')
+    selectChoice: async function(e, index, depth=0) {
+      if (depth >= 10) {
+        this.endGame()
+        return
+      }
+      if (e) {
+        e.preventDefault()
+        e.target.classList.remove('btn-secondary')
+        if (this.difficulty > 1) {
+          e.target.classList.add(this.answer === index ? 'btn-success' : 'btn-danger')
+        }
       }
       document.querySelectorAll('.btn-choice').forEach(b => b.disabled = true)
       this.progressAnimate = true
@@ -369,7 +382,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         const resp = await fetch(`${window.location.origin}/next`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(this.packPayload(this.lvl, this.q_id, this.board, this.answer===index))
+          body: JSON.stringify(this.packPayload(this.lvl, depth>0?0:this.q_id, this.board, this.answer===index))
         })
         const data = await resp.json()
         this.lvl = data.lvl
@@ -379,7 +392,10 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         } else if (this.match_mode == 0) {
           this.unpackRespData(data)
         } else if (this.match_mode == 1) {
-          await this.fetchFuzzyAnswer(data);
+          if (!await this.fetchFuzzyAnswer(data)) {
+            await this.selectChoice(e, index, ++depth)
+            return
+          }
         }
 
         if (this.displayTopQuote) {
@@ -395,29 +411,31 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         console.error(err)
       } finally {
         document.querySelectorAll('.btn-choice').forEach(b => b.disabled = false)
-        e.target.classList.add('btn-secondary')
-        if (this.difficulty > 1) {
-          e.target.classList.remove('btn-success')
-          e.target.classList.remove('btn-danger')
-        }
-        e.target.blur() // Desktop browser: remove focus on anchor; TODO: blur on iOS safari
-        e.handled = true
         this.progressAnimate = false
+        if (e) {
+          e.target.classList.add('btn-secondary')
+          if (this.difficulty > 1) {
+            e.target.classList.remove('btn-success')
+            e.target.classList.remove('btn-danger')
+          }
+          e.target.blur() // Desktop browser: remove focus on anchor; TODO: blur on iOS safari
+          e.handled = true
+        }
       }
     },
     //#endregion
     
     //#region Fuzzy answer
     fetchFuzzyAnswer: async function(fqdata) {
-      const ans = await this.queryFuzzyAnswer(fqdata.q_id, this.alang);
-      console.log(fqdata.q_id,fqdata.q_title,ans);
+      const ans = await this.queryFuzzyAnswer(fqdata.q_id, this.transLangCode(this.alang))
       if (!ans.aid || !ans.atitle) {
-        //TODO: fail to fetch fuzzy answer, retry another q_id
+        return false
       }
-      this.unpackRespData(fqdata);
-      this.choices = [ans.atitle, ...fqdata.choices];
-      this.shuffleArray(this.choices);
-      this.answer = this.choices.indexOf(ans.atitle);
+      this.unpackRespData(fqdata)
+      this.choices = [ans.atitle, ...fqdata.choices]
+      this.shuffleArray(this.choices)
+      this.answer = this.choices.indexOf(ans.atitle)
+      return true
     },
 
     queryFuzzyAnswer: async function(item, lang) {
@@ -433,7 +451,10 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?/wdt:P279', 'wdt:P31?/wdt:P279?')
       if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
       console.info('Expand SuperSuperClass...', item, lang, ans)
-      ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?/wdt:P279/wdt:P279', 'wdt:P31?/wdt:P279?')
+      ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?/wdt:P279/wdt:P279', 'wdt:P31?/wdt:P279/wdt:P279')
+      if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
+      console.info('Expand SuperSuperSuperClass SubClasses...', item, lang, ans)
+      ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?/wdt:P279/wdt:P279/wdt:P279', 'wdt:P31?/wdt:P279+')
       if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
       console.info('Expand scopes failure...', item, lang, ans)
       return { aid: ans.aid, atitle: ans.atitle }
@@ -444,7 +465,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       let atitle = ''
       let isFuzzy = false
       const sparqalQuery = related
-//Possible related items P171 P361 P366 P373 P527 P1535 P1659 P2283 P4969
+//Possible related items P171 P361 P366 P373 P527 P1269 P1535 P1659 P2283 P4969
 // excluding P31?/P279*
 // dropped canditates P1552 has_quality, P1889 different_from, P373 common_category
 ?`SELECT DISTINCT * WHERE {
@@ -512,6 +533,16 @@ UNION
   SELECT DISTINCT
   ?sim ?simLabelA 
     WHERE {
+    wd:Q${item} wdt:P1269? ?facet .
+    ?sim wdt:P1269? ?facet .
+    ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
+    }
+}
+UNION
+{
+  SELECT DISTINCT
+  ?sim ?simLabelA 
+    WHERE {
     wd:Q${item} wdt:P4969? ?deriv .
     ?sim wdt:P4969? ?deriv .
     ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
@@ -543,9 +574,14 @@ WHERE
 ORDER BY uuid()
 LIMIT 2`
       try {
-        const resp = await fetch(`https://query.wikidata.org/sparql?query=${sparqalQuery}`, {
-          headers: {'Accept':'application/json'},
-        })
+        const timeLimit = 2000
+        const resp = await this.fulfillWithTimeLimit(fetch(`https://query.wikidata.org/sparql?query=${sparqalQuery}`, {
+          headers: { 'Accept': 'application/json' },
+        }), timeLimit, null)
+        if (!resp)  {
+          isFuzzy = true
+          throw 'wikidata query timeout ' + timeLimit
+        }
         const data = await resp.json()
         for(let b of data['results']['bindings']) {
           aid = parseInt(b['sim']['value'].split('Q')[1]) || aid
@@ -556,25 +592,37 @@ LIMIT 2`
           }
         }
       } catch (err) {
-        console.error(item,lang,err,sparqalQuery)
+        console.error(item, lang, err)
       } finally {
         atitle = atitle ? atitle.charAt(0).toUpperCase()+atitle.substring(1) : atitle
         return { aid, atitle, isFuzzy }
       }
     },
+    fulfillWithTimeLimit: async function(task, timeLimit, failureValue){
+      let timeout
+      const timeoutPromise = new Promise((resolve, reject) => {
+        timeout = setTimeout(() => {
+          resolve(failureValue)
+        }, timeLimit)
+      })
+      const response = await Promise.race([task, timeoutPromise])
+      if (timeout) {
+        clearTimeout(timeout)
+      }
+      return response
+    },
     //#endregion
 
     //#region Game Actions Helper
     packPayload: function(lvl, qid, board, is_correct) {
-      //good DRY, bad DRY?
       return {
         lvl: lvl,
-        board: board,
         qid: qid,
+        board: board,
+        is_correct: is_correct,
         qlang: this.qlang,
         alang: this.alang,
         hypernym: this.hypernyms,
-        is_correct: is_correct,
         difficulty: this.difficulty,
         match_mode: this.match_mode,
       }
@@ -597,6 +645,7 @@ LIMIT 2`
     gameOverAction: function(score) {
       this.score = score
       this.choices = []
+      this.answer = -1
       this.q_id = 0
       this.q_title = ''
       this.q_title_en = ''
@@ -745,7 +794,7 @@ LIMIT 2`
           const node = document.querySelector(`.tree-hypernyms input[value="${h.value}"]`)
           node.parentElement.style['margin-left'] = h.depth*1 + 'rem'
         })
-      }, 1);
+      }, 1)
     },
     switchHypernymLang: function() {
       this.hypernym_index = (this.hypernym_index+1)%3
@@ -772,22 +821,20 @@ LIMIT 2`
     //#endregion Hypernym options
 
     //#region Menu interactions
-    toggleDisplayQuote: function(e) {
+    toggleDisplayQuote: function() {
       this.displayTopQuote = !this.displayTopQuote
-      document.getElementById('btn-toggle-quote').textContent = this.displayTopQuote ? '🧙💬' : '🧙🔇'
-      document.getElementById('btn-toggle-quote').title = this.displayTopQuote ? "If you can't keep quiet, shut up!" : "shut up and shine"
     },
 
-    toggleCollapseBomb: function(e) {
+    toggleCollapseBomb: function() {
       this.isCollapsingBomb = !this.isCollapsingBomb
-      document.getElementById('btn-bomb').textContent = this.isCollapsingBomb ? '💣' : '💥'
-      document.getElementById('btn-bomb').title = this.isCollapsingBomb ? 'detonator' : `B${'o'.repeat(Math.max(2,this.quizCorrect))}m!`
     },
-        
+
     toggleDisplayTitleImg: function() {
       this.displayTitleImage = !this.displayTitleImage
-      document.getElementById('btn-toggle-image').textContent = this.displayTitleImage ? '🖼' : '⬜'
-      document.getElementById('btn-toggle-image').title = this.displayTitleImage ? 'hide image' : 'hint image'
+    },
+
+    toggleDisplayScoreChart: function() {
+      this.displayScoreChart = !this.displayScoreChart
     },
     //#endregion Menu interactions
 
@@ -836,6 +883,8 @@ LIMIT 2`
         'bh': 'bho',
         'cbk-sam': 'cbk',
         'fiu-vro': 'vro',
+        'no': 'nb',
+        'zh-classical': 'zh-hant',
         'zh-min-nan': 'nan',
         'zh-yue': 'yue',
       }
@@ -852,8 +901,8 @@ LIMIT 2`
     /** Randomize array in-place using Durstenfeld shuffle algorithm */
     shuffleArray: function(array) {
       for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[array[i], array[j]] = [array[j], array[i]]
       }
     },
     //#endregion Utils

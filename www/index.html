@@ -153,10 +153,10 @@
         <a href="https://github.com/xdqc/Knowledge-Bomb" target="_blank" style="position:absolute;top:4px;right:4px;"><img src="./www/asset/GitHub-Mark-32px.png" alt="github" height="20"></a>
         <nav role="menubar">
           <b-row v-show="quizStarted">
-              <!-- style="position:absolute;top:0;left:0;padding:3px;"  -->
-              <b-btn variant="outline-light" class="btn-menu-s" id="btn-bomb" v-b-toggle.collapse-hypernyms  @click="toggleCollapseBomb" >💣</b-btn>
-              <b-btn variant="outline-light" class="btn-menu-d" id="btn-toggle-quote" title="If you can't keep quiet, shut up!" @click="toggleDisplayQuote($event)">🧙💬</b-btn>
-              <b-btn variant="outline-light" class="btn-menu-s" id="btn-toggle-image" title="hide image" @click="toggleDisplayTitleImg">🖼</b-btn>
+              <b-btn variant="outline-light" class="btn-menu-s" id="btn-bomb" v-b-toggle.collapse-hypernyms :title="isCollapsingBomb ? 'detonator' : `B${'o'.repeat(Math.max(2,this.quizCorrect))}m!`"  @click="toggleCollapseBomb" >{{ isCollapsingBomb ? '💣' : '💥' }}</b-btn>
+              <b-btn variant="outline-light" class="btn-menu-d" id="btn-toggle-quote" :title="displayTopQuote ? 'If you cannot keep quiet, shut up!' : 'shut up and shine'" @click="toggleDisplayQuote">{{ displayTopQuote ? '🧙💬' : '🧙🔇' }}</b-btn>
+              <b-btn variant="outline-light" class="btn-menu-s" id="btn-toggle-image" :title="displayTitleImage ? 'hide image' : 'hint image'" @click="toggleDisplayTitleImg">{{ displayTitleImage ? '🖼' : '⬜' }}</b-btn>
+              <b-btn variant="outline-light" class="btn-menu-s" id="btn-toggle-score" :title="displayScoreChart ? 'hide score' : 'show score'" @click="toggleDisplayScoreChart">{{ displayScoreChart ? '📊' : '📋' }}</b-btn>
               <b-btn variant="outline-light" class="btn-menu-s d-none d-sm-inline" id="popover-hotkeys" title="hotkeys">⌨</b-btn>
               <b-popover target="popover-hotkeys" title="Hotkeys" trigger="hover focus" placement="bottom">
                 <b-table borderless :items="hotkeyTable">
@@ -194,16 +194,14 @@
             <b-form-group
               v-show="!quizStarted"
               class="mt-4"
-              horizontal
-              label-cols-sm="5"
-              label-cols-md="4"
+              horizontal label-cols-sm="5" label-cols-md="4"
               :label="labelAnswer"
             >
               <div style="display: flex;">
                 <b-dropdown variant="outline-light"
                   :disabled="startBtnDisabled"
                   class="dropdown-lang alang-leximap"
-                  text="🗺" no-caret>
+                  text="🌍🌏🌎" no-caret>
                   <b-btn v-for="(l,i) in aLeximap" :key="i" 
                     class="btn-dropdown-lang" variant="outline-light" :size="i>0?'sm':''" 
                     :style="`top:${l.coord_y-130}px;left:${l.coord_x*Math.max(1,windowWidth/1440)-100}px;`"
@@ -221,16 +219,14 @@
             </b-form-group>
             <b-form-group
               v-show="!quizStarted"
-              horizontal
-              label-cols-sm="5"
-              label-cols-md="4"
+              horizontal label-cols-sm="5" label-cols-md="4"
               :label="labelQuestion"
             >
               <div style="display: flex;">
                 <b-dropdown variant="outline-light"
                 :disabled="startBtnDisabled"
                 class="dropdown-lang qlang-leximap"
-                text="🗺" no-caret>
+                text="🌍🌏🌎" no-caret>
                   <b-btn v-for="(l,i) in qLeximap" :key="i" 
                     class="btn-dropdown-lang" variant="outline-light" size="sm"
                     :style="`top:${l.coord_y-130}px;left:${l.coord_x*Math.max(1,windowWidth/1440)-100}px;color:${l.value==alang?'var(--blue)':'var(--japanese-indigo)'};`"
@@ -250,9 +246,7 @@
               v-show="!quizStarted&&qlang&&alang"
               v-slot="{ ariaMatchMode }"
               class="mt-4 mb-2"
-              horizontal
-              label-cols-sm="5"
-              label-cols-md="4"
+              horizontal label-cols-sm="5" label-cols-md="4"
               label="">
               <b-form-radio-group
                 id="radio-match-mode"
@@ -266,9 +260,7 @@
             </b-form-group>
             <b-form-group 
               v-show="!quizStarted&&qlang&&alang&&(match_mode!==0||qlang!==alang)"
-              horizontal
-              label-cols-sm="5"
-              label-cols-md="4"
+              horizontal label-cols-sm="5" label-cols-md="4"
               :label="labelGameStart"
             >
               <b-btn variant="outline" size="lg"
@@ -277,7 +269,7 @@
                 :disabled="d.disabled||startBtnDisabled"
                 :title="d.tooltip"
                 v-b-popover.hover.bottom=""
-                @click="setDifficulty(d.value)">
+                @click="startGameAtDifficulty(d.value)">
                 {{ d.icon }}
               </b-btn>
             </b-form-group>
@@ -348,17 +340,19 @@
             </b-row>
           </section>
   
-          <section role="presentation" v-if="showScore">
+          <section role="presentation" class="score-board">
             <b-alert variant="success" :show="showScore">Game Over ~  difficulty {{ difficulty }} ~ score {{ score }}%</b-alert>
-            <b-progress class="my-1"
+            <b-progress class="mt-4 mb-2"
+              v-show="showScore||displayScoreChart"
               :max="quizPlayed"
               :title="Object.values(board).filter(v=>v.length>0).length +' Levels'"
-              v-b-popover.hover.left="`${quizPlayed}❔　${quizCorrect}✔　${quizPlayed-quizCorrect}❌`"
-              v-b-popover.click.left="`${quizPlayed}❔　${quizCorrect}✔　${quizPlayed-quizCorrect}❌`">
+              v-b-popover.hover.left="`${quizPlayed}❔　${quizCorrect}✔　${quizIncorrect}❌`"
+              v-b-popover.click.left="`${quizPlayed}❔　${quizCorrect}✔　${quizIncorrect}❌`">
               <b-progress-bar :value="quizCorrect" variant="success"></b-progress-bar>
-              <b-progress-bar :value="quizPlayed-quizCorrect" variant="danger"></b-progress-bar>
+              <b-progress-bar :value="quizIncorrect" variant="danger"></b-progress-bar>
             </b-progress>
-            <b-progress v-for="([k,v], i) in Object.entries(board)" :key="i"
+            <b-progress v-for="([k,v], i) in Object.entries(board).reverse()" :key="i"
+              v-show="showScore||displayScoreChart"
               :max="Math.max.apply(Math,Object.values(board).map(v => v.length))"
               :title="'Level '+ k"
               :animated="k==lvl"
