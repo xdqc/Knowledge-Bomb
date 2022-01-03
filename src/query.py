@@ -152,7 +152,7 @@ class Query:
         FROM (
             SELECT TOP(1) i.[id]
                 ,i.hypernym ,c.title_monos ht
-                ,q.title qt ,q_en.title qt_en ,'' at 
+                ,q.title qt ,q_en.title qt_en ,a.title at 
                 ,-1 pos
             FROM (
                 SELECT [id], hypernym
@@ -169,6 +169,9 @@ class Query:
             OUTER APPLY (
                 SELECT item, title FROM wiki.article
                 WHERE language = 'en' AND item = i.id) q_en
+            OUTER APPLY (
+                SELECT item, title FROM wiki.article
+                WHERE language = '{alang}' AND item = i.id) a
             ORDER BY NEWID()
         ) q
         UNION ALL

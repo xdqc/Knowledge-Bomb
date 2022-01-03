@@ -13,7 +13,7 @@
     <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
     <link type="text/css" rel="stylesheet" href="./www/style.css"/>
     <link type="text/css" rel="stylesheet" href="./www/animated-quote.css"/>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2Ces2015%2CIntersectionObserver"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2Ces5%2Ces6%2Ces7%2Ces2015%2Ces2016%2Ces2017%2Ces2018%2Ces2019%2Ces2020"></script>
     <script src="https://unpkg.com/vue@latest/dist/vue.min.js"></script>
     <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
     <script src="https://unpkg.com/vue-async-computed"></script>
@@ -313,12 +313,13 @@
                 @touchend="touchEnd($event)"
                 @click="toggleDisplayTitleImg"
                 :style="displayTitleImage ? `background-image:url(${titleImageUrl});` : 'border:1px outset;box-sizing:border-box;'">
-                <h2 class="display-3 my-4 mx-2">
+                <h2 class="display-3 my-4 mx-2 align-bottom">
                   <a class="title-link" target="_blank"
+                    :href="q_title ? `https://${qlang}.wikipedia.org/wiki/${q_title}` : `https://www.google.com/search?q=${q_desc}`"
+                    :style="q_desc ? `font-size: ${titleDescFontSize}%;` : ''"
                     @mouseover="speakTitle"
-                    @click="toggleDisplayTitleImg"
-                    :href="`https://${qlang}.wikipedia.org/wiki/${q_title}`">
-                    {{ q_title }}
+                    @click="toggleDisplayTitleImg">
+                    {{ qText }}
                   </a>
                 </h2>
               </b-col>
@@ -353,7 +354,7 @@
             </b-progress>
             <b-progress v-for="([k,v], i) in Object.entries(board).reverse()" :key="i"
               v-show="showScore||displayScoreChart"
-              :max="Math.max.apply(Math,Object.values(board).map(v => v.length))"
+              :max="longestLevelCount"
               :title="'Level '+ k"
               :animated="k==lvl"
               v-b-popover.hover.left="`${v.length}❔　${v.filter(u=>u>0).length}✔　${v.filter(u=>u<0).length}❌`"

@@ -12,6 +12,7 @@ new Vue({
     qLeximap: [],
     q_title: '',
     q_title_en: '',
+    q_desc: '',
     q_id: 0,
     q_hypernym: 0,
     lvl: 1,
@@ -140,6 +141,9 @@ new Vue({
     qlangOpt() {
       return this.qlang_options.find(l => l.value === this.qlang) || { value: '', text: '', label_a: '', label_q: '', label_s: '', label_t: '', label_m0: '', label_m1: ''}
     },
+    qText() {
+      return this.q_title || this.q_desc
+    },
     quotelangOpt() {
       return this.qlang_options.find(l => l.value === this.quoteLang)
     },
@@ -180,6 +184,9 @@ new Vue({
     quizIncorrect() {
       return Object.values(this.board).reduce((s,v) => s+v.filter(u=>u<0).length, 0)
     },
+    longestLevelCount() {
+      return Math.max.apply(Math, Object.values(this.board).map(v => v.length))
+    },
     qHypernymTexts() {
       // The hypernyme of current question as topics for quote search 
       // hypernym_option.texts [0]:English, [1]:<Answer Language>, [2]<Question Language>
@@ -198,6 +205,11 @@ new Vue({
       let row = document.getElementsByClassName('choices')[0] 
       let width =  window.getComputedStyle(row).width.slice(0, -2)
       return Math.ceil(width / 10 / Math.sqrt(this.difficulty) * (1+(Math.sqrt(this.difficulty)-1)/12))
+    },
+    titleDescFontSize() {
+      this.windowWidth && this.qText
+      const container = document.querySelector('.title-box')
+      return container ? container.clientWidth / Math.min(this.q_desc.length+8, 15) * 1.5 : 70
     },
     showBottomAlert() {
       return !this.getCookieValue('lang')
@@ -237,8 +249,8 @@ new Vue({
         {Key: ['A','Esc'], Description: `toggle category selector`},
         {Key: ['-','D'], Description: `dispaly or hide image`},
         {Key: ['/','S'], Description: `say <quote> in ${this.quotelangOpt ? this.quotelangOpt.text : this.alangOpt.text }`},
-        {Key: ['*','Y'], Description: `yell "${this.q_title}" in ${this.qlangOpt.text}`},
-        {Key: ['+','F'], Description: `find "${this.q_title}" on ${this.qlang}.wikipedia.org`},
+        {Key: ['*','Y'], Description: `yell "${this.qText}" in ${this.qlangOpt.text}`},
+        {Key: ['+','F'], Description: `find "${this.qText}" on ${this.q_title ? this.qlang+'.wikipedia.org' : 'google'}`},
         ...gt
       ]
     },
@@ -248,7 +260,7 @@ new Vue({
       if (!this.displayTitleImage) return 'javascript:void(0)'
 
       const IMG_TYPE = ['collage','trid','schem','chem','pic','dist','locator','taxnrg','flag','logo','icon','rimg']
-      const sparqalQuery = `
+      const sparqlQuery = `
 SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
   VALUES (?item) {(wd:Q${this.q_id})}
   OPTIONAL { ?item wdt:P2716 ?collage }
@@ -264,7 +276,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
   OPTIONAL { ?item wdt:P2910 ?icon }
   OPTIONAL { ?item wdt:P6802 ?rimg }
 }`
-      const resp = await fetch(`https://query.wikidata.org/sparql?query=${sparqalQuery}`, {
+      const resp = await fetch(`https://query.wikidata.org/sparql?query=${sparqlQuery}`, {
         headers: {'Accept':'application/json'},
       })
       const data = await resp.json()
@@ -377,13 +389,18 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       }
       document.querySelectorAll('.btn-choice').forEach(b => b.disabled = true)
       this.progressAnimate = true
-
+      
       try {
-        const resp = await fetch(`${window.location.origin}/next`, {
+        const qid = depth>0 ? 0 : this.q_id
+        const is_correct = depth>0 || this.answer===index
+
+        const resps = await this.fulfillWaitUntil(fetch(`${window.location.origin}/next`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(this.packPayload(this.lvl, depth>0?0:this.q_id, this.board, this.answer===index))
-        })
+          body: JSON.stringify(this.packPayload(this.lvl, qid, this.board, is_correct))
+        }), 160, null)
+
+        const resp = resps.find(r => r.value).value
         const data = await resp.json()
         this.lvl = data.lvl
         this.board = data.board
@@ -427,12 +444,24 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
     
     //#region Fuzzy answer
     fetchFuzzyAnswer: async function(fqdata) {
+      //Check if both atitle & qdesc(long enough?) present, then go with desc mode, otherwise fuzzy mode
+      if (fqdata.answer >= 0) {
+        const qdesc = await this.sparqlGetDescription(fqdata.q_id, this.qlang)
+        if (!!qdesc && 20/qdesc.length*Math.random()<0.5) {
+          this.unpackRespData(fqdata)
+          this.q_title = ''
+          this.q_desc = qdesc
+          return true
+        } else {
+          fqdata.choices.splice(fqdata.answer, 1)
+        }
+      }
       const ans = await this.queryFuzzyAnswer(fqdata.q_id, this.transLangCode(this.alang))
       if (!ans.aid || !ans.atitle) {
         return false
       }
       this.unpackRespData(fqdata)
-      this.choices = [ans.atitle, ...fqdata.choices]
+      this.choices = [ans.atitle, ...fqdata.choices].map(c => c.charAt(0).toUpperCase()+c.substring(1))
       this.shuffleArray(this.choices)
       this.answer = this.choices.indexOf(ans.atitle)
       return true
@@ -440,31 +469,31 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
 
     queryFuzzyAnswer: async function(item, lang) {
       let ans = await this.sparqlGetSiblings(item, lang, '', '', true)
-      if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
-      console.info('Expand Class...', item, lang, ans)
+      if (ans.isFuzzy) return ans
+      // console.info('Expand Class...', item, lang, ans)
       ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?', 'wdt:P31?')
-      if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
-      console.info('Expand SubClass...', item, lang, ans)
+      if (ans.isFuzzy) return ans
+      // console.info('Expand SubClass...', item, lang, ans)
       ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?', 'wdt:P31?/wdt:P279')
-      if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
-      console.info('Expand SuperClass...', item, lang, ans)
+      if (ans.isFuzzy) return ans
+      // console.info('Expand SuperClass...', item, lang, ans)
       ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?/wdt:P279', 'wdt:P31?/wdt:P279?')
-      if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
-      console.info('Expand SuperSuperClass...', item, lang, ans)
+      if (ans.isFuzzy) return ans
+      // console.info('Expand SuperSuperClass...', item, lang, ans)
       ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?/wdt:P279/wdt:P279', 'wdt:P31?/wdt:P279/wdt:P279')
-      if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
-      console.info('Expand SuperSuperSuperClass SubClasses...', item, lang, ans)
+      if (ans.isFuzzy) return ans
+      // console.info('Expand SuperSuperSuperClass SubClasses...', item, lang, ans)
       ans = await this.sparqlGetSiblings(item, lang, 'wdt:P31?/wdt:P279/wdt:P279/wdt:P279', 'wdt:P31?/wdt:P279+')
-      if (ans.isFuzzy) return { aid: ans.aid, atitle: ans.atitle }
-      console.info('Expand scopes failure...', item, lang, ans)
-      return { aid: ans.aid, atitle: ans.atitle }
+      if (ans.isFuzzy) return ans
+      // console.info('Expand scopes failure...', item, lang, ans)
+      return ans
     },
 
     sparqlGetSiblings: async function(item, lang, upscope='wdt:P31?', downscope='wdt:P31?', related=false) {
       let aid = 0
       let atitle = ''
       let isFuzzy = false
-      const sparqalQuery = related
+      const sparqlQuery = related
 //Possible related items P171 P361 P366 P373 P527 P1269 P1535 P1659 P2283 P4969
 // excluding P31?/P279*
 // dropped canditates P1552 has_quality, P1889 different_from, P373 common_category
@@ -560,7 +589,7 @@ UNION
 }
 }
 ORDER BY UUID() 
-LIMIT 2`
+LIMIT 3`
 //NOTE: Because the `?` after upscope P31, directchild is also possible, so sim actually means children and their uncles
 // exclude classes of concept, term, blanket terminology, technical term
 :`SELECT DISTINCT ?sim ?simLabelA 
@@ -572,10 +601,10 @@ WHERE
     ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
 }
 ORDER BY uuid()
-LIMIT 2`
+LIMIT 3`
       try {
         const timeLimit = 2000
-        const resp = await this.fulfillWithTimeLimit(fetch(`https://query.wikidata.org/sparql?query=${sparqalQuery}`, {
+        const resp = await this.fulfillWithTimeLimit(fetch(`https://query.wikidata.org/sparql?query=${sparqlQuery}`, {
           headers: { 'Accept': 'application/json' },
         }), timeLimit, null)
         if (!resp)  {
@@ -586,30 +615,33 @@ LIMIT 2`
         for(let b of data['results']['bindings']) {
           aid = parseInt(b['sim']['value'].split('Q')[1]) || aid
           atitle = b['simLabelA']['value'] || atitle
-          if (aid != item) {
+          if (aid != item && atitle !== '!' && atitle.indexOf(':', 1) < 0) {
             isFuzzy = true
             break
           }
         }
       } catch (err) {
-        console.error(item, lang, err)
+        console.error('sparqlGetSiblings', item, lang, err)
       } finally {
-        atitle = atitle ? atitle.charAt(0).toUpperCase()+atitle.substring(1) : atitle
         return { aid, atitle, isFuzzy }
       }
     },
-    fulfillWithTimeLimit: async function(task, timeLimit, failureValue){
-      let timeout
-      const timeoutPromise = new Promise((resolve, reject) => {
-        timeout = setTimeout(() => {
-          resolve(failureValue)
-        }, timeLimit)
-      })
-      const response = await Promise.race([task, timeoutPromise])
-      if (timeout) {
-        clearTimeout(timeout)
+    sparqlGetDescription: async function(item, lang) {
+      const sparqlQuery = `
+SELECT ?desc WHERE {
+  wd:Q${item} schema:description ?desc.
+  FILTER ( lang(?desc) = "${lang}" )
+}`
+      try {
+        const resp = await fetch(`https://query.wikidata.org/sparql?query=${sparqlQuery}`, {
+          headers: { 'Accept': 'application/json' },
+        })
+        const data = await resp.json()
+        const b = data.results.bindings
+        return b[0] ? b[0].desc.value : null
+      } catch (error) {
+        console.error('sparqlGetDescription', item, lang, err)
       }
-      return response
     },
     //#endregion
 
@@ -628,6 +660,7 @@ LIMIT 2`
       }
     },
     unpackRespData: function(data) {
+      this.q_desc = ''
       this.q_id = data.q_id
       this.q_hypernym = data.q_hypernym
       this.q_title = data.q_title
@@ -647,6 +680,7 @@ LIMIT 2`
       this.choices = []
       this.answer = -1
       this.q_id = 0
+      this.q_desc = ''
       this.q_title = ''
       this.q_title_en = ''
       this.q_hypernym = ''
@@ -671,8 +705,8 @@ LIMIT 2`
     scoreBar: function(v) {
       // fold list of int to subgroup of consecutive pos/neg count
       return JSON.parse(JSON.stringify(v)).reduce((arr,next) => {
-        let end = arr[arr.length-1] || 0
-        if (end*next > 0) arr[arr.length-1] += Math.sign(next)
+        let tail = arr[arr.length-1] || 0
+        if (tail*next > 0) arr[arr.length-1] += Math.sign(next)
         else arr.push(Math.sign(next))
         return arr
       }, [])
@@ -692,7 +726,7 @@ LIMIT 2`
 
     //#region Question Title interactions
     speakTitle: function(e,i) {
-      let text = i >=0 ? this.choices[i] : this.q_title
+      let text = i >=0 ? this.choices[i] : this.qText
       let lang = i >=0 ? this.alang : this.qlang
       lang = this.toMajorLang(lang, true)
       let langVoices = this.getSpeechSynthesisVoices(lang)
@@ -709,7 +743,7 @@ LIMIT 2`
         that.speakTitle(e,i)
       }, 400)
       this.touchTimerLong = setTimeout(()=> {
-        let title = this.choices[i] || this.q_title
+        let title = this.choices[i] || this.qText
         let lang = this.choices[i] ? this.alang : this.qlang
         window.open(`https://${lang}.wikipedia.org/wiki/${title}`, '_blank')
       }, 2000)
@@ -777,8 +811,8 @@ LIMIT 2`
         this.sortHypernymTree()
         
         if (onMount) {
-          // by default fill-in all hypernyms, excluding language==315
-          this.hypernyms = data.filter(h=>h.value!==315).map(h=>h.value)
+          // by default fill-in all hypernyms, excluding language(315), disease(12136)
+          this.hypernyms = data.filter(h=>[315,12136].indexOf(h.value)<0).map(h=>h.value)
         } else {
           this.sortHypernymList()
         }
@@ -904,6 +938,32 @@ LIMIT 2`
         const j = Math.floor(Math.random() * (i + 1))
         ;[array[i], array[j]] = [array[j], array[i]]
       }
+    },
+    fulfillWithTimeLimit: async function(task, timeLimit, failureValue){
+      let timeout
+      const timeoutPromise = new Promise((resolve, reject) => {
+        timeout = setTimeout(() => {
+          resolve(failureValue)
+        }, timeLimit)
+      })
+      const response = await Promise.race([task, timeoutPromise])
+      if (timeout) {
+        clearTimeout(timeout)
+      }
+      return response
+    },
+    fulfillWaitUntil: async function(task, timeUntil, rejectReason){
+      let timeout
+      const timeoutPromise = new Promise((resolve, reject) => {
+        timeout = setTimeout(() => {
+          reject(rejectReason)
+        }, timeUntil)
+      })
+      const responses = await Promise.allSettled([task, timeoutPromise])
+      if (timeout) {
+        clearTimeout(timeout)
+      }
+      return responses
     },
     //#endregion Utils
   },

@@ -61,9 +61,9 @@ class Quiz:
         
         q_id,q_hypernym,q_title,q_title_en,a_title,a_title_latin = level
         # find items with similar sound
-        similar_titles = Query.get_similar_titles(q_id, a_title_latin, alang, difficulty)
-        random.shuffle(similar_titles)
-        correct_choice = similar_titles.index(a_title)
+        choices = Query.get_similar_titles(q_id, a_title_latin, alang, difficulty)
+        random.shuffle(choices)
+        answer = choices.index(a_title)
         return {
             'lvl': lvl, 
             'q_id': q_id, 
@@ -71,8 +71,8 @@ class Quiz:
             'q_title': q_title,
             'q_title_en': q_title_en,
             'a_title': a_title, 
-            'choices': similar_titles, 
-            'answer': correct_choice,
+            'choices': choices, 
+            'answer': answer,
             'board': board
         }
     
@@ -93,17 +93,22 @@ class Quiz:
                 return cls.final_score(board)
             return cls.run_fuzzy_level(1 if lvl == len(cls.ladder) else lvl+1, board, qlang, alang, hypernyms, difficulty, recurr)
 
-        q_id, q_hypernym, q_title, q_title_en = level[0][:4]
-        wrong_choices = [row[4] for row in level[1:]]
+        q_id, q_hypernym, q_title, q_title_en, a_title = level[0][:5]
+        choices = [row[4] for row in level[1:]] # wrong answers
+        answer = -1
+        if a_title: # prepare answer, can be dropped if no description found for question on fuzzy mode
+            choices.append(a_title)
+            random.shuffle(choices)
+            answer = choices.index(a_title)
         return {
             'lvl': lvl, 
             'q_id': q_id, 
             'q_hypernym': q_hypernym, 
             'q_title': q_title,
             'q_title_en': q_title_en,
-            'a_title': None, 
-            'choices': wrong_choices, 
-            'answer': -1,
+            'a_title': a_title, 
+            'choices': choices, 
+            'answer': answer,
             'board': board
         }
 
@@ -136,10 +141,11 @@ class Quiz:
 
     @classmethod
     def level_up(cls, lvl, board, qid):
-        board[str(lvl)].append(qid)
-        sample_size = len(board[str(lvl)])
+        if qid != 0:
+            board[str(lvl)].append(qid)
         cr,beta = cls.correct_rate(lvl, board), random.betavariate(10,10)
         if cr > beta:
+            sample_size = len(board[str(lvl)])
             if lvl == len(cls.ladder) and sample_size > cls.total_sample_size(board) * 0.0618:
                 lvl = round(random.gammavariate(len(cls.ladder), 0.2)) # rebounce back from top
             else:
@@ -149,7 +155,8 @@ class Quiz:
 
     @classmethod
     def level_down(cls, lvl, board, qid):
-        board[str(lvl)].append(-qid)
+        if qid != 0:
+            board[str(lvl)].append(-qid)
         lvl = math.floor(lvl * random.betavariate(30,3))
         return lvl, board
 
@@ -178,11 +185,11 @@ class Quiz:
         rate = 0
         sample_size = len(board[str(lvl)])/1.0
         if sample_size > 0:
+            correct_count = len([k for k in board[str(lvl)] if k > 0])
             level_items_count = cls.level_items_count(lvl)
             miss_coef = math.log10((max(level_items_count-sample_size**3, 1)) / (sample_size+1)) + math.log1p(lvl) - 1
             if final:
                 miss_coef = max(miss_coef * lvl / len(cls.ladder)**2, 0)
-            correct_count = len([k for k in board[str(lvl)] if k > 0])
             rate = correct_count / (sample_size+miss_coef)
         return rate
 
