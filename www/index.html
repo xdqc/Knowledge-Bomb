@@ -316,7 +316,7 @@
                 <h2 class="display-3 my-4 mx-2 align-bottom">
                   <a class="title-link" target="_blank"
                     :href="q_title ? `https://${qlang}.wikipedia.org/wiki/${q_title}` : `https://www.google.com/search?q=${q_desc}`"
-                    :style="q_desc ? `font-size: ${titleDescFontSize}%;` : ''"
+                    :style="q_desc ? `font-size: ${titleDescFontSize}%; background-color: #f5f5f5Bf;` : ''"
                     @mouseover="speakTitle"
                     @click="toggleDisplayTitleImg">
                     {{ qText }}

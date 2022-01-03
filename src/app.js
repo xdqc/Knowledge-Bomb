@@ -209,7 +209,8 @@ new Vue({
     titleDescFontSize() {
       this.windowWidth && this.qText
       const container = document.querySelector('.title-box')
-      return container ? container.clientWidth / Math.min(this.q_desc.length+8, 15) * 1.5 : 70
+      const scale = /[\wа-яα-ω]+/ig.test(this.q_desc) && this.q_desc.length < 60 ? 2.4 : 1.6
+      return container ? container.clientWidth / Math.max(10, Math.min(18, this.q_desc.length)) * scale : 70
     },
     showBottomAlert() {
       return !this.getCookieValue('lang')
@@ -340,7 +341,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
             this.unpackRespData(data)
             this.gameStartAction()
           } else if (this.match_mode == 1) {
-            if (!await this.fetchFuzzyAnswer(data)) {
+            if (!await this.fetchFuzzyAnswer(JSON.parse(JSON.stringify(data)))) {
               await this.selectChoice(null,  -1)
             }
             this.gameStartAction()
@@ -409,7 +410,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         } else if (this.match_mode == 0) {
           this.unpackRespData(data)
         } else if (this.match_mode == 1) {
-          if (!await this.fetchFuzzyAnswer(data)) {
+          if (!await this.fetchFuzzyAnswer(JSON.parse(JSON.stringify(data)))) {
             await this.selectChoice(e, index, ++depth)
             return
           }
@@ -447,7 +448,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       //Check if both atitle & qdesc(long enough?) present, then go with desc mode, otherwise fuzzy mode
       if (fqdata.answer >= 0) {
         const qdesc = await this.sparqlGetDescription(fqdata.q_id, this.qlang)
-        if (!!qdesc && 20/qdesc.length*Math.random()<0.5) {
+        if (!!qdesc && 10/qdesc.length*Math.random()<0.5) {
           this.unpackRespData(fqdata)
           this.q_title = ''
           this.q_desc = qdesc
@@ -461,9 +462,12 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         return false
       }
       this.unpackRespData(fqdata)
-      this.choices = [ans.atitle, ...fqdata.choices].map(c => c.charAt(0).toUpperCase()+c.substring(1))
+      const capitalize = (s) => s.charAt(0).toUpperCase()+s.substring(1)
+      const atitleC = capitalize(ans.atitle)
+      const choicesC = fqdata.choices.map(c => capitalize(c))
+      this.choices = [atitleC, ...choicesC]
       this.shuffleArray(this.choices)
-      this.answer = this.choices.indexOf(ans.atitle)
+      this.answer = this.choices.indexOf(atitleC)
       return true
     },
 
@@ -495,6 +499,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       let isFuzzy = false
       const sparqlQuery = related
 //Possible related items P171 P361 P366 P373 P527 P1269 P1535 P1659 P2283 P4969
+// Prevent only ONE directional (another wikidatapropertyitem only be the facet of this): P1269
 // excluding P31?/P279*
 // dropped canditates P1552 has_quality, P1889 different_from, P373 common_category
 ?`SELECT DISTINCT * WHERE {
@@ -562,7 +567,7 @@ UNION
   SELECT DISTINCT
   ?sim ?simLabelA 
     WHERE {
-    wd:Q${item} wdt:P1269? ?facet .
+    wd:Q${item} wdt:P1269 ?facet .
     ?sim wdt:P1269? ?facet .
     ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
     }

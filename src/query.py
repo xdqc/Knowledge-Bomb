@@ -145,7 +145,8 @@ class Query:
         return result[:num]
 
     @classmethod
-    def get_fuzzy_level(cls, lv, played_correct, qlang, alang, hypernym, difficulty):
+    def get_fuzzy_level(cls, lv, played_correct, qlang, alang, hypernyms, difficulty):
+        hypernyms = [str(h) for h in hypernyms if h > 0]
         sqlstr = f"""
         SELECT id ,hypernym ,qt ,qt_en ,at ,pos
             ,ht
@@ -157,10 +158,10 @@ class Query:
             FROM (
                 SELECT [id], hypernym
                 FROM [wiki].[item]
-                WHERE hypernym IN (?)
-                    AND lang_count >= ?
-                    AND lang_count <  ?
-                    AND id NOT IN ({",".join(played_correct)})
+                WHERE lang_count >= ?
+                  AND lang_count <  ?
+                  AND id NOT IN ({",".join(played_correct)})
+                  {'AND hypernym IN ('+",".join(hypernyms) +')' if len(hypernyms)>0 else ''}
             ) i
              JOIN wiki.category c on c.item=i.hypernym
             CROSS APPLY (
@@ -185,9 +186,9 @@ class Query:
             FROM (
                 SELECT [id], hypernym
                 FROM [wiki].[item]
-                WHERE hypernym NOT IN (?)
-                    AND lang_count >= ?
-                    AND lang_count <  ?
+                WHERE lang_count >= ?
+                  AND lang_count <  ?
+                  {'AND hypernym NOT IN ('+",".join(hypernyms) +')' if len(hypernyms)>0 else ''}
             ) i
              JOIN wiki.category c on c.item=i.hypernym
             CROSS APPLY (
@@ -197,7 +198,7 @@ class Query:
         ) c
         ORDER BY pos
         """ #TODO: optimize true randomization performance on heterogeneous index
-        params = [hypernym, lv[1], lv[2], hypernym, int(lv[1]*0.3), int(lv[2]*3)]
+        params = [lv[1], lv[2], int(lv[1]*0.3), int(lv[2]*3)]
         result = None
         cursor = None
         try:
