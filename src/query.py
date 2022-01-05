@@ -12,7 +12,11 @@ class Query:
 
     @classmethod
     def get_languages(cls):
-        sqlstr = """SELECT TOP(320) code,name_local,label_question,label_answer,label_difficulty,label_gametitle,label_m0,label_m1,coord_x,coord_y 
+        sqlstr = """SELECT TOP(320) code ,name_local 
+            ,label_question ,label_answer 
+            ,label_difficulty ,label_gametitle 
+            ,label_m0 ,label_m1 ,label_m2 
+            ,coord_x ,coord_y 
         FROM wiki.language ORDER BY [rank]"""
         cls.conn = pyodbc.connect(cls.conn_str)
         cursor = cls.conn.cursor()
@@ -21,16 +25,16 @@ class Query:
             res.append({'value':lang[0], 'text':lang[1], 
                 'label_q':lang[2], 'label_a':lang[3],
                 'label_s':lang[4], 'label_t':lang[5],
-                'label_m0':lang[6], 'label_m1':lang[7],
-                'coord_x':lang[8], 'coord_y':lang[9]})
+                'label_m0':lang[6], 'label_m1':lang[7], 'label_m2':lang[8],
+                'coord_x':lang[9], 'coord_y':lang[10]})
         return res
 
     @classmethod
     def get_language_names(cls, lang):
         sqlstr = """DECLARE @langfix AS nvarchar(max) = (SELECT TOP(1) langfix FROM wiki.language WHERE code = ?)
         SELECT code, TRIM(REPLACE(REPLACE(COALESCE(a.title, l.name), @langfix, ''), '()', '')) as title,
-            CASE WHEN title IS NULL THEN NULL ELSE coord_x END, 
-            CASE WHEN title IS NULL THEN NULL ELSE coord_y END
+            CASE WHEN title IS NULL THEN -coord_x ELSE coord_x END, 
+            CASE WHEN title IS NULL THEN -coord_y ELSE coord_y END
         FROM wiki.language l
         OUTER APPLY (
             SELECT item,title FROM wiki.article a
@@ -113,7 +117,7 @@ class Query:
         SELECT title, r FROM (
           SELECT title, r FROM (
             SELECT TOP (?) 
-              title, ABS(item - ?) * 0.001 * (ABS(CHECKSUM(NewId())) % 127 + 1) r
+              title, LOG(ABS(item - ?)+1) * (ABS(CHECKSUM(NewId())) % 31 + 1) r
             FROM wiki.article
             WHERE language = '{alang}'
               AND (soundexo = SOUNDEX(?) AND soundexo <> '0000')
@@ -121,7 +125,7 @@ class Query:
           UNION
           SELECT title, r FROM (
             SELECT TOP (?) 
-              title, ABS(item - ?) * 0.01 * (ABS(CHECKSUM(NewId())) % 127 + 1) r
+              title, LOG(ABS(item - ?)+1) * (ABS(CHECKSUM(NewId())) % 255 + 1) r
             FROM wiki.article
             WHERE language = '{alang}'
               AND (soundexr = SOUNDEX(REVERSE(?)) )
@@ -145,15 +149,16 @@ class Query:
         return result[:num]
 
     @classmethod
-    def get_fuzzy_level(cls, lv, played_correct, qlang, alang, hypernyms, difficulty):
+    def get_fuzzy_level(cls, lv, played_correct, qlang, alang, hypernyms, difficulty, has_answer):
         hypernyms = [str(h) for h in hypernyms if h > 0]
         sqlstr = f"""
-        SELECT id ,hypernym ,qt ,qt_en ,at ,pos
-            ,ht
+        SELECT id ,hypernym ,qt ,qt_en ,at ,at_la ,pos
+            --,ht
         FROM (
             SELECT TOP(1) i.[id]
-                ,i.hypernym ,c.title_monos ht
-                ,q.title qt ,q_en.title qt_en ,a.title at 
+                ,i.hypernym 
+                --,c.title_monos ht
+                ,q.title qt ,q_en.title qt_en ,a.title at ,a.title_latin at_la
                 ,-1 pos
             FROM (
                 SELECT [id], hypernym
@@ -163,25 +168,26 @@ class Query:
                   AND id NOT IN ({",".join(played_correct)})
                   {'AND hypernym IN ('+",".join(hypernyms) +')' if len(hypernyms)>0 else ''}
             ) i
-             JOIN wiki.category c on c.item=i.hypernym
+            -- JOIN wiki.category c on c.item=i.hypernym
             CROSS APPLY (
                 SELECT item, title FROM wiki.article
                 WHERE language = '{qlang}' AND item = i.id) q
             OUTER APPLY (
                 SELECT item, title FROM wiki.article
                 WHERE language = 'en' AND item = i.id) q_en
-            OUTER APPLY (
-                SELECT item, title FROM wiki.article
+            {'CROSS' if has_answer else 'OUTER'} APPLY (
+                SELECT item, title, title_latin FROM wiki.article
                 WHERE language = '{alang}' AND item = i.id) a
             ORDER BY NEWID()
         ) q
         UNION ALL
-        SELECT id ,hypernym ,qt ,qt_en ,at ,pos
-            ,ht
+        SELECT id ,hypernym ,qt ,qt_en ,at ,at_la ,pos
+            --,ht
         FROM (
             SELECT TOP({difficulty-1}) i.[id]
-                ,i.hypernym, c.title_monos ht
-                ,'' qt ,'' qt_en ,a.title at
+                ,i.hypernym 
+                --,c.title_monos ht
+                ,'' qt ,'' qt_en ,a.title at , '' at_la
                 ,1 pos
             FROM (
                 SELECT [id], hypernym
@@ -190,7 +196,7 @@ class Query:
                   AND lang_count <  ?
                   {'AND hypernym NOT IN ('+",".join(hypernyms) +')' if len(hypernyms)>0 else ''}
             ) i
-             JOIN wiki.category c on c.item=i.hypernym
+            -- JOIN wiki.category c on c.item=i.hypernym
             CROSS APPLY (
                 SELECT item, title FROM wiki.article 
                 WHERE language = '{alang}' AND item = i.id) a
@@ -198,7 +204,7 @@ class Query:
         ) c
         ORDER BY pos
         """ #TODO: optimize true randomization performance on heterogeneous index
-        params = [lv[1], lv[2], int(lv[1]*0.3), int(lv[2]*3)]
+        params = [lv[1], lv[2], int(lv[1]*0.4), int(lv[2]*2)]
         result = None
         cursor = None
         try:
@@ -209,7 +215,7 @@ class Query:
             cursor = cls.conn.cursor()
             result = cursor.execute(sqlstr, params).fetchall()
         # validate q(result[0]) exist @pos (-1)
-        if len(result) == 0 or result[0][5] != -1:
+        if len(result) == 0 or result[0][6] != -1:
             return None
         return result
 

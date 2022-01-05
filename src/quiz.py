@@ -3,42 +3,36 @@ from .query import Query
 
 class Quiz:
     ladder = [ # lvl,lo_langcount,hi_langcount,num_of_items
-        (1,120,320,643),
-        (2,100,150,886),
-        (3,90,120,1012),
-        (4,85,110,1102),
-        (5,80,100,1175),
-        (6,76,92,1215),
-        (7,72,85,1296),
-        (8,69,80,1267),
-        (9,66,75,1236),
-        (10,62,70,1347),
-        (11,58,66,1557),
-        (12,54,62,1721),
-        (13,51,58,1830),
-        (14,48,54,2025),
-        (15,46,51,1908),
-        (16,43,48,2190),
-        (17,42,46,1926),
-        (18,39,43,2272),
-        (19,38,41,1859),
-        (20,36,39,2150),
-        (21,34,37,2417),
-        (22,33,35,1827),
-        (23,32,34,1889),
-        (24,31,33,1986),
-        (25,30,32,2153),
-        (26,29,31,2310),
-        (27,28,30,2483),
-        (28,27,29,2756),
-        (29,27,28,1478),
-        (30,26,27,1456),
-        (31,25,26,1579),
-        (32,24,25,1788),
-        (33,23,24,1929),
-        (34,22,23,2080),
-        (35,21,22,2275),
-        (36,20,21,2459),
+        (1,95,320,1395),
+        (2,80,110,1503),
+        (3,72,90,1604),
+        (4,64,75,1595),
+        (5,58,66,1557),
+        (6,54,62,1731),
+        (7,51,58,1842),
+        (8,48,54,2030),
+        (9,46,51,1904),
+        (10,43,48,2203),
+        (11,42,46,1933),
+        (12,39,43,2262),
+        (13,38,41,1869),
+        (14,36,39,2158),
+        (15,34,37,2447),
+        (16,33,35,1834),
+        (17,32,34,1878),
+        (18,31,33,1980),
+        (19,30,32,2156),
+        (20,29,31,2325),
+        (21,28,30,2507),
+        (22,27,29,2750),
+        (23,27,28,1461),
+        (24,26,27,1473),
+        (25,25,26,1571),
+        (26,24,25,1790),
+        (27,23,24,1940),
+        (28,22,23,2094),
+        (29,21,22,2278),
+        (30,2,21,2700),
     ]
 
     @classmethod
@@ -77,22 +71,28 @@ class Quiz:
         }
     
     @classmethod
-    def run_fuzzy_level(cls, lvl, board, qlang, alang, hypernyms, difficulty, recurr=0):
+    def run_fuzzy_level(cls, lvl, board, qlang, alang, hypernyms, difficulty, has_answer=False, recurr=0):
         hypernyms = [h for h in hypernyms if h > 0]
         hypernym_sample = random.sample(hypernyms, min(random.randint(3,30), len(hypernyms)))
-        level = Query.get_fuzzy_level(cls.ladder[lvl-1], cls.played_correct(board), qlang, alang, hypernym_sample, difficulty)
+        level = Query.get_fuzzy_level(cls.ladder[lvl-1], cls.played_correct(board), qlang, alang, hypernym_sample, difficulty, has_answer)
         # when run out of current level, run next level; circle the ladder, stop when done a circle
         #NOTE: hypernym will be randomized on each recursive run, possible premature termination
         if level is None:
             recurr += 1
             if recurr > len(cls.ladder):
                 return cls.final_score(board)
-            return cls.run_fuzzy_level(1 if lvl == len(cls.ladder) else lvl+1, board, qlang, alang, hypernyms, difficulty, recurr)
+            return cls.run_fuzzy_level(1 if lvl == len(cls.ladder) else lvl+1, board, qlang, alang, hypernyms, difficulty, has_answer, recurr)
 
-        q_id, q_hypernym, q_title, q_title_en, a_title = level[0][:5]
+        q_id, q_hypernym, q_title, q_title_en, a_title, a_title_latin = level[0][:6]
         choices = [row[4] for row in level[1:]] # wrong answers
         answer = -1
-        if a_title: # prepare answer, can be dropped if no description found for question on fuzzy mode
+        if difficulty == 1 and has_answer:
+            choices = [a_title]
+            answer = 0
+        elif has_answer:
+            choices = Query.get_similar_titles(q_id, a_title_latin, alang, difficulty*2)[1:] + choices
+            choices = list(filter(lambda s: s[-4:]!=a_title[-4:] and s[:5]!=a_title[:5], choices))
+            choices = random.sample(choices, difficulty-1)
             choices.append(a_title)
             random.shuffle(choices)
             answer = choices.index(a_title)
@@ -115,7 +115,7 @@ class Quiz:
         if (not isinstance(qlang, str) or not isinstance(alang, str) 
             or '--' in alang or '--' in qlang or len(alang) > 12 or len(qlang) > 12 
             or difficulty not in [1,2,3,4,6,8,9,12,16,24,36,54]
-            or match_mode not in [0,1]):
+            or match_mode not in [0,1,2]):
             return cls.final_score(board)
 
         if lvl < 0: # start quiz
@@ -128,8 +128,9 @@ class Quiz:
             return cls.final_score(board)
         if match_mode == 0:
             return cls.run_exact_level(lvl, board, qlang, alang, hypernyms, difficulty)
-        if match_mode == 1:
-            return cls.run_fuzzy_level(lvl, board, qlang, alang, hypernyms, difficulty)
+        if match_mode == 1 or match_mode == 2:
+            must_has_answer = match_mode == 1
+            return cls.run_fuzzy_level(lvl, board, qlang, alang, hypernyms, difficulty, must_has_answer)
 
     @classmethod
     def final_score(cls, board):
@@ -143,7 +144,7 @@ class Quiz:
         if cr > beta:
             sample_size = len(board[str(lvl)])
             if lvl == len(cls.ladder) and sample_size > cls.total_sample_size(board) * 0.0618:
-                lvl = round(random.gammavariate(len(cls.ladder), 0.2)) # rebounce back from top
+                lvl = 1 # round(random.gammavariate(len(cls.ladder), 0.2)) # rebounce back from top
             else:
                 lvl += 1
         lvl = min(lvl, len(cls.ladder))
@@ -183,7 +184,7 @@ class Quiz:
         if sample_size > 0:
             correct_count = len([k for k in board[str(lvl)] if k > 0])
             level_items_count = cls.level_items_count(lvl)
-            miss_coef = math.log10((max(level_items_count-sample_size**3, 1)) / (sample_size+1)) + math.log1p(lvl) - 1
+            miss_coef = math.log10((max(level_items_count-sample_size**3, 1)) / (sample_size+1)) + math.log1p(lvl)
             if final:
                 miss_coef = max(miss_coef * lvl / len(cls.ladder)**2, 0)
             rate = correct_count / (sample_size+miss_coef)

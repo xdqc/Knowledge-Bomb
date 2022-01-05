@@ -114,6 +114,17 @@ a.title-link {
   background-color: #f5f5f58f;
   text-decoration: none;
 }
+button.dropdown-toggle {
+  border-color: #ced4da;
+  box-shadow: 0 0.2rem 0.2rem -0.3rem var(--japanese-indigo);
+}
+button.dropdown-toggle:active {
+  border-color: #ced4da;
+}
+button.dropdown-toggle:focus {
+  border-color: #ced4da;
+  box-shadow: 0 0.2rem 0.2rem -0.3rem var(--japanese-indigo);
+}
 .dropdown-lang .dropdown-menu {
   position: fixed!important;
   transform: translate(0%, 0%)!important;
@@ -152,6 +163,31 @@ a.title-link {
 .dropdown-lang.show .dropdown-toggle {
   border-style: dotted;
   border-color: var(--jelly-bean-blue);
+}
+.language-options-switcher {
+  position: absolute;
+  right: -20px;
+  top: -25px;
+  z-index: 1;
+}
+.title-leximap {
+  position: absolute;
+  left: 10px;
+  min-height: 680px;
+  background-color: white;
+  opacity: 0.99;
+  z-index: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.title-leximap a {
+  position: absolute;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--japanese-indigo); 
+}
+.game-progress {
+  width: 91%;
 }
 #quote-quote {
   font-style: italic;
@@ -214,6 +250,9 @@ a.title-link {
   .title-link {
     font-size: 4rem;
   }
+  .game-progress {
+    width: 80%;
+  }
 }
 @media (max-width: 768px) {
   .list-hypernyms {
@@ -245,13 +284,23 @@ a.title-link {
   .tree-hypernyms {
     column-count: 1;
   }
+  .language-options-switcher {
+    right: 15px;
+    top: 0;
+  }
 }
 @media (max-width: 455px) {
+  .game-progress {
+    width: 76.5%;
+  }
   .title-link {
     font-size: 2.5rem;
   }
 }
-@media (max-width: 380px) {
+@media (max-width: 375px) {
+  .game-progress {
+    width: 70%;
+  }
   .title-link {
     font-size: 2.25rem;
   }

@@ -37,7 +37,9 @@ jobs:
         with:
           name: python-app
           path: |
-            . 
+            .
+            !data/
+            !docs/
             !venv/
 
   deploy:

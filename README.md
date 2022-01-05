@@ -5,6 +5,27 @@ A "random wiki roamer" minigame, a "vocabulary test" tool, a "quiz generator" vi
 
 ## Data mining from Wikipedia
 
+
+### 2D Language picker based on lexical distance map
+
+The 🗺 [2D language picker](docs/lexi_map.PNG) keeps the constant position of each language no matter showing in which language setting. It solves the problem of one dimentional language pickers (re)ordering languages alphabetically (even non alphabetical writing system) on various positions that hard to find: **A**leman, **I**naleman, **L**ialémani, **B**ich'ahii, **C**eruman, **D**uits, **E**leman, **F**rangikos, **G**erman,  **J**erman, **K**rzyżacki, **M**jymjecko, **Н**емецкий, **N**émet, **O**lmon, **P**reisen, **R**ajch, **S**aksa, **𐌸**𐌹𐌿𐌳𐌹𐍃𐌺𐌰𐍂𐌰𐌶𐌳𐌰, **Þ**ýska, **T**ysk, **U**budage, **V**ācu, **W**eimar, **Y**oeraman, **Z**ėm, **独**逸, **德**意志, etc.
+
+This lexical distance map also availble in game as a cheatsheet... (hit top menubar ⌨ for hotkeys)
+
+[![a](docs/lexi_map_brain.PNG)](docs/lexi_map.PNG)
+
+Design principles:
+
+  1. Easy to pick - align to grid
+  2. Based on lexical distance - Afrikaans, ייִדיש are placed at West Germanic of Indo-European
+  5. Major languages on top or bottom of their blobs that quick to be found
+  3. Respect relative geolocation and culture similarity within blob
+  6. Extinct languages next to major languages - Classical Chinese, Sanskrit, Aramaic, Latin, Gothic, Ænglisc
+  4. Isolated languages look isolated - Basque, Greek, Albanian, Armenian, Chuvash, etc.
+  7. Screen real estate - no overlapping in most languages on 1300px minimum width
+  8. Background image is only for decoration
+
+
 ### Qualified Wikidata items
 
 A qualified article ([examples](data/sample_titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these criteria:
@@ -158,20 +179,6 @@ Node          Path
 　　　　　　　　　　　　　　　　└[─](https://en.wiktionary.org/wiki/飲#Definitions)[飲](https://www.wikidata.org/wiki/Q40050)    
 
 
-### 2D Language picker based on lexical distance map
-
-This 🗺 [2D language picker](docs/lexi_map.PNG) keeps the constant position of each language no matter showing in which language setting. It solves the problem of one dimentional language pickers (re)ordering languages alphabetically (even non alphabetical writing system) on various positions that hard to find: **A**leman, **I**naleman, **L**ialémani, **B**ich'ahii, **C**eruman, **D**uits, **E**leman, **F**rangikos, **G**erman,  **J**erman, **K**rzyżacki, **M**jymjecko, **Н**емецкий, **N**émet, **O**lmon, **P**reisen, **R**ajch, **S**aksa, **𐌸**𐌹𐌿𐌳𐌹𐍃𐌺𐌰𐍂𐌰𐌶𐌳𐌰, **Þ**ýska, **T**ysk, **U**budage, **V**ācu, **W**eimar, **Y**oeraman, **Z**ėm, **独**逸, **德**意志 ...
-
-Design principles:
-
-  1. Easy to pick - align to grid
-  2. Based on lexical distance - Afrikaans, ייִדיש are placed at West Germanic of Indo-European
-  5. Major languages on top or bottom of their blobs that quick to be found
-  3. Respect relative geolocation and culture similarity within blob
-  6. Extinct languages next to major languages - Classical Chinese, Sanskrit, Aramaic, Latin, Gothic, Ænglisc
-  4. Isolated languages look isolated - Basque, Greek, Albanian, Armenian, Chuvash, etc.
-  7. Screen real estate - no overlapping in most languages on 1300px minimum width
-  8. Background image is only for decoration
 
 ### List of languages ranking table
 

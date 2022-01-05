@@ -9,7 +9,6 @@ new Vue({
     qlang_options: [{ value: '', text: '(Question Language)' }],
     alang_options: [{ value: '', text: '(Answers Language)' }],
     aLeximap: [],
-    qLeximap: [],
     q_title: '',
     q_title_en: '',
     q_desc: '',
@@ -26,6 +25,7 @@ new Vue({
     displayTopQuote: true,
     displayTitleImage: true,
     displayScoreChart: false,
+    displayTitleLeximap: false,
     displayHypernymTree: false,
     startBtnDisabled: false,
     progressAnimate: false,
@@ -38,7 +38,7 @@ new Vue({
     hypernym_index: 1,
     match_mode: 0,
     difficulty: 4,
-    difficultyLvl: 4,
+    difficultyLvl: 7,
     difficulties: [
       {value: 1, icon:'1️⃣', tooltip:'Wanderer', keymap:{'7':0,'8':0,'9':0}},
       {value: 2, icon:'2️⃣', tooltip:'Picnic', keymap:{'7':0,'8':0,'9':0,'4':1,'5':1,'6':1,'g':1,'u':1,'c':1,'i':1,'r':1,'o':1}},
@@ -106,6 +106,7 @@ new Vue({
         if (e.key == '*' || e.key == 'y') this.speakTitle()
         if (e.key == '/' || e.key == 's') this.speakQuote()
         if (e.key == '-' || e.key == 'd') this.toggleDisplayTitleImg()
+        if (e.key == '.' || e.key == 'e') this.toggleDisplayTitleLeximap()
         if (e.key == '+' || e.key == 'f') document.getElementsByClassName('title-link')[0].click()
       }
     })
@@ -130,16 +131,16 @@ new Vue({
       return this.choices && this.choices.length > 0 && this.score < 0
     },
     qlangOptions() {
-      return this.match_mode === 1 ? this.qlang_options : this.qlang_options.filter(l => l.value != this.alang)
+      return this.match_mode !== 0 ? this.qlang_options : this.qlang_options.filter(l => l.value != this.alang)
     },
     alangOptions() {
       return this.alang_options
     },
     alangOpt() {
-      return this.alang_options.find(l => l.value === this.alang) || { value: '', text: '', label_a: '', label_q: '', label_s: '', label_t: '', label_m0: '', label_m1: ''}
+      return this.alang_options.find(l => l.value === this.alang) || { value: '', text: '', label_a: '', label_q: '', label_s: '', label_t: '', label_m0: '', label_m1: '', label_m2: ''}
     },
     qlangOpt() {
-      return this.qlang_options.find(l => l.value === this.qlang) || { value: '', text: '', label_a: '', label_q: '', label_s: '', label_t: '', label_m0: '', label_m1: ''}
+      return this.qlang_options.find(l => l.value === this.qlang) || { value: '', text: '', label_a: '', label_q: '', label_s: '', label_t: '', label_m0: '', label_m1: '', label_m2: ''}
     },
     qText() {
       return this.q_title || this.q_desc
@@ -163,7 +164,8 @@ new Vue({
     match_mode_options() {
       return [
         { text: `🙂 ${this.alangOpt.label_m0 || this.alang_options[0].label_m0 || ''} ${this.qlangOpt.text}`, value: 0 },
-        { text: `😎 ${this.alangOpt.label_m1 || this.alang_options[0].label_m1 || ''} ${this.qlangOpt.text}`, value: 1 },
+        { text: `🧐 ${this.alangOpt.label_m1 || this.alang_options[0].label_m1 || ''} ${this.qlangOpt.text}`, value: 1 },
+        { text: `😎 ${this.alangOpt.label_m2 || this.alang_options[0].label_m2 || ''} ${this.qlangOpt.text}`, value: 2 },
       ]
     },
     difficultyIndex() {
@@ -209,8 +211,8 @@ new Vue({
     titleDescFontSize() {
       this.windowWidth && this.qText
       const container = document.querySelector('.title-box')
-      const scale = /[\wа-яα-ω]+/ig.test(this.q_desc) && this.q_desc.length < 60 ? 2.4 : 1.6
-      return container ? container.clientWidth / Math.max(10, Math.min(18, this.q_desc.length)) * scale : 70
+      const scale = /[a-zа-яα-ω]{3,}/ig.test(this.q_desc) && this.q_desc.length < 60 ? 2.4 : 1.6
+      return container ? container.clientWidth / Math.max(12, Math.min(18, this.q_desc.length-2)) * scale : 70
     },
     showBottomAlert() {
       return !this.getCookieValue('lang')
@@ -225,12 +227,12 @@ new Vue({
             dd.icon = '️??'
             dd.tooltip = 'Reach all levels in the previous difficulty to unlock'
           }
-          if (i===0 && this.difficultyLvl<=this.difficulties.length-0) {
-            dd.disabled = true
-            dd.icon = '??'
-            dd.hide = this.difficultyLvl<this.difficulties.length
-            dd.tooltip = `Finish the last difficulty to unlock`
-          }
+          // if (i===0 && this.difficultyLvl<=this.difficulties.length-0) {
+          //   dd.disabled = true
+          //   dd.icon = '??'
+          //   dd.hide = this.difficultyLvl<this.difficulties.length
+          //   dd.tooltip = `Finish the last difficulty to unlock`
+          // }
           return dd 
         })
         .sort((a,b) => a.value-b.value)
@@ -248,7 +250,8 @@ new Vue({
 
       return [
         {Key: ['A','Esc'], Description: `toggle category selector`},
-        {Key: ['-','D'], Description: `dispaly or hide image`},
+        {Key: ['.','E'], Description: `exposit lexical map`},
+        {Key: ['-','D'], Description: `display image`},
         {Key: ['/','S'], Description: `say <quote> in ${this.quotelangOpt ? this.quotelangOpt.text : this.alangOpt.text }`},
         {Key: ['*','Y'], Description: `yell "${this.qText}" in ${this.qlangOpt.text}`},
         {Key: ['+','F'], Description: `find "${this.qText}" on ${this.q_title ? this.qlang+'.wikipedia.org' : 'google'}`},
@@ -308,6 +311,44 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       this.qlang_options = data
       return data.filter(l => l.coord_x > 0)
     },
+    async titleLeximap() {
+      const qid = this.q_id
+      if (qid > 0) {
+        const sparqlQuery = `
+SELECT (lang(?label) as ?lang) ?label WHERE {
+  wd:Q${qid} rdfs:label ?label.
+}`
+        try {
+          const timeLimit = 2000
+          const resp = await this.fulfillWithTimeLimit(fetch(`https://query.wikidata.org/sparql?query=${sparqlQuery}`, {
+            headers: { 'Accept': 'application/json' },
+          }), timeLimit, null)
+          if (!resp)  {
+            throw 'wikidata query timeout ' + timeLimit
+          }
+          const data = await resp.json()
+          const res = []
+          data.results.bindings.forEach(b => {
+            const lang = b.lang.value
+            const text = b.label.value
+            const opt = this.qlang_options.find(x => this.transLangCode(x.value) == lang)
+            if (opt && opt.coord_x){
+              res.push ({
+                text: text,
+                code: opt.value,
+                lang: opt.text,
+                coord_x: Math.abs(opt.coord_x),
+                coord_y: Math.abs(opt.coord_y),
+              })
+            }
+          })
+          return res
+        } catch (error) {
+          console.error('titleLeximap', qid, error)
+        }
+      }
+      return []
+    }
   },
   methods: {
     //#region Game Actions
@@ -337,15 +378,18 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
           this.gameOverAction(data.score)
         } else {
           this.popHypernym()
-          if (this.match_mode == 0) {
+          if (this.match_mode === 0) {
             this.unpackRespData(data)
-            this.gameStartAction()
-          } else if (this.match_mode == 1) {
-            if (!await this.fetchFuzzyAnswer(JSON.parse(JSON.stringify(data)))) {
-              await this.selectChoice(null,  -1)
+          } else if (this.match_mode === 1) {
+            if (!await this.fetchQuestionDescription(data)) {
+              await this.selectChoice(null, -1)
             }
-            this.gameStartAction()
+          } else if (this.match_mode === 2) {
+            if (!await this.fetchFuzzyAnswer(data)) {
+              await this.selectChoice(null, -1)
+            }
           }
+          this.gameStartAction()
         }
       } catch (error) {
         console.error(error)
@@ -376,8 +420,10 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       }
     },
 
+    //Match mode 1&2 rely on client to fetch wikidata question desc and fuzzy answer respectively;
+    //recursively request server for another qid to retry, in case client cannot fulfill
     selectChoice: async function(e, index, depth=0) {
-      if (depth >= 10) {
+      if (depth >= 30/this.match_mode) {
         this.endGame()
         return
       }
@@ -407,11 +453,16 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
         this.board = data.board
         if (data.score >= 0) {
           this.gameOverAction(data.score)
-        } else if (this.match_mode == 0) {
+        } else if (this.match_mode === 0) {
           this.unpackRespData(data)
-        } else if (this.match_mode == 1) {
-          if (!await this.fetchFuzzyAnswer(JSON.parse(JSON.stringify(data)))) {
-            await this.selectChoice(e, index, ++depth)
+        } else if (this.match_mode === 1) {
+          if (!await this.fetchQuestionDescription(data)) {
+            await this.selectChoice(null, index, ++depth)
+            return
+          }
+        } else if (this.match_mode === 2) {
+          if (!await this.fetchFuzzyAnswer(data)) {
+            await this.selectChoice(null, index, ++depth)
             return
           }
         }
@@ -426,6 +477,7 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
           ])
         }
       } catch (err) {
+        console.info(e, index, depth, this.q_id)
         console.error(err)
       } finally {
         document.querySelectorAll('.btn-choice').forEach(b => b.disabled = false)
@@ -442,24 +494,51 @@ SELECT ?item ${IMG_TYPE.map(t=>'?'+t).join(' ')} {
       }
     },
     //#endregion
-    
-    //#region Fuzzy answer
-    fetchFuzzyAnswer: async function(fqdata) {
-      //Check if both atitle & qdesc(long enough?) present, then go with desc mode, otherwise fuzzy mode
-      if (fqdata.answer >= 0) {
-        const qdesc = await this.sparqlGetDescription(fqdata.q_id, this.qlang)
-        if (!!qdesc && 10/qdesc.length*Math.random()<0.5) {
-          this.unpackRespData(fqdata)
-          this.q_title = ''
-          this.q_desc = qdesc
-          return true
-        } else {
-          fqdata.choices.splice(fqdata.answer, 1)
-        }
+
+    //#region Wikidata Question description (mode_1)
+    fetchQuestionDescription: async function(fqdata) {
+      const qdesc = await this.sparqlGetDescription(fqdata.q_id, this.qlang)
+      if (!!qdesc) {
+        this.unpackRespData(fqdata)
+        this.q_title = ''
+        this.q_desc = qdesc
+        return true
       }
+      return false
+    },
+    sparqlGetDescription: async function(item, lang) {
+      const sparqlQuery = `
+SELECT ?desc WHERE {
+  wd:Q${item} schema:description ?desc.
+  FILTER ( lang(?desc) = "${lang}" )
+}`
+      try {
+        const timeLimit = 2000
+        const resp = await this.fulfillWithTimeLimit(fetch(`https://query.wikidata.org/sparql?query=${sparqlQuery}`, {
+          headers: { 'Accept': 'application/json' },
+        }), timeLimit, null)
+        if (!resp)  {
+          isFuzzy = true
+          throw 'wikidata query timeout ' + timeLimit
+        }
+        const data = await resp.json()
+        const b = data.results.bindings
+        return b[0] ? b[0].desc.value : null
+      } catch (error) {
+        console.error('sparqlGetDescription', item, lang, err)
+      }
+    },
+    //#endregion
+
+    //#region Wikidata Fuzzy answer (mode_2)
+    fetchFuzzyAnswer: async function(fqdata) {
       const ans = await this.queryFuzzyAnswer(fqdata.q_id, this.transLangCode(this.alang))
       if (!ans.aid || !ans.atitle) {
         return false
+      }
+      if (fqdata.answer >= 0) {
+        //knock off exsiting answer (why keep this vestige? because DRY on client mode 1&2 use same method)
+        fqdata.choices.splice(fqdata.answer, 1)
       }
       this.unpackRespData(fqdata)
       const capitalize = (s) => s.charAt(0).toUpperCase()+s.substring(1)
@@ -596,12 +675,12 @@ UNION
 ORDER BY UUID() 
 LIMIT 3`
 //NOTE: Because the `?` after upscope P31, directchild is also possible, so sim actually means children and their uncles
-// exclude classes of concept, term, blanket terminology, technical term
+// exclude classes of concept, term, blanket terminology, technical term, Wikimedia list article, Wikidata metaclass
 :`SELECT DISTINCT ?sim ?simLabelA 
 WHERE
 {
     wd:Q${item} ${upscope} ?class.
-    FILTER (?class not in (wd:Q151885, wd:Q1969448, wd:Q4925178, wd:Q12812139))
+    FILTER (?class not in (wd:Q151885, wd:Q1969448, wd:Q4925178, wd:Q12812139, wd:Q13406463, wd:Q19361238))
     ?sim ${downscope} ?class .
     ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
 }
@@ -629,23 +708,6 @@ LIMIT 3`
         console.error('sparqlGetSiblings', item, lang, err)
       } finally {
         return { aid, atitle, isFuzzy }
-      }
-    },
-    sparqlGetDescription: async function(item, lang) {
-      const sparqlQuery = `
-SELECT ?desc WHERE {
-  wd:Q${item} schema:description ?desc.
-  FILTER ( lang(?desc) = "${lang}" )
-}`
-      try {
-        const resp = await fetch(`https://query.wikidata.org/sparql?query=${sparqlQuery}`, {
-          headers: { 'Accept': 'application/json' },
-        })
-        const data = await resp.json()
-        const b = data.results.bindings
-        return b[0] ? b[0].desc.value : null
-      } catch (error) {
-        console.error('sparqlGetDescription', item, lang, err)
       }
     },
     //#endregion
@@ -875,12 +937,16 @@ SELECT ?desc WHERE {
     toggleDisplayScoreChart: function() {
       this.displayScoreChart = !this.displayScoreChart
     },
+
+    toggleDisplayTitleLeximap: function() {
+      this.displayTitleLeximap = !this.displayTitleLeximap
+    },
     //#endregion Menu interactions
 
     //#region Utils
     getCookieValue: function(name) {
       const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
-      return m ? m.pop()||'' : '4'
+      return m ? m.pop()||'' : '7'
     },
     toMajorLang: function(lang, isSpeaking) {
       const MAJOR_LANG = {

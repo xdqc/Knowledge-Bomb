@@ -217,6 +217,7 @@
                 </b-form-select>
               </div>
             </b-form-group>
+            <b-row v-show="!quizStarted&&qlang&&alang"><b-col><b-btn variant="outline-light" class="language-options-switcher p-0 border-0" @click="[alang,qlang]=[qlang,alang]">🔃</b-btn></b-col></b-row>
             <b-form-group
               v-show="!quizStarted"
               horizontal label-cols-sm="5" label-cols-md="4"
@@ -293,14 +294,27 @@
   
           <section role="progressbar">
             <b-row class="flex my-2" v-if="quizStarted">
-              <b-progress class="d-inline-flex col col-9 col-sm-10 col-lg-11 p-0" :max="levelMaxCap+10" height="2rem" striped :animated="progressAnimate">
+              <b-col class="flex px-0">
+              <b-btn class="m-0 p-0 border-0" variant="outline-light" @click="toggleDisplayTitleLeximap">🗺</b-btn>
+              <b-progress class="d-inline-flex game-progress" :max="levelMaxCap+10" height="2rem" striped :animated="progressAnimate">
                 <b-progress-bar class="bg-steel-blue" style="animation-direction: reverse;"
                   :value="lvl+10"
                   :label="`Lv. ${lvl} ✔${quizCorrect}/${quizPlayed}`">
                 </b-progress-bar>
               </b-progress>
-              <b-col class="col-3 col-sm-2 col-lg-1 pr-0">
-                <b-btn class="w-100 bd-steel-blue bg-steel-blue-hover py-1" variant="outline-primary"  v-on:click="endGame">End</b-btn>
+              <b-btn class="bd-steel-blue bg-steel-blue-hover mr-1 py-1 float-right" variant="outline-primary" @click="endGame">End</b-btn>
+              </b-col>
+            </b-row>
+
+            <b-row v-if="displayTitleLeximap&&q_id>0">
+              <b-col class="title-leximap">
+                <a v-for="(l,i) in titleLeximap" :key="i" 
+                  variant="outline-light" size="sm"
+                  :style="`top:${l.coord_y-130}px;left:${l.coord_x*Math.max(1,windowWidth/1440)-70}px;color:${l.code==qlang?'var(--blue)':l.code==alang?'var(--green)':'var(--japanese-indigo)'};`"
+                  :href="`https://${l.code}.wikipedia.org/wiki/${l.text}`" target="_blank"
+                  :title="`${l.text} - ${l.lang}`">
+                  {{ l.text.replace(/ *\([^)]*\) */g, '') }}
+                </a>
               </b-col>
             </b-row>
           </section>
