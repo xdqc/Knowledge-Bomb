@@ -287,14 +287,15 @@ var Wikiquote = function (lang) {
       error(msg)
     }
 
-    // chooseQuote with length between (8,100)
+    // chooseQuote with length between (6,120)
     var chooseQuote = function (quotes) {
       quotes.quotes = quotes.quotes
         .map(q => q.trim())
-        .filter(q => q.length > 8 && q.length < 100 &&
-        !/^([\-—–:]| —|\(|\d|as |quote[ds-] at|Encyclopedic article|Wik[ic]|см)/.test(q) &&
-        !/:$/.test(q) &&
-        !/\d{3,4}/g.test(q))
+        .filter(q => q.length > 6 && q.length < 120 &&
+          !/^([\-—–:]| —|\(|\.|\d|as |quote[ds-] at|Encyclopedic article|Wik[ic]|см)/.test(q) &&
+          !/:$/.test(q) &&
+          !q.toLowerCase().includes(quotes.titles.toLowerCase()) &&
+          !/\d{3,4}/g.test(q))
       var randomNum = Math.floor(Math.random() * quotes.quotes.length)
       success({ titles: quotes.titles, quote: quotes.quotes[randomNum] })
     }

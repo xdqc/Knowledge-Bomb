@@ -5,35 +5,24 @@ A "random wiki roamer" minigame, a "vocabulary test" tool, a "quiz generator" vi
 
 ## Data mining from Wikipedia
 
-
-### 2D Language picker based on lexical distance map
+### 2D Language picker
 
 The 🗺 [2D language picker](docs/lexi_map.PNG) keeps the constant position of each language no matter showing in which language setting. It solves the problem of one dimentional language pickers (re)ordering languages alphabetically (even non alphabetical writing system) on various positions that hard to find: **A**leman, **I**naleman, **L**ialémani, **B**ich'ahii, **C**eruman, **D**uits, **E**leman, **F**rangikos, **G**erman,  **J**erman, **K**rzyżacki, **M**jymjecko, **Н**емецкий, **N**émet, **O**lmon, **P**reisen, **R**ajch, **S**aksa, **𐌸**𐌹𐌿𐌳𐌹𐍃𐌺𐌰𐍂𐌰𐌶𐌳𐌰, **Þ**ýska, **T**ysk, **U**budage, **V**ācu, **W**eimar, **Y**oeraman, **Z**ėm, **独**逸, **德**意志, etc.
 
-This lexical distance map also availble in game as a cheatsheet... (hit top menubar ⌨ for hotkeys)
-
 [![a](docs/lexi_map_brain.PNG)](docs/lexi_map.PNG)
 
-Design principles:
+Design considerations:
 
   1. Easy to pick - align to grid
-  2. Based on lexical distance - Afrikaans, ייִדיש are placed at West Germanic of Indo-European
-  5. Major languages on top or bottom of their blobs that quick to be found
-  3. Respect relative geolocation and culture similarity within blob
-  6. Extinct languages next to major languages - Classical Chinese, Sanskrit, Aramaic, Latin, Gothic, Ænglisc
-  4. Isolated languages look isolated - Basque, Greek, Albanian, Armenian, Chuvash, etc.
+  2. Language family together - Afrikaans, ייִדיש are placed at West Germanic blob
+  3. Respect relative geolocation and culture similarity
+  4. Major languages on top or bottom of their blobs that quick to be found
+  5. Extinct languages next to major languages - Classical Chinese, Aramaic, Sanskrit, Latin, Gothic, Ænglisc
+  6. Isolated languages look isolated - Basque, Greek, Albanian, Armenian, Chuvash, etc.
   7. Screen real estate - no overlapping in most languages on 1300px minimum width
   8. Background image is only for decoration
 
-
-### Qualified Wikidata items
-
-A qualified article ([examples](data/sample_titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these criteria:
-
-- With more than *20* languages versions.
-- Not a Onomatology (Anthroponymy, Taxon, Toponomastics, Hydronym, etc.), which is not a particular person, place, biota, event, chemical, astronomical object, company, product, publication, team, sport match, song, year, decade, day, unicode, etc.
-- Can be Hypernym of (`instance_of?/subclass_of*`) items above.
-- Not a disambiguation page.
+This lexical distance map 🗺 in also availble in game as a cheatsheet (hit top menubar ⌨ for hotkeys).
 
 ### Hypernym Hierarchy
 
@@ -180,13 +169,14 @@ Node          Path
 
 
 
-### List of languages ranking table
+### List of Wikipedia - Languages ranking table
 
 Ranking is based on numbers of [qualified Wikidata items](#Qualified-Wikidata-items) per language.
+(*wonder where's the swedish cebuano?*)
 
   - **`Q60`** is the number of qualified wikipedia articles with more than *60* language versions, so as `Q50` `Q40` `Q30` `Q20`.
-  - **`WSM`**, weighted sum model, is square root of sum of squares of language_versions_count of qualified articles of the language.
-  - **`Coverage%`** is the language WSM to English WSM ratio.
+  - **`WSM`**, weighted sum model, is the square root of sum of squares of language_versions_count of all qualified articles of the language.
+  - **`Coverage%`**<sup>[‡](#notes)</sup> is the language WSM to English WSM ratio<sup>[†](#notes)</sup>
   - **`Articles`** is total [number of Wikipedia articles by language](https://meta.wikimedia.org/wiki/List_of_Wikipedias).
   - **`Solidness%`** is WSM to article ratio, using simple_english as 100% benchmark. Higher solidness means less proportion of trivial articles of that language.
   - **`Speakers`** is L1+L2 speakers of the language in thousand (source: wikipedia of each language).
@@ -513,3 +503,19 @@ Ranking is based on numbers of [qualified Wikidata items](#Qualified-Wikidata-it
 | 318 | Choctaw | Choctaw | cho | 0.15% | 4 | 4 | 6 | 6 | 6 | 354.83 | 6 | 6,666.41% |      |
 | 319 | Hiri Motu | Hiri Motu | ho | 0.08% | 1 | 1 | 1 | 1 | 1 | 249.00 | 3 | 6,565.70% |      |
 | 320 | Ebon | Marshallese | mh | 0.05% | 2 | 3 | 3 | 3 | 3 | 205.17 | 4 | 3,343.21% |      |
+
+##### Notes
+† Supposing English (the language this document is written in) covers all Q20+ non-onomatologies, which is not far from the truth.
+
+‡ By comparing coverage, we may identify relative blind spots in certain languages (clusters). For instance, East Slavics are lack of words to describe sugarcane or athlete's foot; Altaic and Turkish languages are unknowing to concubinage; Chinese are yet illiterate about some concepts aware among Japanese, Koreans and Vietnamese. 
+
+
+### Qualified Wikidata items
+
+A qualified article ([examples](data/sample_titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these criteria:
+
+- With more than *20* languages versions.
+- Not an onomatology (anthroponymy, toponymy, hydronym, taxon etc.), which is not a particular person, place, biota, event, chemical, astronomical object, company, product, publication, team, sport match, song, year, decade, day, unicode, etc. However, a handful of common names of animals/plants/stars observed in ancient times are allowed.
+- Can be Hypernym of items above (any level of parents of `instance_of?/subclass_of*` item). Hypernyms can have less than 20 languages versions, as small quantity of abstract philosophical terms backboning the semantic tree.
+- Not a disambiguation item.
+- Last but not least, every qualified item/articles should have gone through proof reading for quality check.

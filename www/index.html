@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="A 'random wiki roamer' minigame, a 'vocabulary test' tool, a 'quiz generator' vis-à-vis Wikipedia in numerous knowledge domains, available 300+ languages🌍🌏🌎" />
+    <meta name="description" content="A 'random wiki roamer' minigame, a 'vocabulary test' tool, a 'quiz generator' vis-à-vis Wikipedia in numerous knowledge domains, available in 300+ languages🌍🌏🌎" />
     <meta name="keywords" content="wikipedia, wikidata, wikiquote, quiz, language, vocabulary">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>Knowledge Bomb 🌍🌏🌎 - KnB.wiki</title>
@@ -283,7 +283,7 @@
           <section role="doc-pullquote">
             <b-row v-show="displayTopQuote" class="justify-content-center" :class="{'mb-4': !quizStarted}"
               @click="fetchLeadQuote([q_title_en,choices[answer],qHypernymTexts[0],qHypernymTexts[1]], quizStarted)">
-              <b-col class="flex col-sm-11 col-md-10 col-lg-9 col-xl-8 animated-border-quote">
+              <b-col class="flex animated-border-quote" :class="quizStarted?'col-sm-11 col-md-10 col-lg-9 col-xl-8 ':'col-sm-11 col-md-8 col-lg-6 col-xl-5'">
                 <blockquote>
                   <p @mouseover="speakQuote" id="quote-quote">{{ quoteQuote }}</p>
                   <cite id="quote-title">{{ quoteTitle }}</cite>
@@ -310,7 +310,7 @@
               <b-col class="title-leximap">
                 <a v-for="(l,i) in titleLeximap" :key="i" 
                   variant="outline-light" size="sm"
-                  :style="`top:${l.coord_y-130}px;left:${l.coord_x*Math.max(1,windowWidth/1440)-70}px;color:${l.code==qlang?'var(--blue)':l.code==alang?'var(--green)':'var(--japanese-indigo)'};`"
+                  :style="`top:${l.coord_y-140}px;left:${l.coord_x*leximapXfactor-90}px;color:${l.code==qlang?'var(--blue)':l.code==alang?'var(--green)':'var(--japanese-indigo)'};`"
                   :href="`https://${l.code}.wikipedia.org/wiki/${l.text}`" target="_blank"
                   :title="`${l.text} - ${l.lang}`">
                   {{ l.text.replace(/ *\([^)]*\) */g, '') }}
@@ -319,10 +319,10 @@
             </b-row>
           </section>
   
-          <section role="application" class="justify-content-center">
-            <b-row v-if="quizStarted" >
+          <section role="application">
+            <b-row v-if="quizStarted" class="justify-content-center">
               <b-col class="title-box px-0" 
-                sm="12" :md="Math.max(10,difficultyIndex)" :lg="Math.max(8,difficultyIndex)" :xl="Math.max(6,difficultyIndex)"
+                sm="12" :md="Math.max(10,difficultyIndex+2)" :lg="Math.max(8,difficultyIndex+1)" :xl="Math.max(6,difficultyIndex)"
                 @touchstart="touchStart($event)"
                 @touchend="touchEnd($event)"
                 @click="toggleDisplayTitleImg"
@@ -339,8 +339,8 @@
               </b-col>
             </b-row>
 
-            <b-row>
-              <b-col sm="12" :md="Math.max(7,difficultyIndex+2)" :lg="Math.max(5,difficultyIndex+2)" :xl="Math.max(4,difficultyIndex+2)" class="choices p-0">
+            <b-row class="justify-content-center">
+              <b-col sm="12" :md="Math.max(10,difficultyIndex+2)" :lg="Math.max(8,difficultyIndex+1)" :xl="Math.max(6,difficultyIndex)" class="choices p-0">
                 <b-button secondary
                 v-for="(choice,index) in choices" :key="index"
                   :style="`height: ${choiceHeight}px; font-size: ${choiceFontSize}px`"

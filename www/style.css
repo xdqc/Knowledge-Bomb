@@ -89,14 +89,15 @@ h1 {
   border-color: transparent;
 }
 .btn-outline-light:hover {
-  border-style: dotted;
-  border-color: var(--jelly-bean-blue);
+  border-color: var(--light-wiki-blue);
 }
 .btn-outline:hover {
-  border-style: dotted;
-  border-color: var(--jelly-bean-blue);
+  /* border-color: var(--jelly-bean-blue);
   box-shadow: 0 0.5rem 0.5rem -0.4rem var(--half-jpn-indigo);
-  transform: translateY(-0.2rem);
+  transform: translateY(-0.2rem); */
+  outline: 0;
+  border-color: var(--light-wiki-blue);
+  box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%); 
  }
 .btn-outline.disabled:hover {
   background-color: var(--body-background);
@@ -115,15 +116,19 @@ a.title-link {
   text-decoration: none;
 }
 button.dropdown-toggle {
-  border-color: #ced4da;
-  box-shadow: 0 0.2rem 0.2rem -0.3rem var(--japanese-indigo);
+  border-color: #ced4da8f;
+  border-radius: 2rem;
 }
-button.dropdown-toggle:active {
-  border-color: #ced4da;
+.dropdown-lang.show button.dropdown-toggle {
+  border-color: var(--light-wiki-blue);
+}
+button.dropdown-toggle:hover {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
 }
 button.dropdown-toggle:focus {
-  border-color: #ced4da;
-  box-shadow: 0 0.2rem 0.2rem -0.3rem var(--japanese-indigo);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
 }
 .dropdown-lang .dropdown-menu {
   position: fixed!important;
@@ -160,10 +165,6 @@ button.dropdown-toggle:focus {
   box-shadow: 0 0.2rem 0.2rem -0.15rem var(--half-jpn-indigo);
   z-index: 100;
 }
-.dropdown-lang.show .dropdown-toggle {
-  border-style: dotted;
-  border-color: var(--jelly-bean-blue);
-}
 .language-options-switcher {
   position: absolute;
   right: -20px;
@@ -172,13 +173,20 @@ button.dropdown-toggle:focus {
 }
 .title-leximap {
   position: absolute;
-  left: 10px;
-  min-height: 680px;
+  left: 0;
+  min-height: 660px;
   background-color: white;
   opacity: 0.99;
   z-index: 1;
   overflow: auto;
+  cursor: move;
+  cursor: grab;
+  cursor: -webkit-grab;
   -webkit-overflow-scrolling: touch;
+}
+.title-leximap.grabbing{
+  cursor: grabbing; 
+  cursor: -webkit-grabbing;
 }
 .title-leximap a {
   position: absolute;
@@ -285,7 +293,7 @@ button.dropdown-toggle:focus {
     column-count: 1;
   }
   .language-options-switcher {
-    right: 15px;
+    right: 0;
     top: 0;
   }
 }

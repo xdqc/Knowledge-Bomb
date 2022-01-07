@@ -52,7 +52,8 @@ new Vue({
       {value:24, icon:'2️⃣4️⃣', tooltip:'Mephistophelian', keymap:{}},
       {value:36, icon:'3️⃣6️⃣', tooltip:'Diabolical', keymap:{}},
       {value:54, icon:'5️⃣4️⃣', tooltip:'Maelstrom', keymap:{}},
-    ]
+    ],
+    leximapXWheelFactor: 1,
   },
   mounted: function() {
     ;((saveState) => {
@@ -82,7 +83,7 @@ new Vue({
           coord_y: d.coord_y,
         }))
         // show leximap on large screen
-        if (this.windowWidth>1200 && this.windowHeight>950) {
+        if (this.windowWidth>1200 && this.windowHeight>950 && saveState.length<3) {
           document.querySelector('.dropdown-lang .dropdown-toggle').click()
         }
       })
@@ -158,15 +159,7 @@ new Vue({
       return this.alangOpt.label_s || this.alang_options[0].label_s
     },
     labelPageTitle() {
-      if (this.quizStarted) return ''
-      return this.alangOpt.label_t || this.alang_options[0].label_t
-    },
-    match_mode_options() {
-      return [
-        { text: `🙂 ${this.alangOpt.label_m0 || this.alang_options[0].label_m0 || ''} ${this.qlangOpt.text}`, value: 0 },
-        { text: `🧐 ${this.alangOpt.label_m1 || this.alang_options[0].label_m1 || ''} ${this.qlangOpt.text}`, value: 1 },
-        { text: `😎 ${this.alangOpt.label_m2 || this.alang_options[0].label_m2 || ''} ${this.qlangOpt.text}`, value: 2 },
-      ]
+      return this.quizStarted ? '' : this.alangOpt.label_t || this.alang_options[0].label_t
     },
     difficultyIndex() {
       return this.difficulties.findIndex(d => d.value == this.difficulty)+1
@@ -196,6 +189,12 @@ new Vue({
       if (hypernym) return hypernym.texts
       else return [null,null,null]
     },
+    leximapXfactor() {
+      return Math.max(1440/this.windowWidth, this.leximapXWheelFactor) * this.windowWidth/1440;
+    },
+    showBottomAlert() {
+      return !this.getCookieValue('lang')
+    },
     choiceHeight() {
       this.windowWidth
       let row = document.getElementsByClassName('choices')[0]
@@ -209,13 +208,17 @@ new Vue({
       return Math.ceil(width / 10 / Math.sqrt(this.difficulty) * (1+(Math.sqrt(this.difficulty)-1)/12))
     },
     titleDescFontSize() {
-      this.windowWidth && this.qText
       const container = document.querySelector('.title-box')
+      const width = container ? container.clientWidth : Math.min(800, this.windowWidth)
       const scale = /[a-zа-яα-ω]{3,}/ig.test(this.q_desc) && this.q_desc.length < 60 ? 2.4 : 1.6
-      return container ? container.clientWidth / Math.max(12, Math.min(18, this.q_desc.length-2)) * scale : 70
+      return width / Math.max(12, Math.min(18, this.q_desc.length-2)) * scale
     },
-    showBottomAlert() {
-      return !this.getCookieValue('lang')
+    match_mode_options() {
+      return [
+        { text: `🙂 ${this.alangOpt.label_m0 || this.alang_options[0].label_m0 || ''} ${this.qlangOpt.text}`, value: 0 },
+        { text: `🧐 ${this.alangOpt.label_m1 || this.alang_options[0].label_m1 || ''} ${this.qlangOpt.text}`, value: 1 },
+        { text: `😎 ${this.alangOpt.label_m2 || this.alang_options[0].label_m2 || ''} ${this.qlangOpt.text}`, value: 2 },
+      ]
     },
     showDifficulties() {
       return this.difficulties
@@ -227,12 +230,12 @@ new Vue({
             dd.icon = '️??'
             dd.tooltip = 'Reach all levels in the previous difficulty to unlock'
           }
-          // if (i===0 && this.difficultyLvl<=this.difficulties.length-0) {
-          //   dd.disabled = true
-          //   dd.icon = '??'
-          //   dd.hide = this.difficultyLvl<this.difficulties.length
-          //   dd.tooltip = `Finish the last difficulty to unlock`
-          // }
+          if (i===0 && this.difficultyLvl<=this.difficulties.length-0) {
+            dd.disabled = true
+            dd.icon = '??'
+            dd.hide = this.difficultyLvl<this.difficulties.length
+            dd.tooltip = `Finish the last difficulty to unlock`
+          }
           return dd 
         })
         .sort((a,b) => a.value-b.value)
@@ -348,7 +351,7 @@ SELECT (lang(?label) as ?lang) ?label WHERE {
         }
       }
       return []
-    }
+    },
   },
   methods: {
     //#region Game Actions
@@ -357,6 +360,7 @@ SELECT (lang(?label) as ?lang) ?label WHERE {
       this.score = -1
       this.startBtnDisabled = true
       this.displayScoreChart = false
+      this.displayTitleLeximap = false
       this.newGame()
     },
 
@@ -740,7 +744,7 @@ LIMIT 3`
       if (this.windowWidth <= 576) {
         document.getElementById('btn-toggle-quote').click()
       }
-      document.getElementById('page-header').classList.add('py-0','mb-0')
+      document.getElementById('page-header').classList.add('py-0','mb-2')
     },
     gameOverAction: function(score) {
       this.score = score
@@ -751,7 +755,7 @@ LIMIT 3`
       this.q_title = ''
       this.q_title_en = ''
       this.q_hypernym = ''
-      document.getElementById('page-header').classList.remove('py-0', 'mb-0')
+      document.getElementById('page-header').classList.remove('py-0', 'mb-2')
       this.displayTopQuote = true
 
       // recalculate available difficulties
@@ -779,17 +783,6 @@ LIMIT 3`
       }, [])
     },
     //#endregion Game Scores
-
-    //#region Language picker
-    onClickLeximapBtnAlang: function(e, lexi) {
-      this.alang = lexi.value
-      e.target.parentElement.previousSibling.click()
-    },
-    onClickLeximapBtnQlang: function(e, lexi) {
-      this.qlang = lexi.value
-      e.target.parentElement.previousSibling.click()
-    },
-    //#endregion Language picker
 
     //#region Question Title interactions
     speakTitle: function(e,i) {
@@ -920,7 +913,7 @@ LIMIT 3`
       this.displayHypernymTree || this.sortHypernymList()
     },
     //#endregion Hypernym options
-
+    
     //#region Menu interactions
     toggleDisplayQuote: function() {
       this.displayTopQuote = !this.displayTopQuote
@@ -937,11 +930,76 @@ LIMIT 3`
     toggleDisplayScoreChart: function() {
       this.displayScoreChart = !this.displayScoreChart
     },
+    //#endregion Menu interactions
+
+
+    //#region Language picker
+    onClickLeximapBtnAlang: function(e, lexi) {
+      this.alang = lexi.value
+      e.target.parentElement.previousSibling.click()
+    },
+    onClickLeximapBtnQlang: function(e, lexi) {
+      this.qlang = lexi.value
+      e.target.parentElement.previousSibling.click()
+    },
+    onShowLeximapQlang: function(e) {
+      console(e.target, e.target.nextElementSibling)
+      this.leximapDragToScroll(null, e.target.nextElementSibling)
+    },
 
     toggleDisplayTitleLeximap: function() {
       this.displayTitleLeximap = !this.displayTitleLeximap
+      if (this.displayTitleLeximap) {
+        this.leximapDragToScroll('.title-leximap')
+      }
     },
-    //#endregion Menu interactions
+
+    leximapDragToScroll: function(containerClass, containerElem) {      
+      this.leximapXWheelFactor = 1
+      let pos = { left:0, top:0, x:0, y:0 }
+      const leximapWheelScrollHandler = (e) => {
+        e.preventDefault()
+        this.leximapXWheelFactor = Math.max(1440/this.windowWidth, this.leximapXWheelFactor * Math.exp(e.wheelDelta/(1200*this.leximapXWheelFactor)))
+      }
+      const leximapMouseMoveHandler = (e) => {
+        e.preventDefault()
+        // How far the mouse has been moved
+        const dx = e.clientX - pos.x;
+        const dy = e.clientY - pos.y;
+        // Scroll the element
+        e.target.scrollTop = pos.top - dy;
+        e.target.scrollLeft = pos.left - dx;
+      }
+      const leximapMouseUpHandler = (e) => {
+        e.preventDefault()
+        e.target.classList.remove('grabbing')
+        e.target.removeEventListener('mousemove', leximapMouseMoveHandler)
+        e.target.removeEventListener('mouseup', leximapMouseUpHandler)
+      }
+      const leximapMouseDownHandler = (e) => {
+        e.preventDefault()
+        e.target.classList.add('grabbing')
+        pos = {
+          left: e.target.scrollLeft,
+          top: e.target.scrollTop,
+          x: e.clientX,
+          y: e.clientY,
+        }
+        e.target.addEventListener('mousemove', leximapMouseMoveHandler)
+        e.target.addEventListener('mouseup', leximapMouseUpHandler)
+      }
+      let checkExist = setInterval(() => {
+        const container = containerClass ? document.querySelector(containerClass) : containerElem
+        if (container) {
+          clearInterval(checkExist)
+          container.scrollLeft = 50;
+          container.addEventListener('wheel', leximapWheelScrollHandler, {passive: false})
+          container.addEventListener('mousedown', leximapMouseDownHandler)
+          // container.addEventListener('mouseup', leximapMouseUpHandler)
+        }
+      }, 1);
+    },
+    //#endregion Language picker
 
     //#region Utils
     getCookieValue: function(name) {
@@ -968,13 +1026,13 @@ LIMIT 3`
         MAJOR_LANG.ru.push('uk', 'bg', 'sr')
         MAJOR_LANG.pl = ['cs', 'sk', 'sl', 'hr', 'bs']
         MAJOR_LANG.zh = []
-        MAJOR_LANG['zh-CN'] = ['zh', 'wuu', 'gan', 'zh-classical']
-        MAJOR_LANG['zh-HK'] = ['zh-yue', 'hak']
-        MAJOR_LANG['zh-TW'] = ['zh-min-nan', 'cdo']
         const voiceLangs = new Set(speechSynthesis.getVoices().map(v => v.lang.slice(0,2)))
         for (let k of Object.keys(MAJOR_LANG)){
           MAJOR_LANG[k] = MAJOR_LANG[k].filter(l => !voiceLangs.has(l))
         } 
+        MAJOR_LANG['zh-CN'] = ['zh', 'wuu', 'gan', 'zh-classical']
+        MAJOR_LANG['zh-HK'] = ['zh-yue', 'hak']
+        MAJOR_LANG['zh-TW'] = ['zh-min-nan', 'cdo']
       }
       for (let e of Object.entries(MAJOR_LANG)){
         if (e[1].indexOf(lang) >= 0) return e[0]

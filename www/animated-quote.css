@@ -19,11 +19,11 @@
   opacity: 0.5;
   position: absolute;
   right: 0;
-  top: -100%;
-  height: 250%;
+  top: 5%;
+  height: 125%;
 }
 .animated-border-quote blockquote:after {
-  animation: counter 37s infinite cubic-bezier(0.11, 1.4, 0.56, -0.33);
+  animation: counter 47s infinite cubic-bezier(0.11, 1.4, 0.56, -0.33);
   background-color: #fff;
   bottom: 10%;
   content: "";
