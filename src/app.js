@@ -424,8 +424,8 @@ SELECT (lang(?label) as ?lang) ?label WHERE {
       }
     },
 
-    //Match mode 1&2 rely on client to fetch wikidata question desc and fuzzy answer respectively;
-    //recursively request server for another qid to retry, in case client cannot fulfill
+    // Match_mode 1&2 rely on client to fetch wikidata question desc and fuzzy answer respectively;
+    // in case client cannot fulfill, request server for another qid to retry recursively.
     selectChoice: async function(e, index, depth=0) {
       if (depth >= 30/this.match_mode) {
         this.endGame()
@@ -492,7 +492,9 @@ SELECT (lang(?label) as ?lang) ?label WHERE {
             e.target.classList.remove('btn-success')
             e.target.classList.remove('btn-danger')
           }
-          e.target.blur() // Desktop browser: remove focus on anchor; TODO: blur on iOS safari
+          // Desktop browser: remove focus on anchor
+          // TODO: blur on iOS safari
+          e.target.blur()
           e.handled = true
         }
       }
@@ -539,10 +541,6 @@ SELECT ?desc WHERE {
       const ans = await this.queryFuzzyAnswer(fqdata.q_id, this.transLangCode(this.alang))
       if (!ans.aid || !ans.atitle) {
         return false
-      }
-      if (fqdata.answer >= 0) {
-        //knock off exsiting answer (why keep this vestige? because DRY on client mode 1&2 use same method)
-        fqdata.choices.splice(fqdata.answer, 1)
       }
       this.unpackRespData(fqdata)
       const capitalize = (s) => s.charAt(0).toUpperCase()+s.substring(1)
@@ -650,8 +648,8 @@ UNION
   SELECT DISTINCT
   ?sim ?simLabelA 
     WHERE {
-    wd:Q${item} wdt:P1269 ?facet .
-    ?sim wdt:P1269? ?facet .
+    wd:Q${item} wdt:P1269 ?face_duo .
+    ?sim wdt:P1269? ?face_duo .
     ?sim rdfs:label ?simLabelA filter (lang(?simLabelA) = '${lang}').
     }
 }
@@ -757,7 +755,6 @@ LIMIT 3`
       this.q_hypernym = ''
       document.getElementById('page-header').classList.remove('py-0', 'mb-2')
       this.displayTopQuote = true
-
       // recalculate available difficulties
       if (this.difficultyLvl === this.difficultyIndex 
         && this.score > 0
@@ -769,6 +766,33 @@ LIMIT 3`
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({difficultyLvl: this.difficultyLvl})
       })
+    },
+
+    fulfillWithTimeLimit: async function(task, timeLimit, failureValue){
+      let timeout
+      const timeoutPromise = new Promise((resolve, reject) => {
+        timeout = setTimeout(() => {
+          resolve(failureValue)
+        }, timeLimit)
+      })
+      const response = await Promise.race([task, timeoutPromise])
+      if (timeout) {
+        clearTimeout(timeout)
+      }
+      return response
+    },
+    fulfillWaitUntil: async function(task, timeUntil, rejectReason){
+      let timeout
+      const timeoutPromise = new Promise((resolve, reject) => {
+        timeout = setTimeout(() => {
+          reject(rejectReason)
+        }, timeUntil)
+      })
+      const responses = await Promise.allSettled([task, timeoutPromise])
+      if (timeout) {
+        clearTimeout(timeout)
+      }
+      return responses
     },
     //#endregion
 
@@ -786,11 +810,11 @@ LIMIT 3`
 
     //#region Question Title interactions
     speakTitle: function(e,i) {
-      let text = i >=0 ? this.choices[i] : this.qText
       let lang = i >=0 ? this.alang : this.qlang
       lang = this.toMajorLang(lang, true)
-      let langVoices = this.getSpeechSynthesisVoices(lang)
-      let sp = new SpeechSynthesisUtterance(text)
+      const text = i >=0 ? this.choices[i] : this.qText
+      const sp = new SpeechSynthesisUtterance(text)
+      const langVoices = this.getSpeechSynthesisVoices(lang)
       sp.voice = langVoices[Math.floor(Math.random()*langVoices.length)]
       speechSynthesis.cancel()
       speechSynthesis.speak(sp)
@@ -803,10 +827,10 @@ LIMIT 3`
         that.speakTitle(e,i)
       }, 400)
       this.touchTimerLong = setTimeout(()=> {
-        let title = this.choices[i] || this.qText
-        let lang = this.choices[i] ? this.alang : this.qlang
+        const title = this.choices[i] || this.qText
+        const lang = this.choices[i] ? this.alang : this.qlang
         window.open(`https://${lang}.wikipedia.org/wiki/${title}`, '_blank')
-      }, 2000)
+      }, 2400)
     },
     touchEnd: function(e) {
       clearTimeout(this.touchTimer)
@@ -932,8 +956,7 @@ LIMIT 3`
     },
     //#endregion Menu interactions
 
-
-    //#region Language picker
+    //#region Lexical map
     onClickLeximapBtnAlang: function(e, lexi) {
       this.alang = lexi.value
       e.target.parentElement.previousSibling.click()
@@ -963,12 +986,8 @@ LIMIT 3`
       }
       const leximapMouseMoveHandler = (e) => {
         e.preventDefault()
-        // How far the mouse has been moved
-        const dx = e.clientX - pos.x;
-        const dy = e.clientY - pos.y;
-        // Scroll the element
-        e.target.scrollTop = pos.top - dy;
-        e.target.scrollLeft = pos.left - dx;
+        e.target.scrollLeft = pos.left + pos.x - e.clientX;
+        e.target.scrollTop = pos.top + pos.y - e.clientY;
       }
       const leximapMouseUpHandler = (e) => {
         e.preventDefault()
@@ -992,10 +1011,9 @@ LIMIT 3`
         const container = containerClass ? document.querySelector(containerClass) : containerElem
         if (container) {
           clearInterval(checkExist)
-          container.scrollLeft = 50;
+          container.scrollLeft = 100;
           container.addEventListener('wheel', leximapWheelScrollHandler, {passive: false})
           container.addEventListener('mousedown', leximapMouseDownHandler)
-          // container.addEventListener('mouseup', leximapMouseUpHandler)
         }
       }, 1);
     },
@@ -1004,7 +1022,15 @@ LIMIT 3`
     //#region Utils
     getCookieValue: function(name) {
       const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
-      return m ? m.pop()||'' : '7'
+      return m ? (m.pop()||'') : '7'
+    },
+    getSpeechSynthesisVoices: function(lang) {
+      const sliceLen = lang.startsWith('zh-') ? 5 : 2
+      let langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,sliceLen) == lang)
+      if (langVoices.length == 0) {
+        langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == 'en')
+      }
+      return langVoices
     },
     toMajorLang: function(lang, isSpeaking) {
       const MAJOR_LANG = {
@@ -1039,8 +1065,8 @@ LIMIT 3`
       }
       return lang || 'en'
     },
+    // Resolve diff b/w WMF & IETF
     transLangCode: function(lang) {
-      // resolve diff b/w WMF & IETF
       const TRANS = {
         'be-x-old': 'be-tarask',
         'bh': 'bho',
@@ -1053,46 +1079,12 @@ LIMIT 3`
       }
       return TRANS[lang] || lang
     },
-    getSpeechSynthesisVoices: function(lang) {
-      const sliceLen = lang.startsWith('zh-') ? 5 : 2
-      let langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,sliceLen) == lang)
-      if (langVoices.length == 0) {
-        langVoices = speechSynthesis.getVoices().filter(v => v.lang.slice(0,2) == 'en')
-      }
-      return langVoices
-    },
-    /** Randomize array in-place using Durstenfeld shuffle algorithm */
+    // Randomize array in-place using Durstenfeld shuffle algorithm
     shuffleArray: function(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
         ;[array[i], array[j]] = [array[j], array[i]]
       }
-    },
-    fulfillWithTimeLimit: async function(task, timeLimit, failureValue){
-      let timeout
-      const timeoutPromise = new Promise((resolve, reject) => {
-        timeout = setTimeout(() => {
-          resolve(failureValue)
-        }, timeLimit)
-      })
-      const response = await Promise.race([task, timeoutPromise])
-      if (timeout) {
-        clearTimeout(timeout)
-      }
-      return response
-    },
-    fulfillWaitUntil: async function(task, timeUntil, rejectReason){
-      let timeout
-      const timeoutPromise = new Promise((resolve, reject) => {
-        timeout = setTimeout(() => {
-          reject(rejectReason)
-        }, timeUntil)
-      })
-      const responses = await Promise.allSettled([task, timeoutPromise])
-      if (timeout) {
-        clearTimeout(timeout)
-      }
-      return responses
     },
     //#endregion Utils
   },

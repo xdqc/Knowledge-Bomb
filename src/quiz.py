@@ -86,16 +86,17 @@ class Quiz:
         q_id, q_hypernym, q_title, q_title_en, a_title, a_title_latin = level[0][:6]
         choices = [row[4] for row in level[1:]] # wrong answers
         answer = -1
-        if difficulty == 1 and has_answer:
-            choices = [a_title]
-            answer = 0
-        elif has_answer:
-            choices = Query.get_similar_titles(q_id, a_title_latin, alang, difficulty*2)[1:] + choices
-            choices = list(filter(lambda s: s[-4:]!=a_title[-4:] and s[:5]!=a_title[:5], choices))
-            choices = random.sample(choices, difficulty-1)
-            choices.append(a_title)
-            random.shuffle(choices)
-            answer = choices.index(a_title)
+        if has_answer:
+            if difficulty == 1:
+                choices = [a_title]
+                answer = 0
+            else:
+                choices += Query.get_similar_titles(q_id, a_title_latin, alang, difficulty*2)[1:]
+                choices = [s for s in choices if s[-4:]!=a_title[-4:] and s[:5]!=a_title[:5]]
+                choices = random.sample(choices, difficulty-1)
+                choices.append(a_title)
+                random.shuffle(choices)
+                answer = choices.index(a_title)
         return {
             'lvl': lvl, 
             'q_id': q_id, 

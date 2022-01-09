@@ -1,32 +1,17 @@
 
 # Knowledge Bomb :bomb:
 
-A "random wiki roamer" minigame, a "vocabulary test" tool, a "quiz generator" vis-à-vis Wikipedia, available in 300+ languages 🌍🌏🌎 https://www.knb.wiki
+An alternative to Wikipedia "random article", a vocabulary quiz game, an undercurrent idea generator, available in 300+ languages 🌍🌏🌎 https://www.knb.wiki
 
 ## Data mining from Wikipedia
 
-### 2D Language picker
 
-The 🗺 [2D language picker](docs/lexi_map.PNG) keeps the constant position of each language no matter showing in which language setting. It solves the problem of one dimentional language pickers (re)ordering languages alphabetically (even non alphabetical writing system) on various positions that hard to find: **A**leman, **I**naleman, **L**ialémani, **B**ich'ahii, **C**eruman, **D**uits, **E**leman, **F**rangikos, **G**erman,  **J**erman, **K**rzyżacki, **M**jymjecko, **Н**емецкий, **N**émet, **O**lmon, **P**reisen, **R**ajch, **S**aksa, **𐌸**𐌹𐌿𐌳𐌹𐍃𐌺𐌰𐍂𐌰𐌶𐌳𐌰, **Þ**ýska, **T**ysk, **U**budage, **V**ācu, **W**eimar, **Y**oeraman, **Z**ėm, **独**逸, **德**意志, etc.
-
-[![a](docs/lexi_map_brain.PNG)](docs/lexi_map.PNG)
-
-Design considerations:
-
-  1. Easy to pick - align to grid
-  2. Language family together - Afrikaans, ייִדיש are placed at West Germanic blob
-  3. Respect relative geolocation and culture similarity
-  4. Major languages on top or bottom of their blobs that quick to be found
-  5. Extinct languages next to major languages - Classical Chinese, Aramaic, Sanskrit, Latin, Gothic, Ænglisc
-  6. Isolated languages look isolated - Basque, Greek, Albanian, Armenian, Chuvash, etc.
-  7. Screen real estate - no overlapping in most languages on 1300px minimum width
-  8. Background image is only for decoration
-
-This lexical distance map 🗺 in also availble in game as a cheatsheet (hit top menubar ⌨ for hotkeys).
 
 ### Hypernym Hierarchy
 
-All Wikidata items / Wikipedia articles are categorized in the following buckets. The design principle is to achieve balanced number of items/articles per node for gameplay, classifying as a decision tree, instead of networking as an ontologically precise semantic graph.
+All Wikidata items / Wikipedia articles are categorized in buckets. The design principle is: gameplay first, performance second, academic last; coarsely classifying as a decision tree, instead of networking as an ontologically precise semantic graph. The branches are grown and pruned to achieve balanced number of items/articles per node.
+
+The following 66 top-level trunk hypernyms of controlled vocabulary are exposed to end users to pick during the game by detonating 💣
 
 ```
 Node          Path
@@ -168,8 +153,28 @@ Node          Path
 　　　　　　　　　　　　　　　　└[─](https://en.wiktionary.org/wiki/飲#Definitions)[飲](https://www.wikidata.org/wiki/Q40050)    
 
 
+### 2D Language picker
 
-### List of Wikipedia - Languages ranking table
+The 🗺 [2D language picker](docs/lexi_map.PNG) keeps the constant position of each language no matter choosing which language to display. It solves the problem of one dimentional language pickers (re)ordering certain languages alphabetically at various positions that hard to find, e.g. *Deutsche* - _**A**leman_, _**I**naleman_, _**L**ialémani_, _**B**éésh bichʼahii_, _**C**eruman_, _**D**uits_, _**E**leman_, _**F**rangikos_, _**G**erman_, _**J**erman_, _**K**rzyżacki_, _**M**jymjecko_, _**Н**емецкий_, _**N**émet_, _**O**lmoni_, _**P**reisen_, _**R**ajchski_, _**S**aksa_, _**𐌸**𐌹𐌿𐌳𐌹𐍃𐌺𐌰𐍂𐌰𐌶𐌳𐌰_, _**Þ**ýska_, _**T**ysk_, _**U**budage_, _**V**ācu_, _**W**eimarische_, _**Y**oeraman_, _**Z**ėm_, etc.
+
+[![a](docs/lexi_map_brain.PNG)](docs/lexi_map.PNG)
+
+🗺 is also availble in game as a cheatsheet (hit top menubar ⌨ for hotkeys).
+
+Design considerations:
+
+  1. Easy to pick - align to grid
+  2. Language lineage lead - Afrikaans, ייִדיש are placed at West Germanic blob
+  3. Respect relative geolocation inter- and in- blobs
+  4. Major languages at the top or bottom of blobs that quick to be found
+  5. Extinct languages next to major languages - Classical Chinese, Aramaic, Sanskrit, Latin, Gothic, Ænglisc
+  6. Isolated languages look isolated - Basque, Greek, Albanian, Armenian, Chuvash, etc.
+  7. Screen real estate - no overlapping in most languages on 1300px minimum width
+  8. Background image is only for decoration
+
+
+
+### List of Wikipedias - Languages ranking table
 
 Ranking is based on numbers of [qualified Wikidata items](#Qualified-Wikidata-items) per language.
 (*wonder where's the swedish cebuano?*)
@@ -515,7 +520,7 @@ Ranking is based on numbers of [qualified Wikidata items](#Qualified-Wikidata-it
 A qualified article ([examples](data/sample_titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these criteria:
 
 - With more than *20* languages versions.
-- Not an onomatology (anthroponymy, toponymy, hydronym, taxon etc.), which is not a particular person, place, biota, event, chemical, astronomical object, company, product, publication, team, sport match, song, year, decade, day, unicode, etc. However, a handful of common names of animals/plants/stars observed in ancient times are allowed.
-- Can be Hypernym of items above (any level of parents of `instance_of?/subclass_of*` item). Hypernyms can have less than 20 languages versions, as small quantity of abstract philosophical terms backboning the semantic tree.
-- Not a disambiguation item.
-- Last but not least, every qualified item/articles should have gone through proof reading for quality check.
+- Not an onomatology (anthroponymy, toponymy, hydronym, taxon etc.), which is not a particular person, place, biota, chemical, astronomical object, company, product, publication, song, team, sport match, event, year, decade, day, unicode, etc.
+- Not a disambiguation page item.
+- Can be hypernyms of items above (any level of parents of `instance_of?/subclass_of*`). Hypernyms are legitimate to have less than 20 languages versions, being small quantity of abstract philosophical terms backboning the semantic network.
+- Last but not least, every qualified item/article should have gone through proof reading for quality check.
