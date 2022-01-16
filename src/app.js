@@ -107,8 +107,8 @@ new Vue({
         if (e.key == '*' || e.key == 'y') this.speakTitle()
         if (e.key == '/' || e.key == 's') this.speakQuote()
         if (e.key == '-' || e.key == 'd') this.toggleDisplayTitleImg()
-        if (e.key == '.' || e.key == 'e') this.toggleDisplayTitleLeximap()
         if (e.key == '+' || e.key == 'f') document.getElementsByClassName('title-link')[0].click()
+        if (e.key == '.' || e.key == ',' || e.key == 'e' || e.key == 'w') this.toggleDisplayTitleLeximap()
       }
     })
 
@@ -253,7 +253,7 @@ new Vue({
 
       return [
         {Key: ['A','Esc'], Description: `toggle category selector`},
-        {Key: ['.','E'], Description: `exposit lexical map`},
+        {Key: ['.',',','E','W'], Description: `exposit lexical map`},
         {Key: ['-','D'], Description: `display image`},
         {Key: ['/','S'], Description: `say <quote> in ${this.quotelangOpt ? this.quotelangOpt.text : this.alangOpt.text }`},
         {Key: ['*','Y'], Description: `yell "${this.qText}" in ${this.qlangOpt.text}`},
