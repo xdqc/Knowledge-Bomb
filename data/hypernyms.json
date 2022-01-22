@@ -142,12 +142,7 @@
         "item": 7184903,
         "or_instance": true,
         "subclass_deep": 2
-      }
-    ]
-  },
-  {
-    "hypernym": "Relation (philosophy)",
-    "queries": [
+      },
       {
         "label": "relation",
         "item": 930933,
@@ -253,16 +248,17 @@
         "item": 1190554,
         "or_instance": true,
         "subclass_deep": 2
-      }
-    ]
-  },
-  {
-    "hypernym": "Event",
-    "queries": [ 
+      },
+      {
+        "label": "crisis",
+        "item": 381072,
+        "or_instance": true,
+        "subclass_deep": null
+      },
       {
         "label": "event",
         "item": 100235738,
-        "or_instance": true,
+        "or_instance": false,
         "subclass_deep": null
       },
       {
@@ -321,6 +317,12 @@
       {
         "label": "connection",
         "item": 23009459,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "attempt",
+        "item": 12897867,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -433,24 +435,6 @@
         "item": 937228,
         "or_instance": true,
         "subclass_deep": 2
-      },
-      {
-        "label": "direction",
-        "item": 2151613,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "location",
-        "item": 17334923,
-        "or_instance": false,
-        "subclass_deep": 4
-      },
-      {
-        "label": "location",
-        "item": 17334923,
-        "or_instance": true,
-        "subclass_deep": 1
       }
     ]
   },
@@ -478,6 +462,17 @@
       {
         "label": "value",
         "item": 878143,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Disease",
+    "queries": [
+      {
+        "label": "disease",
+        "item": 12136,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -531,6 +526,12 @@
       {
         "label": "plant",
         "item": 756,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "cultigen",
+        "item": 1362373,
         "or_instance": true,
         "subclass_deep": null
       },
@@ -782,6 +783,29 @@
     ]
   },
   {
+    "hypernym": "Sign",
+    "queries": [
+      {
+        "label": "sign",
+        "item": 3695082,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "notation",
+        "item": 2001982,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "letter",
+        "item": 9788,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
     "hypernym": "Document",
     "queries": [
       {
@@ -939,6 +963,29 @@
         "item": 336,
         "or_instance": true,
         "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Direction",
+    "queries": [
+      {
+        "label": "direction",
+        "item": 2151613,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "location",
+        "item": 17334923,
+        "or_instance": false,
+        "subclass_deep": 4
+      },
+      {
+        "label": "location",
+        "item": 17334923,
+        "or_instance": true,
+        "subclass_deep": 1
       }
     ]
   },
@@ -1347,30 +1394,6 @@
     ]
   },
   {
-    "hypernym": "Sign",
-    "queries": [
-      {
-        "label": "sign",
-        "item": 3695082,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "notation",
-        "item": 2001982,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "letter",
-        "item": 9788,
-        "or_instance": true,
-        "subclass_deep": null
-      }
-    ]
-  },
-
-  {
     "hypernym": "Physical property",
     "queries": [
       {
@@ -1524,6 +1547,12 @@
       {
         "label": "musical work",
         "item": 2188189,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "visual artwork",
+        "item": 4502142,
         "or_instance": true,
         "subclass_deep": null
       },
@@ -1683,7 +1712,12 @@
         "item": 39546,
         "or_instance": true,
         "subclass_deep": null
-      },
+      }
+    ]
+  },
+  {
+    "hypernym": "Device",
+    "queries": [
       {
         "label": "device",
         "item": 1183543,
@@ -1701,12 +1735,6 @@
         "item": 31807746,
         "or_instance": true,
         "subclass_deep": null
-      },
-      {
-        "label": "machine element",
-        "item": 839546,
-        "or_instance": true,
-        "subclass_deep": null
       }
     ]
   },
@@ -1716,6 +1744,12 @@
       {
         "label": "machine",
         "item": 11019,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "machine element",
+        "item": 839546,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -1779,17 +1813,6 @@
       {
         "label": "ethnic group",
         "item": 41710,
-        "or_instance": true,
-        "subclass_deep": null
-      }
-    ]
-  },
-  {
-    "hypernym": "Disease",
-    "queries": [
-      {
-        "label": "disease",
-        "item": 12136,
         "or_instance": true,
         "subclass_deep": null
       }
