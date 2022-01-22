@@ -38,7 +38,7 @@ new Vue({
     hypernym_index: 1,
     match_mode: 0,
     difficulty: 4,
-    difficultyLvl: 7,
+    difficultyLvl: 4,
     difficulties: [
       {value: 1, icon:'1️⃣', tooltip:'Wanderer', keymap:{'7':0,'8':0,'9':0}},
       {value: 2, icon:'2️⃣', tooltip:'Picnic', keymap:{'7':0,'8':0,'9':0,'4':1,'5':1,'6':1,'g':1,'u':1,'c':1,'i':1,'r':1,'o':1}},
@@ -83,7 +83,7 @@ new Vue({
           coord_y: d.coord_y,
         }))
         // show leximap on large screen
-        if (this.windowWidth>1200 && this.windowHeight>950 && saveState.length<3) {
+        if (this.windowWidth>=768 && this.windowHeight>890 && saveState.length<3) {
           document.querySelector('.dropdown-lang .dropdown-toggle').click()
         }
       })
@@ -739,10 +739,13 @@ LIMIT 3`
     },
 
     gameStartAction: function() {
+      document.getElementById('page-header').classList.add('py-0','mb-2')
       if (this.windowWidth <= 576) {
         document.getElementById('btn-toggle-quote').click()
       }
-      document.getElementById('page-header').classList.add('py-0','mb-2')
+      if (!this.isCollapsingBomb) {
+        document.getElementById('btn-bomb').click()
+      }
     },
     gameOverAction: function(score) {
       this.score = score
@@ -754,6 +757,7 @@ LIMIT 3`
       this.q_title_en = ''
       this.q_hypernym = ''
       document.getElementById('page-header').classList.remove('py-0', 'mb-2')
+      document.getElementById('btn-bomb').click()
       this.displayTopQuote = true
       // recalculate available difficulties
       if (this.difficultyLvl === this.difficultyIndex 
@@ -766,33 +770,6 @@ LIMIT 3`
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({difficultyLvl: this.difficultyLvl})
       })
-    },
-
-    fulfillWithTimeLimit: async function(task, timeLimit, failureValue){
-      let timeout
-      const timeoutPromise = new Promise((resolve, reject) => {
-        timeout = setTimeout(() => {
-          resolve(failureValue)
-        }, timeLimit)
-      })
-      const response = await Promise.race([task, timeoutPromise])
-      if (timeout) {
-        clearTimeout(timeout)
-      }
-      return response
-    },
-    fulfillWaitUntil: async function(task, timeUntil, rejectReason){
-      let timeout
-      const timeoutPromise = new Promise((resolve, reject) => {
-        timeout = setTimeout(() => {
-          reject(rejectReason)
-        }, timeUntil)
-      })
-      const responses = await Promise.allSettled([task, timeoutPromise])
-      if (timeout) {
-        clearTimeout(timeout)
-      }
-      return responses
     },
     //#endregion
 
@@ -915,7 +892,7 @@ LIMIT 3`
       }, 1)
     },
     switchHypernymLang: function() {
-      this.hypernym_index = (this.hypernym_index+1)%3
+      this.hypernym_index = (this.hypernym_index+(this.alang==='en'&&this.hypernym_index===2?2:1)) % (this.qlang==='en'?2:3)
       this.hypernym_list.forEach(h => h.text=h.texts[this.hypernym_index])
       this.hypernym_tree.forEach(h => h.text=h.texts[this.hypernym_index])
       if (!this.quizStarted && 
@@ -933,7 +910,7 @@ LIMIT 3`
     toggleDisplayHypernymTree: function() {
       this.displayHypernymTree = !this.displayHypernymTree
       document.getElementById('btn-toggle-hypernym-tree').textContent = this.displayHypernymTree ? '🎄' : '🌲'
-      document.getElementById('btn-toggle-hypernym-tree').title = this.displayHypernymTree ? 'to list' : 'to tree'
+      document.getElementById('btn-toggle-hypernym-tree').title = this.displayHypernymTree ? 'list view' : 'tree view'
       this.displayHypernymTree || this.sortHypernymList()
     },
     //#endregion Hypernym options
@@ -1022,7 +999,7 @@ LIMIT 3`
     //#region Utils
     getCookieValue: function(name) {
       const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
-      return m ? (m.pop()||'') : '7'
+      return m ? (m.pop()||'') : '4'
     },
     getSpeechSynthesisVoices: function(lang) {
       const sliceLen = lang.startsWith('zh-') ? 5 : 2
@@ -1085,6 +1062,32 @@ LIMIT 3`
         const j = Math.floor(Math.random() * (i + 1))
         ;[array[i], array[j]] = [array[j], array[i]]
       }
+    },
+    fulfillWithTimeLimit: async function(task, timeLimit, failureValue){
+      let timeout
+      const timeoutPromise = new Promise((resolve, reject) => {
+        timeout = setTimeout(() => {
+          resolve(failureValue)
+        }, timeLimit)
+      })
+      const response = await Promise.race([task, timeoutPromise])
+      if (timeout) {
+        clearTimeout(timeout)
+      }
+      return response
+    },
+    fulfillWaitUntil: async function(task, timeUntil, rejectReason){
+      let timeout
+      const timeoutPromise = new Promise((resolve, reject) => {
+        timeout = setTimeout(() => {
+          reject(rejectReason)
+        }, timeUntil)
+      })
+      const responses = await Promise.allSettled([task, timeoutPromise])
+      if (timeout) {
+        clearTimeout(timeout)
+      }
+      return responses
     },
     //#endregion Utils
   },

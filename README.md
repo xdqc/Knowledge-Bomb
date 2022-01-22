@@ -5,13 +5,13 @@ An alternative to Wikipedia "random article", a vocabulary quiz game, an undercu
 
 ## Data mining from Wikipedia
 
-
+The game content is data mined and analysed from Wikipedia articles and Wikidata items by multiple dimensions: language, language count, language cluster, hypernym, hypernym category, complexity scoring, etc. 
 
 ### Hypernym Hierarchy
 
-All Wikidata items / Wikipedia articles are categorized in buckets. The design principle is: gameplay first, performance second, academic last; coarsely classifying as a decision tree, instead of networking as an ontologically precise semantic graph. The branches are grown and pruned to achieve balanced number of items/articles per node.
+All Wikidata items / Wikipedia articles are categorized in buckets. The design principle is: gameplay first, performance (query speed) second, academic last; coarsely classifying as a decision tree, instead of networking as an ontologically precise semantic graph. The tree branches are grown and pruned to achieve balanced number of items/articles per node.
 
-The 66 top-level hypernyms of controlled vocabulary are exposed for players to pick during the game by detonating 💣
+The 66 top-level hypernyms of controlled vocabulary are presented for players to pick during the game by detonating 💣
 
 ```
 Node          Path
@@ -524,4 +524,4 @@ A qualified article ([examples](data/sample_titles.csv)) should be a general, un
 - Not an onomatology (anthroponymy, toponymy, hydronym, taxon etc.), which is not a particular person, place, biota, chemical, astronomical object, company, product, publication, song, team, sport match, event, year, decade, day, unicode, etc.
 - Not a disambiguation page item.
 - Can be hypernyms of items above (any level of parents of `instance_of?/subclass_of*`). Hypernyms are legitimate to have less than 20 languages versions, being small quantity of abstract philosophical terms backboning the semantic network.
-- Last but not least, every qualified item/article should have gone through proof reading for quality check.
+- Last but not least, every qualified item/article should have been passed through proofreading for quality check.

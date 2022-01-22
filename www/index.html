@@ -166,28 +166,28 @@
           </b-row>
         </nav>
         <b-container>
-          <section role="treeitem">
-            <b-collapse id="collapse-hypernyms" class="py-2">
-              <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" id="btn-toggle-hypernym-tree" title="tree" @click="toggleDisplayHypernymTree">🌲</b-btn>
-              <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" title="switch language" @click="switchHypernymLang">🔡</b-btn>
-              <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" title="reverse selection" @click="reverseHypernymSelect">🔛</b-btn>
-              <b-form-group  label=" " v-slot="{ ariaHypernymOptions }">
-                <b-form-checkbox-group v-show="!displayHypernymTree"
-                  class="list-hypernyms"
-                  v-model="hypernyms"
-                  :options="hypernym_list"
-                  aria-describedby="ariaHypernymOptions"
-                  stacked switches size="sm">
-                </b-form-checkbox-group>
-                <b-form-checkbox-group v-show="displayHypernymTree"
-                  class="tree-hypernyms"
-                  v-model="hypernyms"
-                  :options="hypernym_tree"
-                  aria-describedby="ariaHypernymOptions"
-                  stacked size="sm">
-              </b-form-checkbox-group>
-              </b-form-group>
-            </b-collapse>
+
+          <section role="presentation" v-if="showScore||displayScoreChart" class="score-board pb-4">
+            <b-alert variant="info" :show="showScore">Game Over ~  difficulty {{ difficulty }} ~ score {{ score }}%</b-alert>
+            <b-progress class="mt-4 mb-2"
+              v-show="showScore||displayScoreChart"
+              :max="quizPlayed"
+              :title="Object.values(board).filter(v=>v.length>0).length +' Levels'"
+              v-b-popover.hover.left="`${quizPlayed}❔　${quizCorrect}✔　${quizIncorrect}❌`"
+              v-b-popover.click.left="`${quizPlayed}❔　${quizCorrect}✔　${quizIncorrect}❌`">
+              <b-progress-bar :value="quizCorrect" variant="success"></b-progress-bar>
+              <b-progress-bar :value="quizIncorrect" variant="danger"></b-progress-bar>
+            </b-progress>
+            <b-progress v-for="([k,v], i) in Object.entries(board).reverse()" :key="i"
+              v-show="showScore||displayScoreChart"
+              :max="longestLevelCount"
+              :title="'Level '+ k"
+              :animated="k==lvl"
+              v-b-popover.hover.left="`${v.length}❔　${v.filter(u=>u>0).length}✔　${v.filter(u=>u<0).length}❌`"
+              v-if="v.length > 0">
+              <b-progress-bar v-for="(u, index) in scoreBar(v)" :key="index"
+                :value="Math.abs(u)" :variant="u>0?'success':'danger'"></b-progress-bar>
+            </b-progress>
           </section>
 
           <section role="option">
@@ -221,6 +221,7 @@
             <b-form-group
               v-show="!quizStarted"
               horizontal label-cols-sm="5" label-cols-md="4"
+              class="pb-2"
               :label="labelQuestion"
             >
               <div style="display: flex;">
@@ -246,7 +247,7 @@
             <b-form-group 
               v-show="!quizStarted&&qlang&&alang"
               v-slot="{ ariaMatchMode }"
-              class="mt-4 mb-2"
+              class="my-4"
               horizontal label-cols-sm="5" label-cols-md="4"
               label="">
               <b-form-radio-group
@@ -275,6 +276,34 @@
               </b-btn>
             </b-form-group>
           </section>
+
+          <section role="treeitem">
+            <b-collapse id="collapse-hypernyms" class="py-2">
+              <hr>
+              <div class="text-center mb-2">
+                <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" id="btn-toggle-hypernym-tree" title="tree" @click="toggleDisplayHypernymTree">🌲</b-btn>
+                <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" title="switch language" @click="switchHypernymLang">🔡</b-btn>
+                <b-btn variant="outline-light" size="lg" style="font-size: xx-large;" title="reverse selection" @click="reverseHypernymSelect">🔛</b-btn>
+              </div>
+              <b-form-group  label=" " v-slot="{ ariaHypernymOptions }">
+                <b-form-checkbox-group v-show="!displayHypernymTree"
+                  class="list-hypernyms"
+                  v-model="hypernyms"
+                  :options="hypernym_list"
+                  aria-describedby="ariaHypernymOptions"
+                  stacked switches size="sm">
+                </b-form-checkbox-group>
+                <b-form-checkbox-group v-show="displayHypernymTree"
+                  class="tree-hypernyms"
+                  v-model="hypernyms"
+                  :options="hypernym_tree"
+                  aria-describedby="ariaHypernymOptions"
+                  stacked size="sm">
+              </b-form-checkbox-group>
+              </b-form-group>
+            </b-collapse>
+          </section>
+
         </b-container>
       </b-jumbotron>
       
@@ -354,29 +383,7 @@
               </b-col>
             </b-row>
           </section>
-  
-          <section role="presentation" class="score-board">
-            <b-alert variant="success" :show="showScore">Game Over ~  difficulty {{ difficulty }} ~ score {{ score }}%</b-alert>
-            <b-progress class="mt-4 mb-2"
-              v-show="showScore||displayScoreChart"
-              :max="quizPlayed"
-              :title="Object.values(board).filter(v=>v.length>0).length +' Levels'"
-              v-b-popover.hover.left="`${quizPlayed}❔　${quizCorrect}✔　${quizIncorrect}❌`"
-              v-b-popover.click.left="`${quizPlayed}❔　${quizCorrect}✔　${quizIncorrect}❌`">
-              <b-progress-bar :value="quizCorrect" variant="success"></b-progress-bar>
-              <b-progress-bar :value="quizIncorrect" variant="danger"></b-progress-bar>
-            </b-progress>
-            <b-progress v-for="([k,v], i) in Object.entries(board).reverse()" :key="i"
-              v-show="showScore||displayScoreChart"
-              :max="longestLevelCount"
-              :title="'Level '+ k"
-              :animated="k==lvl"
-              v-b-popover.hover.left="`${v.length}❔　${v.filter(u=>u>0).length}✔　${v.filter(u=>u<0).length}❌`"
-              v-if="v.length > 0">
-              <b-progress-bar v-for="(u, index) in scoreBar(v)" :key="index"
-                :value="Math.abs(u)" :variant="u>0?'success':'danger'"></b-progress-bar>
-            </b-progress>
-          </section>
+
         </b-container>
       </main>
 
@@ -394,7 +401,7 @@
         This site does not use any analytical or marketing cookies. Only functional cookies are used for remembering language setting and game progress. <br> 
         Third-party cookies from wikimedia.org may present for accessing wikidata and wikiquote: <a href="https://foundation.wikimedia.org/wiki/Cookie_statement">Wikimedia cookie statement</a>
       </b-alert>
-      <footer class="text-muted">KnB.wiki © 2021</footer>
+      <footer class="text-muted">KnB.wiki © 2021-<script>document.write(new Date().getFullYear())</script></footer>
     </div>
     <script type="text/javascript" src="./www/wikiquote.js"></script>
     <script type="text/javascript" src="./www/app.js"></script>

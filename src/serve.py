@@ -24,7 +24,7 @@ def hypernym():
     return jsonify(Quiz.get_hypernyms(request.args.get('ql'),request.args.get('al')))
 
 @app.route('/next', methods=['POST'])
-@limiter.limit('4/second, 1000/hour', error_message='chill, knowledge bomber!')
+@limiter.limit('4/second, 4000/hour', error_message='chill, knowledge bomber!')
 @limiter.limit('9000/day', error_message="It's Over 9000!!")
 def next():
     return jsonify(Quiz.next_quiz(request.get_json()))

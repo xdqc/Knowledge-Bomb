@@ -134,7 +134,7 @@ button.dropdown-toggle:focus {
   position: fixed!important;
   transform: translate(0%, 0%)!important;
   left: 1%!important;
-  top: 30%!important;
+  top: 28%!important;
   width: 98%;
   min-height: 680px;
   max-height: 750px;
@@ -241,7 +241,33 @@ button.dropdown-toggle:focus {
 .popover td[aria-colindex="1"] {
   max-width: 120px;
 }
-@media (max-height: 950px) {
+h1 {
+  position: relative;
+  top: -65px;
+  margin: 0 -32px;
+  padding: 150px 0;
+  text-align: center;
+  color: white;
+  font-size: 6rem!important;
+  font-weight: 700!important;
+  background-image: radial-gradient(circle farthest-corner at 38.2% 14.5%, rgba(4, 191, 228, 1) 10%, rgba(2,83,185,1) 110% );
+  animation: color-gradient 42s cubic-bezier(0.46, 0.13, 0.45, 0.88) 0.1s infinite;
+}
+@keyframes color-gradient {
+  0% {
+    background-position:top left;
+    background-size:100% 100%;
+  }
+  50% {
+    background-position:bottom left;
+    background-size:400% 400%;
+  }
+  100% {
+    background-position:top right;
+    background-size:100% 100%;
+  }
+}
+@media (max-height: 890px) {
   .dropdown-lang .dropdown-menu {
     top: 2%!important;
   }
@@ -263,6 +289,10 @@ button.dropdown-toggle:focus {
   }
 }
 @media (max-width: 768px) {
+  h1 {
+    padding: 100px 0;
+    font-size: 4.5rem!important;
+  }
   .list-hypernyms {
     column-count: 3;
   }
@@ -274,6 +304,11 @@ button.dropdown-toggle:focus {
   body, html {
     padding:0;
     overflow-x: hidden;
+  }
+  h1 {
+    top: -35px;
+    padding: 40px 20px;
+    font-size: 3rem!important;
   }
   .navbar-fixed-top, .navbar-fixed-bottom, .navbar-static-top {
     margin-left: 0;
