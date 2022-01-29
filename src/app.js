@@ -932,15 +932,24 @@ LIMIT 3`
       this.displayScoreChart = !this.displayScoreChart
     },
     //#endregion Menu interactions
-
+    
     //#region Lexical map
     onClickLeximapBtnAlang: function(e, lexi) {
       this.alang = lexi.value
+      // on selecting language, toggle close the leximap panel
       e.target.parentElement.previousSibling.click()
     },
     onClickLeximapBtnQlang: function(e, lexi) {
       this.qlang = lexi.value
       e.target.parentElement.previousSibling.click()
+    },
+    onHoverAlangSelect: function(e) {
+      // document.querySelector('#alang-form-group .lang-select-wrapper').hover()
+      document.querySelector('#alang-form-group button').focus()
+    },
+    onHoverQlangSelect: function(e) {
+      // document.querySelector('#qlang-form-group .lang-select-wrapper').hover()
+      document.querySelector('#qlang-form-group button').focus()
     },
     onShowLeximapQlang: function(e) {
       console(e.target, e.target.nextElementSibling)

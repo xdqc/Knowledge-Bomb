@@ -197,7 +197,7 @@
               horizontal label-cols-sm="5" label-cols-md="4"
               :label="labelAnswer"
             >
-              <div style="display: flex;">
+              <div id="alang-form-group" class="lang-form-group" style="display: flex;">
                 <b-dropdown variant="outline-light"
                   :disabled="startBtnDisabled"
                   class="dropdown-lang alang-leximap"
@@ -209,12 +209,14 @@
                     {{ l.text }}
                   </b-btn>
                 </b-dropdown>
-                <b-form-select
-                  v-model="alang"
-                  :options="alangOptions"
-                  :disabled="startBtnDisabled"
-                  label="alang">
-                </b-form-select>
+                <div class="lang-select-wrapper" id="alang-select-wrapper" tabindex="-1" @mouseover="onHoverAlangSelect($event)">
+                  <b-form-select
+                    v-model="alang"
+                    :options="alangOptions"
+                    :disabled="startBtnDisabled"
+                    label="alang">
+                  </b-form-select>
+                </div>
               </div>
             </b-form-group>
             <b-row v-show="!quizStarted&&qlang&&alang"><b-col><b-btn variant="outline-light" class="language-options-switcher p-0 border-0" @click="[alang,qlang]=[qlang,alang]">🔃</b-btn></b-col></b-row>
@@ -224,7 +226,7 @@
               class="pb-2"
               :label="labelQuestion"
             >
-              <div style="display: flex;">
+              <div id="qlang-form-group" class="lang-form-group" style="display: flex;">
                 <b-dropdown variant="outline-light"
                 :disabled="startBtnDisabled"
                 class="dropdown-lang qlang-leximap"
@@ -236,12 +238,14 @@
                     {{ l.text.replace(/ *\([^)]*\) */g, '') }}
                   </b-btn>
                 </b-dropdown>
-                <b-form-select
-                  v-model="qlang"
-                  :options="qlangOptions"
-                  :disabled="startBtnDisabled"
-                  label="qlang">
-                </b-form-select>
+                <div class="lang-select-wrapper" id="qlang-select-wrapper" tabindex="-1" @mouseover="onHoverQlangSelect($event)">
+                  <b-form-select
+                    v-model="qlang"
+                    :options="qlangOptions"
+                    :disabled="startBtnDisabled"
+                    label="qlang">
+                  </b-form-select>
+                </div>
               </div>
             </b-form-group>
             <b-form-group 

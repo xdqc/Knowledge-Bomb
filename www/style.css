@@ -92,9 +92,6 @@ h1 {
   border-color: var(--light-wiki-blue);
 }
 .btn-outline:hover {
-  /* border-color: var(--jelly-bean-blue);
-  box-shadow: 0 0.5rem 0.5rem -0.4rem var(--half-jpn-indigo);
-  transform: translateY(-0.2rem); */
   outline: 0;
   border-color: var(--light-wiki-blue);
   box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%); 
@@ -119,16 +116,18 @@ button.dropdown-toggle {
   border-color: #ced4da8f;
   border-radius: 2rem;
 }
-.dropdown-lang.show button.dropdown-toggle {
-  border-color: var(--light-wiki-blue);
-}
-button.dropdown-toggle:hover {
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
-}
 button.dropdown-toggle:focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
+}
+.dropdown-lang.show button.dropdown-toggle {
+  border-color: var(--light-wiki-blue);
+}
+.lang-select-wrapper {
+  display: contents;
+}
+.lang-select-wrapper:hover::before {
+  content: "👈　";
 }
 .dropdown-lang .dropdown-menu {
   position: fixed!important;
