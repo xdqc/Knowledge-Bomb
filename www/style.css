@@ -204,7 +204,7 @@ button.dropdown-toggle:focus {
   font-style: oblique;
 }
 .hypernym-grid {
-  width: 240px;
+  width: 320px;
   margin-left: auto;
   display: flex;
   flex-flow: row wrap;
@@ -218,18 +218,16 @@ button.dropdown-toggle:focus {
   margin-bottom: 20px;
 }
 .hypernym-grid .card-body {
-  padding: 6px 0;
+  padding: 4px 0;
 }
 .hypernym-grid .card-title {
-  font-size: 16px;
   color: var(--body-background);
-  /* opacity: 0.618; */
   text-align: center;
 }
 .hypernym-tile {
-  width: 30px;
-  min-width: 30px;
-  height: 30px;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
   border: none;
   border-radius: 0%;
 }

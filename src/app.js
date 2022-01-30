@@ -39,7 +39,7 @@ new Vue({
     hypernym_index: 1,
     hypernymColorHue: 0,
     hypernymGridTextIndex: 0,
-    match_mode: 0,
+    match_mode: 1,
     difficulty: 4,
     difficultyLvl: 4,
     difficulties: [
@@ -68,7 +68,7 @@ new Vue({
       } else {
         let browserLangs = [...window.navigator.languages.reduce((s,a)=>{s.add(a.slice(0,2));return s},new Set())]
         this.alang = browserLangs[0] ? browserLangs[0] : ''
-        this.qlang = browserLangs[1] ? browserLangs[1] : ''
+        this.qlang = browserLangs[1] ? browserLangs[1] : (browserLangs[0] ? browserLangs[0] : '')
       }
       // Hold v-model="qlang" in qlang_options, before async qLeximap() finish populating qlang_options
       this.alang_options.push({value: this.alang})
