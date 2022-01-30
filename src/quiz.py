@@ -73,7 +73,7 @@ class Quiz:
     @classmethod
     def run_fuzzy_level(cls, lvl, board, qlang, alang, hypernyms, difficulty, has_answer=False, recurr=0):
         hypernyms = [h for h in hypernyms if h > 0]
-        hypernym_sample = random.sample(hypernyms, min(random.randint(3,30), len(hypernyms)))
+        hypernym_sample = random.sample(hypernyms, min(random.randint(2,8), len(hypernyms)))
         level = Query.get_fuzzy_level(cls.ladder[lvl-1], cls.played_correct(board), qlang, alang, hypernym_sample, difficulty, has_answer)
         # when run out of current level, run next level; circle the ladder, stop when done a circle
         #NOTE: hypernym will be randomized on each recursive run, possible premature termination

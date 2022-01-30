@@ -6,6 +6,8 @@ The 64 top-level hypernyms of controlled vocabulary are presented for players to
 
 ### Hilbert curve 
 
+The hypernym categories can be arranged from 1D to 2D using Hilbert curve for better localtity of reference for searching performance and information visual locality to reduce users cognitive burden.
+
 Hilbert curve (order=3) of hypernym categories
 
 ```

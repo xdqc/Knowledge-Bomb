@@ -35,7 +35,10 @@ new Vue({
     hypernym_list: [],
     hypernym_tree: [],
     hypernym_lang: [],
+    hypernym_grid: [],
     hypernym_index: 1,
+    hypernymColorHue: 0,
+    hypernymGridTextIndex: 0,
     match_mode: 0,
     difficulty: 4,
     difficultyLvl: 4,
@@ -181,6 +184,11 @@ new Vue({
     },
     longestLevelCount() {
       return Math.max.apply(Math, Object.values(this.board).map(v => v.length))
+    },
+    hyperGeoMean() {
+      const total = 64
+      const sqSum = this.hypernym_grid.reduce((q,h) => q+(h.count)*(h.count), 0)
+      return Math.sqrt(sqSum/total)+8
     },
     qHypernymTexts() {
       // The hypernyme of current question as topics for quote search 
@@ -361,6 +369,7 @@ SELECT (lang(?label) as ?lang) ?label WHERE {
       this.startBtnDisabled = true
       this.displayScoreChart = false
       this.displayTitleLeximap = false
+      this.hypernymColorHue = Math.floor(Math.random()*64)
       this.newGame()
     },
 
@@ -432,11 +441,15 @@ SELECT (lang(?label) as ?lang) ?label WHERE {
         return
       }
       if (e) {
+        // function called by click event
         e.preventDefault()
         e.target.classList.remove('btn-secondary')
         if (this.difficulty > 1) {
           e.target.classList.add(this.answer === index ? 'btn-success' : 'btn-danger')
         }
+        // update hypernym grid count
+        const hypernym = this.hypernym_grid.find(h => h.value === this.q_hypernym)
+        hypernym.count += (this.answer === index ? 1 : -1)
       }
       document.querySelectorAll('.btn-choice').forEach(b => b.disabled = true)
       this.progressAnimate = true
@@ -740,12 +753,14 @@ LIMIT 3`
 
     gameStartAction: function() {
       document.getElementById('page-header').classList.add('py-0','mb-2')
-      if (this.windowWidth <= 576) {
-        document.getElementById('btn-toggle-quote').click()
-      }
-      if (!this.isCollapsingBomb) {
-        document.getElementById('btn-bomb').click()
-      }
+      if (!this.isCollapsingBomb) { document.getElementById('btn-bomb').click() }
+      this.displayTopQuote = false
+      // re-place hyperyme-grid on progress row
+      const $hyperGrid = document.querySelector('.hypernym-grid')
+      const $progressRow = document.querySelector('#progress-row')
+      $hyperGrid.classList.remove('hypernym-grid-centered')
+      if (this.windowWidth > 1200) { $hyperGrid.classList.add('float-right') }
+      $progressRow.parentNode.insertBefore($hyperGrid, $progressRow)
     },
     gameOverAction: function(score) {
       this.score = score
@@ -756,10 +771,16 @@ LIMIT 3`
       this.q_title = ''
       this.q_title_en = ''
       this.q_hypernym = ''
+      this.displayTopQuote = true
       document.getElementById('page-header').classList.remove('py-0', 'mb-2')
       document.getElementById('btn-bomb').click()
-      this.displayTopQuote = true
-      // recalculate available difficulties
+      // re-place hyperyme-grid on score board
+      const $hyperGrid = document.querySelector('.hypernym-grid')
+      const $scoreBoard = document.querySelector('.score-board')
+      $hyperGrid.classList.remove('float-right')
+      $hyperGrid.classList.add('hypernym-grid-centered')
+      $scoreBoard.parentNode.insertBefore($hyperGrid, $scoreBoard)
+      // re-calculate available difficulties
       if (this.difficultyLvl === this.difficultyIndex 
         && this.score > 0
         && this.levelPlayed === Object.keys(this.board).length) {
@@ -863,12 +884,26 @@ LIMIT 3`
           h.text = h.texts[this.hypernym_index]
         })
         this.hypernym_lang = ['en', this.alang, this.qlang]
-        this.hypernym_tree = data
+        this.hypernym_tree = data.map(h => ({
+          value: h.value,
+          tetxs: h.texts,
+          text: h.text,
+          place: h.place,
+          depth: h.depth,
+        }))
         this.hypernym_list = data.map(h => ({
           value: h.value,
           texts: h.texts,
           text: h.text,
         }))
+        this.hypernym_grid = data.map(h => ({
+          value: h.value,
+          place: h.place,
+          order: h.hilbert_order,
+          texts: ['', h.hexagram, h.ideogram, ...h.texts.slice(1)],
+          count: 0,
+        }))
+        this.hypernym_grid.sort((h1,h2) => h1.order-h2.order)
         this.sortHypernymTree()
         
         if (onMount) {
@@ -892,6 +927,7 @@ LIMIT 3`
       }, 1)
     },
     switchHypernymLang: function() {
+      // omit duplicated 'en', if one of alang or qlang is 'en'
       this.hypernym_index = (this.hypernym_index+(this.alang==='en'&&this.hypernym_index===2?2:1)) % (this.qlang==='en'?2:3)
       this.hypernym_list.forEach(h => h.text=h.texts[this.hypernym_index])
       this.hypernym_tree.forEach(h => h.text=h.texts[this.hypernym_index])
@@ -912,6 +948,9 @@ LIMIT 3`
       document.getElementById('btn-toggle-hypernym-tree').textContent = this.displayHypernymTree ? '🎄' : '🌲'
       document.getElementById('btn-toggle-hypernym-tree').title = this.displayHypernymTree ? 'list view' : 'tree view'
       this.displayHypernymTree || this.sortHypernymList()
+    },
+    toggleHypernymGridTextIndex: function() {
+      this.hypernymGridTextIndex = (this.hypernymGridTextIndex+1) % 5
     },
     //#endregion Hypernym options
     
@@ -936,7 +975,7 @@ LIMIT 3`
     //#region Lexical map
     onClickLeximapBtnAlang: function(e, lexi) {
       this.alang = lexi.value
-      // on selecting language, toggle close the leximap panel
+      // on language selected, toggle close the leximap panel
       e.target.parentElement.previousSibling.click()
     },
     onClickLeximapBtnQlang: function(e, lexi) {
@@ -944,11 +983,9 @@ LIMIT 3`
       e.target.parentElement.previousSibling.click()
     },
     onHoverAlangSelect: function(e) {
-      // document.querySelector('#alang-form-group .lang-select-wrapper').hover()
       document.querySelector('#alang-form-group button').focus()
     },
     onHoverQlangSelect: function(e) {
-      // document.querySelector('#qlang-form-group .lang-select-wrapper').hover()
       document.querySelector('#qlang-form-group button').focus()
     },
     onShowLeximapQlang: function(e) {
@@ -994,6 +1031,7 @@ LIMIT 3`
         e.target.addEventListener('mouseup', leximapMouseUpHandler)
       }
       let checkExist = setInterval(() => {
+        //wait every 1ms to check the container fully loaded
         const container = containerClass ? document.querySelector(containerClass) : containerElem
         if (container) {
           clearInterval(checkExist)
@@ -1071,6 +1109,27 @@ LIMIT 3`
         const j = Math.floor(Math.random() * (i + 1))
         ;[array[i], array[j]] = [array[j], array[i]]
       }
+    },
+    hsv2hex: function(h, s, v) {
+      let r, g, b
+      const i = Math.floor(h * 6)
+      const f = h * 6 - i
+      const p = v * (1 - s)
+      const q = v * (1 - f * s)
+      const t = v * (1 - (1 - f) * s)
+      switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+      }
+      const toHex = (c) => {
+        const hex = Math.floor(c).toString(16)
+        return hex.length == 1 ? '0' + hex : hex
+      }      
+      return '#'+toHex(r)+toHex(g)+toHex(b)
     },
     fulfillWithTimeLimit: async function(task, timeLimit, failureValue){
       let timeout

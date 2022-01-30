@@ -203,6 +203,36 @@ button.dropdown-toggle:focus {
 #quote-title {
   font-style: oblique;
 }
+.hypernym-grid {
+  width: 240px;
+  margin-left: auto;
+  display: flex;
+  flex-flow: row wrap;
+  cursor: pointer;
+}
+.hypernym-grid-centered {
+  float: none;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -20px;
+  margin-bottom: 20px;
+}
+.hypernym-grid .card-body {
+  padding: 6px 0;
+}
+.hypernym-grid .card-title {
+  font-size: 16px;
+  color: var(--body-background);
+  /* opacity: 0.618; */
+  text-align: center;
+}
+.hypernym-tile {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 0%;
+}
 .tree-hypernyms {
   column-count: 2;
 }

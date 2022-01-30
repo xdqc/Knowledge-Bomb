@@ -53,7 +53,7 @@ class Query:
     @classmethod
     def get_hypernyms(cls, qlang, alang):
         sqlstr = """SELECT DISTINCT 
-            i.hypernym ,e.title ,a.title ,q.title ,c.depth ,c.place
+            i.hypernym ,e.title ,a.title ,q.title ,c.depth ,c.place ,c.hilbert_order ,c.title_mono ,c.hexagram
         FROM [wiki].[item] i
         LEFT JOIN wiki.article e
             ON e.item = i.hypernym AND e.language = 'en'
@@ -70,7 +70,8 @@ class Query:
         res = []
         for h in cursor.execute(sqlstr, [alang, qlang]).fetchall():
             if h[0]:
-                res.append({'value':h[0], 'texts': [h[1],h[2],h[3]], 'depth':h[4], 'place':h[5]})
+                res.append({'value':h[0], 'texts': [h[1],h[2],h[3]], 
+                'depth':h[4], 'place':h[5], 'hilbert_order':h[6], 'ideogram':h[7], 'hexagram':h[8]})
         return res
 
     @classmethod

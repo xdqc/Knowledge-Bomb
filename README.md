@@ -9,7 +9,7 @@ The game content is data mined and analysed from Wikipedia articles and Wikidata
 
 ### Hypernym Hierarchy
 
-All Wikidata items / Wikipedia articles are categorized in buckets. The design principle is: gameplay first, performance (query speed) second, academic last; coarsely classifying as a decision tree, instead of networking as an ontologically precise semantic graph. The tree branches are grown and pruned to achieve balanced number of items/articles per node.
+All Wikidata items / Wikipedia articles are categorized in buckets. The design principle is: gameplay first, performance second, academic last; coarsely classifying as a decision tree, instead of networking as an ontologically precise semantic graph. The tree branches are grown and pruned to achieve balanced number of items/articles per node.
 
 The 64 top-level hypernyms of controlled vocabulary are presented for players to pick during the game by detonating 💣
 
