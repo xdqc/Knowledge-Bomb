@@ -3,36 +3,38 @@ from .query import Query
 
 class Quiz:
     ladder = [ # lvl,lo_langcount,hi_langcount,num_of_items
-        (1,95,320,1395),
-        (2,80,110,1503),
-        (3,72,90,1604),
-        (4,64,75,1595),
-        (5,58,66,1557),
-        (6,54,62,1731),
-        (7,51,58,1842),
-        (8,48,54,2030),
-        (9,46,51,1904),
-        (10,43,48,2203),
-        (11,42,46,1933),
-        (12,39,43,2262),
-        (13,38,41,1869),
-        (14,36,39,2158),
-        (15,34,37,2447),
-        (16,33,35,1834),
-        (17,32,34,1878),
-        (18,31,33,1980),
-        (19,30,32,2156),
-        (20,29,31,2325),
-        (21,28,30,2507),
-        (22,27,29,2750),
-        (23,27,28,1461),
-        (24,26,27,1473),
-        (25,25,26,1571),
-        (26,24,25,1790),
-        (27,23,24,1940),
-        (28,22,23,2094),
-        (29,21,22,2278),
-        (30,2,21,2700),
+        (1,95,320,1406),
+        (2,80,110,1508),
+        (3,72,90,1612),
+        (4,64,75,1603),
+        (5,58,66,1559),
+        (6,54,62,1744),
+        (7,51,58,1853),
+        (8,48,54,2038),
+        (9,46,51,1916),
+        (10,44,48,1732),
+        (11,42,46,1925),
+        (12,39,43,2273),
+        (13,38,41,1879),
+        (14,36,39,2155),
+        (15,35,37,1554),
+        (16,34,36,1685),
+        (17,33,35,1827),
+        (18,32,34,1880),
+        (19,31,33,1991),
+        (20,30,32,2166),
+        (21,29,31,2343),
+        (22,28,30,2514),
+        (23,27,29,2742),
+        (24,27,28,1454),
+        (25,26,27,1462),
+        (26,25,26,1586),
+        (27,24,25,1772),
+        (28,23,24,1965),
+        (29,22,23,2062),
+        (30,21,22,2268),
+        (31,20,21,2446),
+        (32,4,20,2308),
     ]
 
     @classmethod
@@ -93,6 +95,8 @@ class Quiz:
             else:
                 choices += Query.get_similar_titles(q_id, a_title_latin, alang, difficulty*2)[1:]
                 choices = [s for s in choices if s[-4:]!=a_title[-4:] and s[:5]!=a_title[:5]]
+                if len(choices) < difficulty-1:
+                    choices = list(set(choices + Query.get_similar_titles(q_id, a_title_latin, alang, difficulty)[1:]))
                 choices = random.sample(choices, difficulty-1)
                 choices.append(a_title)
                 random.shuffle(choices)
@@ -141,7 +145,7 @@ class Quiz:
     def level_up(cls, lvl, board, qid):
         if qid != 0:
             board[str(lvl)].append(qid)
-        cr,beta = cls.correct_rate(lvl, board), random.betavariate(10,10)
+        cr,beta = cls.correct_rate(lvl, board), random.betavariate(5,10)
         if cr > beta:
             sample_size = len(board[str(lvl)])
             if lvl == len(cls.ladder) and sample_size > cls.total_sample_size(board) * 0.0618:
@@ -185,7 +189,7 @@ class Quiz:
         if sample_size > 0:
             correct_count = len([k for k in board[str(lvl)] if k > 0])
             level_items_count = cls.level_items_count(lvl)
-            miss_coef = math.log10((max(level_items_count-sample_size**3, 1)) / (sample_size+1)) + math.log1p(lvl)
+            miss_coef = math.log10((max(level_items_count-sample_size**4, 1)) / (sample_size+1)) + math.log1p(lvl)
             if final:
                 miss_coef = max(miss_coef * lvl / len(cls.ladder)**2, 0)
             rate = correct_count / (sample_size+miss_coef)

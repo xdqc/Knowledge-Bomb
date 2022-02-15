@@ -41,7 +41,7 @@ new Vue({
     hypernymGridTextIndex: 0,
     match_mode: 1,
     difficulty: 4,
-    difficultyLvl: 4,
+    difficultyLvl: 7,
     difficulties: [
       {value: 1, icon:'1️⃣', tooltip:'Wanderer', keymap:{'7':0,'8':0,'9':0}},
       {value: 2, icon:'2️⃣', tooltip:'Picnic', keymap:{'7':0,'8':0,'9':0,'4':1,'5':1,'6':1,'g':1,'u':1,'c':1,'i':1,'r':1,'o':1}},
@@ -223,9 +223,9 @@ new Vue({
     },
     match_mode_options() {
       return [
-        { text: `🙂 ${this.alangOpt.label_m0 || this.alang_options[0].label_m0 || ''} ${this.qlangOpt.text}`, value: 0 },
-        { text: `🧐 ${this.alangOpt.label_m1 || this.alang_options[0].label_m1 || ''} ${this.qlangOpt.text}`, value: 1 },
-        { text: `😎 ${this.alangOpt.label_m2 || this.alang_options[0].label_m2 || ''} ${this.qlangOpt.text}`, value: 2 },
+        { text: `👁 ${this.alangOpt.label_m0 || this.alang_options[0].label_m0 || ''} ${this.qlangOpt.text}`, value: 0 },
+        { text: `👁️‍🗨️ ${this.alangOpt.label_m1 || this.alang_options[0].label_m1 || ''} ${this.qlangOpt.text}`, value: 1 },
+        { text: `🧠 ${this.alangOpt.label_m2 || this.alang_options[0].label_m2 || ''} ${this.qlangOpt.text}`, value: 2 },
       ]
     },
     showDifficulties() {
@@ -544,7 +544,7 @@ SELECT ?desc WHERE {
         const b = data.results.bindings
         return b[0] ? b[0].desc.value : null
       } catch (error) {
-        console.error('sparqlGetDescription', item, lang, err)
+        console.error('sparqlGetDescription', item, lang, error)
       }
     },
     //#endregion
@@ -886,7 +886,7 @@ LIMIT 3`
         this.hypernym_lang = ['en', this.alang, this.qlang]
         this.hypernym_tree = data.map(h => ({
           value: h.value,
-          tetxs: h.texts,
+          texts: h.texts,
           text: h.text,
           place: h.place,
           depth: h.depth,
@@ -907,8 +907,11 @@ LIMIT 3`
         this.sortHypernymTree()
         
         if (onMount) {
-          // by default fill-in all hypernyms, excluding language(315), disease(12136)
-          this.hypernyms = data.filter(h=>[315,12136].indexOf(h.value)<0).map(h=>h.value)
+          // by default fill-in all hypernyms, ?excluding language(315), disease(12136)?
+          this.hypernyms = data.filter(h=>[
+            // 315,
+            // 12136,
+          ].indexOf(h.value)<0).map(h=>h.value)
         } else {
           this.sortHypernymList()
         }
@@ -1046,7 +1049,7 @@ LIMIT 3`
     //#region Utils
     getCookieValue: function(name) {
       const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
-      return m ? (m.pop()||'') : '4'
+      return m ? (m.pop()||'') : '7'
     },
     getSpeechSynthesisVoices: function(lang) {
       const sliceLen = lang.startsWith('zh-') ? 5 : 2

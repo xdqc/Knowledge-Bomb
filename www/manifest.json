@@ -1,0 +1,30 @@
+{
+  "short_name": "KnB.wiki",
+  "name": "Knowledge Bomb",
+  "icons": [
+    {
+      "src": "https://icons.iconarchive.com/icons/sykonist/popular-sites/32/Wikipedia-globe-icon.png",
+      "type": "image/png",
+      "sizes": "32x32"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#f9f9f9",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#77c1f6",
+  "shortcuts": [],
+  "description": "A language quiz game, an undercurrent quote & idea generator, an alternative to Wikipedia 'random article', available in 300+ languages🌍🌏🌎",
+  "screenshots": [
+    {
+      "src": "/asset/1024px-Languages_world_map.svg.png",
+      "type": "image/png",
+      "sizes": "1024x490"
+    },
+    {
+      "src": "/asset/Languages_world_map_rotate_filter_a.png",
+      "type": "image/png",
+      "sizes": "1357x650"
+    }
+  ]
+}
