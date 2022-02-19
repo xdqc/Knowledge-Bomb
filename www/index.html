@@ -4,19 +4,33 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="A language quiz game, an undercurrent quote & idea generator, an alternative to Wikipedia 'random article', available in 300+ languages🌍🌏🌎" />
-    <meta name="keywords" content="wikipedia, wikidata, game, quiz, quote, language, vocabulary, test,">
+    <meta name="keywords" content="wikipedia, wikidata, game, quiz, quote, language, vocabulary">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@knb.wiki" />
+    <meta name="twitter:title" content="Knowledge Bomb" />
+    <meta name="twitter:description" content="A language quiz game, an undercurrent quote & idea generator, an alternative to Wikipedia 'random article', available in 300+ languages🌍🌏🌎" />
+    <meta name="twitter:image" content="https://www.knb.wiki/www/asset/Languages_world_map_rotate_filter_a.png"/>
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="knb.wiki" />
+    <meta property="og:title" content="Knowledge Bomb" />
+    <meta property="og:description" content="A language quiz game, an undercurrent quote & idea generator, an alternative to Wikipedia 'random article', available in 300+ languages🌍🌏🌎" />
+    <meta property="og:url" content="https://www.knb.wiki" />
+    <meta property="og:image" content="https://www.knb.wiki/www/asset/screenshot_0.png" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
     <title>Knowledge Bomb 🌍🌏🌎 - KnB.wiki</title>
 
+    <link rel="manifest" href="/www/manifest.json">
     <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/css/bootstrap.min.css" integrity="sha512-T584yQ/tdRR5QwOpfvDfVQUidzfgc2339Lc8uBDtcp/wYu80d7jwBgAxbyMh0a9YM9F8N3tdErpFI8iaGx6x5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-vue/2.21.2/bootstrap-vue.min.css" integrity="sha512-YnP4Ql71idaMB+/ZG38+1adSSQotdqvixQ+dQg8x/IFA4heIj6i0BC31W5T5QUdK1Uuwa01YdqdcT42q+RldAg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link type="text/css" rel="stylesheet" href="./www/style.css"/>
-    <link type="text/css" rel="stylesheet" href="./www/animated-quote.css"/>
+    <link type="text/css" rel="stylesheet" href="/www/style.css"/>
+    <link type="text/css" rel="stylesheet" href="/www/animated-quote.css"/>
     <link type="image/x-icon" rel="icon" href="https://icons.iconarchive.com/icons/sykonist/popular-sites/32/Wikipedia-globe-icon.png"/>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2Ces5%2Ces6%2Ces7%2Ces2015%2Ces2016%2Ces2017%2Ces2018%2Ces2019%2Ces2020"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js" integrity="sha512-XdUZ5nrNkVySQBnnM5vzDqHai823Spoq1W3pJoQwomQja+o4Nw0Ew1ppxo5bhF2vMug6sfibhKWcNJsG8Vj9tg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-vue/2.21.2/bootstrap-vue.min.js" integrity="sha512-Z0dNfC81uEXC2iTTXtE0rM18I3ATkwn1m8Lxe0onw/uPEEkCmVZd+H8GTeYGkAZv50yvoSR5N3hoy/Do2hNSkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-async-computed@3.9.0/dist/vue-async-computed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   </head>
   <body>
@@ -167,9 +181,10 @@
         <b-container>
 
           <section role="presentation" v-show="showScore||displayScoreChart" class="score-board pb-4">
-            <b-alert variant="info" id="score-alert" :show="showScore">Game Over　　{{ [alangOpt.label_m0, alangOpt.label_m1, alangOpt.label_m2][match_mode] }}　{{qlangOpt.text}}->{{alangOpt.text}}　　difficulty {{difficulties[difficultyIndex-1]['icon']}} {{difficulties[difficultyIndex-1]['tooltip']}}<br>levels ~ {{levelPlayed}}<br>{{quizCorrect}}✔/{{quizIncorrect}}❌<br>score ~ {{score}}% </b-alert>
-            <a v-if="showScore&&!quizStarted" class="badge badge-pill badge-primary" target="_blank"
-              :href="`https://twitter.com/intent/tweet?url=www.knb.wiki&text=%23${labelPageTitle.replace(/ /g,'')}  💣  %23${qlangOpt.text.replace(/ /g,'')}-%23${alangOpt.text.replace(/ /g,'')} ${[alangOpt.label_m0, alangOpt.label_m1, alangOpt.label_m2][match_mode]} @ difficulty${difficulties[difficultyIndex-1]['icon']}  level~${levelPlayed}  ✔${quizCorrect}/${quizIncorrect}❌  score: ${score}%25  🌍🌏🌎 `">
+            <b-alert variant="info" id="score-alert" :show="showScore">~ Game Over ~<br>difficulty {{difficulties[difficultyIndex-1]['icon']}}　{{levelPlayed}} levels　✔{{quizCorrect}}/{{quizIncorrect}}❌　score: {{score}}% </b-alert>
+            <a v-if="showScore&&!quizStarted" class="badge badge-pill badge-primary twitter-share" target="_blank"
+              :href="`https://twitter.com/intent/tweet?url=www.knb.wiki&text=%23${labelPageTitle.replace(/ /g,'')} 💣 %23${qlangOpt.text.replace(/ /g,'')}-%23${alangOpt.text.replace(/ /g,'')} ${[alangOpt.label_m0, alangOpt.label_m1, alangOpt.label_m2][match_mode]} @ difficulty${difficulties[difficultyIndex-1]['icon']} level~${levelPlayed} ✔${quizCorrect}/${quizIncorrect}❌ score: ${score}%25 `"
+              @click="shareImage">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-twitter" viewBox="0 0 16 16">
                 <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"></path>
               </svg> Share on Twitter</a>
@@ -332,7 +347,7 @@
           </section>
   
           <section role="progressbar">
-            <b-card-group v-show="quizStarted||(!quizStarted&&showScore)"
+            <b-card-group v-show="quizStarted||(!quizStarted&&showScore)" id="hilbert-grid"
               class="hypernym-grid" :class="{'float-right': windowWidth>1200}"
               :style="`margin-right: ${quizStarted&&windowWidth>1200 ? Math.min(0,360-windowWidth/3)+'px' : 'auto'};`"
               @click="toggleHypernymGridTextIndex">
@@ -424,7 +439,7 @@
       </b-alert>
       <footer class="text-muted">KnB.wiki © 2021-<script>document.write(new Date().getFullYear())</script></footer>
     </div>
-    <script type="text/javascript" src="./www/wikiquote.js"></script>
-    <script type="text/javascript" src="./www/app.js"></script>
+    <script type="text/javascript" src="/www/wikiquote.js"></script>
+    <script type="text/javascript" src="/www/app.js"></script>
   </body>
 </html>

@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
   "short_name": "KnB.wiki",
   "name": "Knowledge Bomb",
   "icons": [
@@ -8,21 +9,28 @@
       "sizes": "32x32"
     }
   ],
+  "id": "/",
   "start_url": "/",
   "background_color": "#f9f9f9",
-  "display": "standalone",
+  "display": "fullscreen",
+  "orientation": "portrait-primary",
   "scope": "/",
   "theme_color": "#77c1f6",
   "shortcuts": [],
   "description": "A language quiz game, an undercurrent quote & idea generator, an alternative to Wikipedia 'random article', available in 300+ languages🌍🌏🌎",
   "screenshots": [
     {
-      "src": "/asset/1024px-Languages_world_map.svg.png",
+      "src": "./asset/screenshot_0.png",
+      "type": "image/png",
+      "sizes": "1024x825"
+    },
+    {
+      "src": "./asset/1024px-Languages_world_map.svg.png",
       "type": "image/png",
       "sizes": "1024x490"
     },
     {
-      "src": "/asset/Languages_world_map_rotate_filter_a.png",
+      "src": "./asset/Languages_world_map_rotate_filter_a.png",
       "type": "image/png",
       "sizes": "1357x650"
     }

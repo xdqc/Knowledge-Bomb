@@ -1134,6 +1134,20 @@ LIMIT 3`
       }      
       return '#'+toHex(r)+toHex(g)+toHex(b)
     },
+    shareImage: function() {
+      html2canvas(document.querySelector('#hilbert-grid'), {
+        scale: 4
+      }).then(canvas => {
+        const image = canvas.toDataURL();
+        const aDownloadLink = document.createElement('a');
+        aDownloadLink.download = `!tweet_share_my_result_${this.labelPageTitle}_${this.qlangOpt.text}-${this.alangOpt.text}
+_${[this.alangOpt.label_m0, this.alangOpt.label_m1, this.alangOpt.label_m2][this.match_mode]}
+_D${this.difficulty}_Lv${this.levelPlayed}_${this.quizCorrect}(${this.quizIncorrect})_score=${this.score}
+_knb.wiki_${new Date().toLocaleString()}.png`;
+        aDownloadLink.href = image;
+        aDownloadLink.click();
+      });
+    },
     fulfillWithTimeLimit: async function(task, timeLimit, failureValue){
       let timeout
       const timeoutPromise = new Promise((resolve, reject) => {
