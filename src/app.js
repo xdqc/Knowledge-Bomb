@@ -41,7 +41,7 @@ new Vue({
     hypernym_index: 1,
     hypernymColorHue: 0,
     hypernymGridTextIndex: 0,
-    match_mode: 1,
+    match_mode: -1,
     difficulty: 4,
     difficultyLvl: 7,
     difficulties: [
@@ -228,7 +228,7 @@ new Vue({
         { text: `👁 ${this.alangOpt.label_m0 || this.alang_options[0].label_m0 || ''} ${this.qlangOpt.text}`, value: 0 },
         { text: `👁️‍🗨️ ${this.alangOpt.label_m1 || this.alang_options[0].label_m1 || ''} ${this.qlangOpt.text}`, value: 1 },
         { text: `🧠 ${this.alangOpt.label_m2 || this.alang_options[0].label_m2 || ''} ${this.qlangOpt.text}`, value: 2 },
-      ]
+      ].slice(this.qlang===this.alang?1:0)
     },
     showDifficulties() {
       return this.difficulties
@@ -366,6 +366,14 @@ SELECT (lang(?label) as ?lang) ?label WHERE {
   methods: {
     //#region Game Actions
     startGameAtDifficulty: function(df) {
+      if (this.match_mode < 0) {
+        alert('Choose a mode to start: 👁 | 👁️‍🗨️ | 🧠')
+        return
+      }
+      if (this.match_mode==0 && this.qlang==this.alang) {
+        alert(`Choose a language other than ${this.alangOpt.text} to ${this.alangOpt.label_m0||this.alang_options[0].label_m0} ... or choose a mode: 👁️‍🗨️ | 🧠`)
+        return
+      }
       this.difficulty = df
       this.score = -1
       this.startBtnDisabled = true
@@ -769,26 +777,28 @@ LIMIT 3`
       if (this.difficulty > 1) {
         e.target.classList.add(this.answer === index ? 'btn-success' : 'btn-danger')
       }
-      // update hypernym grid count
-      const hypernym = this.hypernym_grid.find(h => h.value === this.q_hypernym)
-      hypernym.count += (this.answer === index ? 1 : -1)
-
-      // save answered quiz
-      const record = {
-        i: this.q_id,
-        q: this.qText,
-        p: this.choices[index],
-        c: this.choices,
-        a: this.answer,
-        r: this.answer === index,
-        t: new Date().getTime(),
-      }
-      if (!!this.sessionHistory[this.lvl]) {
-        this.sessionHistory[this.lvl].push(record)
-      } else {
-        this.sessionHistory[this.lvl] = [record]
-      }
-      sessionStorage.setItem(this.gameStartTime, JSON.stringify(this.sessionHistory))
+      setTimeout(() => {        
+        // update hypernym grid count
+        const hypernym = this.hypernym_grid.find(h => h.value === this.q_hypernym)
+        hypernym.count += (this.answer === index ? 1 : -1)
+  
+        // save answered quiz
+        const record = {
+          i: this.q_id,
+          q: this.qText,
+          p: this.choices[index],
+          c: this.choices,
+          a: this.answer,
+          r: this.answer === index,
+          t: new Date().getTime(),
+        }
+        if (!!this.sessionHistory[this.lvl]) {
+          this.sessionHistory[this.lvl].push(record)
+        } else {
+          this.sessionHistory[this.lvl] = [record]
+        }
+        sessionStorage.setItem(this.gameStartTime, JSON.stringify(this.sessionHistory))
+      }, 10);
     },
     gameOverAction: function(score) {
       this.score = score
@@ -928,7 +938,7 @@ LIMIT 3`
           value: h.value,
           place: h.place,
           order: h.hilbert_order,
-          texts: ['', h.hexagram, h.ideogram, ...h.texts.slice(1)],
+          texts: ['', ...h.texts.slice(1), h.ideogram, h.hexagram,],
           count: 0,
         }))
         this.hypernym_grid.sort((h1,h2) => h1.order-h2.order)
