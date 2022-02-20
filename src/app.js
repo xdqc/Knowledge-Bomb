@@ -19,6 +19,8 @@ new Vue({
     choices: [],
     answer: -1,
     score: -1,
+    gameStartTime: 0,
+    sessionHistory: {},
     windowWidth: window.innerWidth,
     windowHeight: window.innerHeight,
     isCollapsingBomb: true,
@@ -441,15 +443,7 @@ SELECT (lang(?label) as ?lang) ?label WHERE {
         return
       }
       if (e) {
-        // function called by click event
-        e.preventDefault()
-        e.target.classList.remove('btn-secondary')
-        if (this.difficulty > 1) {
-          e.target.classList.add(this.answer === index ? 'btn-success' : 'btn-danger')
-        }
-        // update hypernym grid count
-        const hypernym = this.hypernym_grid.find(h => h.value === this.q_hypernym)
-        hypernym.count += (this.answer === index ? 1 : -1)
+        this.gameSelectAction(e, index)
       }
       document.querySelectorAll('.btn-choice').forEach(b => b.disabled = true)
       this.progressAnimate = true
@@ -761,6 +755,40 @@ LIMIT 3`
       $hyperGrid.classList.remove('hypernym-grid-centered')
       if (this.windowWidth > 1200) { $hyperGrid.classList.add('float-right') }
       $progressRow.parentNode.insertBefore($hyperGrid, $progressRow)
+
+      // re-init quiz history
+      this.gameStartTime = new Date().getTime()
+      this.sessionHistory = {}
+      sessionStorage.setItem(this.gameStartTime, '{}')
+      //NOTE: very unlikely to have sessionstorageoverflow, won't bother to clear deterministic old ones with extra logic, because key order is defined by useragent.
+    },
+    gameSelectAction: function(e, index) {
+      // function called by click event
+      e.preventDefault()
+      e.target.classList.remove('btn-secondary')
+      if (this.difficulty > 1) {
+        e.target.classList.add(this.answer === index ? 'btn-success' : 'btn-danger')
+      }
+      // update hypernym grid count
+      const hypernym = this.hypernym_grid.find(h => h.value === this.q_hypernym)
+      hypernym.count += (this.answer === index ? 1 : -1)
+
+      // save answered quiz
+      const record = {
+        i: this.q_id,
+        q: this.qText,
+        p: this.choices[index],
+        c: this.choices,
+        a: this.answer,
+        r: this.answer === index,
+        t: new Date().getTime(),
+      }
+      if (!!this.sessionHistory[this.lvl]) {
+        this.sessionHistory[this.lvl].push(record)
+      } else {
+        this.sessionHistory[this.lvl] = [record]
+      }
+      sessionStorage.setItem(this.gameStartTime, JSON.stringify(this.sessionHistory))
     },
     gameOverAction: function(score) {
       this.score = score

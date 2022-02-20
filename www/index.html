@@ -171,7 +171,7 @@
               <b-btn variant="outline-light" class="btn-menu-s" id="btn-toggle-image" :title="displayTitleImage ? 'hide image' : 'hint image'" @click="toggleDisplayTitleImg">{{ displayTitleImage ? '🖼' : '⬜' }}</b-btn>
               <b-btn variant="outline-light" class="btn-menu-s" id="btn-toggle-score" :title="displayScoreChart ? 'hide score' : 'show score'" @click="toggleDisplayScoreChart">{{ displayScoreChart ? '📊' : '📋' }}</b-btn>
               <b-btn variant="outline-light" class="btn-menu-s d-none d-sm-inline" id="popover-hotkeys" title="hotkeys">⌨</b-btn>
-              <b-popover target="popover-hotkeys" title="Hotkeys" trigger="hover focus" placement="bottom">
+              <b-popover target="popover-hotkeys" title="Hotkeys" triggers="hover" placement="bottom">
                 <b-table borderless :items="hotkeyTable">
                   <template #cell(Key)="data"><kbd v-for="k in data.item.Key" :key="k">{{ k }}</kbd></template>
                 </b-table>
@@ -193,20 +193,33 @@
               v-show="showScore||displayScoreChart"
               :max="quizPlayed"
               :title="Object.values(board).filter(v=>v.length>0).length +' Levels'"
-              v-b-popover.hover.left="`${quizPlayed}❔　${quizCorrect}✔　${quizIncorrect}❌`"
-              v-b-popover.click.left="`${quizPlayed}❔　${quizCorrect}✔　${quizIncorrect}❌`">
+              v-b-popover.click.right="`${quizPlayed}❔　${quizCorrect}✔　${quizIncorrect}❌`"
+              v-b-popover.hover.right="`${quizPlayed}❔　${quizCorrect}✔　${quizIncorrect}❌`">
               <b-progress-bar :value="quizCorrect" variant="success"></b-progress-bar>
               <b-progress-bar :value="quizIncorrect" variant="danger"></b-progress-bar>
             </b-progress>
-            <b-progress v-for="([k,v], i) in Object.entries(board).reverse()" :key="i"
+            <b-progress v-for="([k,v], idx) in Object.entries(board).reverse()" :key="idx"
               v-show="showScore||displayScoreChart"
               :max="longestLevelCount"
               :title="'Level '+ k"
               :animated="k==lvl"
-              v-b-popover.hover.left="`${v.length}❔　${v.filter(u=>u>0).length}✔　${v.filter(u=>u<0).length}❌`"
               v-if="v.length > 0">
-              <b-progress-bar v-for="(u, index) in scoreBar(v)" :key="index"
-                :value="Math.abs(u)" :variant="u>0?'success':'danger'"></b-progress-bar>
+              <!-- v-b-popover.hover.rightbottom="`${v.length}❔　${v.filter(u=>u>0).length}✔　${v.filter(u=>u<0).length}❌`" -->
+              <b-progress-bar v-for="(u, i) in (v)" :key="i"
+                :id="`quizhistory-${k}-${i}`"
+                :value="1"
+                :variant="u>0?'success':'danger'"
+                :title="sessionHistory[k][i].q">
+                <b-popover :target="`quizhistory-${k}-${i}`" :title="sessionHistory[k][i].q" triggers="hover click" placement="bottom" class="popover-quiz-history">
+                  <b-list-group>
+                    <b-list-group-item v-for="(ch, cidx) in sessionHistory[k][i].c" :key="cidx" 
+                      :variant="cidx==sessionHistory[k][i].a?'success':ch==sessionHistory[k][i].p?'danger':'light'">
+                      {{ ch }}
+                    </b-list-group-item>
+                  </b-list-group>
+                </b-popover>
+              </b-progress-bar>
+
             </b-progress>
             <hr>
           </section>
