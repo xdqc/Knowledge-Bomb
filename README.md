@@ -1,27 +1,36 @@
 
 # Knowledge Bomb :bomb:
 
-An alternative to Wikipedia "random article", a vocabulary quiz game, an undercurrent idea generator, available in 300+ languages 🌍🌏🌎 https://www.knb.wiki
+A quiz game, a brain imagery generator, an ice breaker to galvanize undercurrent ideas, an alternative to Wikipedia "random article", available in 300+ languages 🌍🌏🌎 https://www.knb.wiki
 
-## Data mining from Wikipedia
+----
 
 The game content is data mined and analysed from Wikipedia articles and Wikidata items by multiple dimensions: languages clustering, hypernyms categorization, complexity scoring, etc. 
 
-### Hypernym Hierarchy
+## Hypernym Hierarchy
 
-All qualified Wikidata items / Wikipedia articles are categorized in buckets. The design principle is: gameplay first, performance second, academic last; coarsely classifying as a decision tree, instead of networking as an ontologically precise semantic graph. The tree branches are grown and pruned to achieve balanced number of items/articles per node.
+All qualified Wikidata items / Wikipedia articles are categorized in 64 buckets. 
 
-The 64 top-level hypernyms of controlled vocabulary are presented for players to pick during the game by detonating 💣
+The 64 top-level hypernyms of controlled vocabulary are presented for players to switch on/off to control the scopes of the next randomized quiz during game session by detonating 💣
 
 Different views of the hypernym hierarchy:
 
-- [Hilbert curve](docs/hypernym-hierarchy.md#Hilbert-curve)
-- [Monospaced Hilbert curve](docs/hypernym-hierarchy.md#Monospaced-Hilbert-curve)
-- [Compact tiles](docs/hypernym-hierarchy.md#Compact-tiles)
 - [Tree path](docs/hypernym-hierarchy.md#Tree-path)
-- [Monospaced tree path](docs/hypernym-hierarchy.md#Monospaced-tree-path)
+- [Tree path (monospaced node)](docs/hypernym-hierarchy.md#Monospaced-tree-path)
+- [Hilbert curve](docs/hypernym-hierarchy.md#Hilbert-curve)
+- [Hilbert curve (monospaced node)](docs/hypernym-hierarchy.md#Monospaced-Hilbert-curve)
+  - [Compact tiles](docs/hypernym-hierarchy.md#Compact-tiles)
 
-### 2D language picker
+The design principle is: gameplay first, performance second, academic last; coarsely classifying as a decision tree, instead of networking as an ontologically precise semantic graph. The tree branches are grown and pruned to achieve balanced number of items/articles per node.
+
+### Knowledge Profile
+
+For each game, a **knowledge profile**, or a **brain imagery**, will be generated to represent the player's mind for that quiz session. The more correct answer of the hypernym category, the more saturation of the cell color; the more wrong answer of the hypernym caterogy, the less saturation of the cell color. Example of *knowledge profile* :
+
+![!knowledge_profile_example](docs/knowledge_profile_example.gif)
+
+
+## 2D language picker
 
 The 🗺 [2D language picker](docs/lexi_map.PNG) keeps the constant position of each language no matter choosing which language to display. It solves the problem of one dimentional language pickers (re)ordering certain languages alphabetically at various positions that hard to find, e.g. *Deutsch* - _**A**leman_, _**I**naleman_, _**L**ialémani_, _**B**éésh bichʼahii_, _**C**eruman_, _**D**uits_, _**E**leman_, _**F**rangikos_, _**G**erman_, _**J**erman_, _**K**rzyżacki_, _**M**jymjecko_, _**Н**емецкий_, _**N**émet_, _**O**lmoni_, _**P**reisen_, _**R**ajchski_, _**S**aksa_, _**𐌸**𐌹𐌿𐌳𐌹𐍃𐌺𐌰𐍂𐌰𐌶𐌳𐌰_, _**Þ**ýska_, _**T**ysk_, _**U**budage_, _**V**ācu_, _**W**eimarische_, _**Y**oeraman_, _**Z**ėm_, etc.
 
@@ -31,12 +40,18 @@ The 🗺 [2D language picker](docs/lexi_map.PNG) keeps the constant position of 
 
 [Design considerations](docs/languages-cluster.md#Design-considerations)
 
-### List of Wikipedias - Languages ranking table
+A lite version of the lexical distance map can be used as an convenient language picker for Google Translate:
 
-Ranking is based on numbers of [qualified Wikidata items](#Qualified-Wikidata-items) per language.
-(*wonder where's the swedish cebuano?*)
+![!google_translate_lang](docs/00-leximap.gif)
 
-[Columns description](docs/languages-ranking.md)
+## List of Wikipedias - Languages ranking table
+
+English is the first language in terms of information coverage and completeness. But which language is the second, and so on? Can we order languages in a quantitative manner?
+
+The ranking is based on numbers of [qualified Wikidata items](#Qualified-Wikidata-items) per language.
+(*wonder where's the [swedish-cebuano](https://blog.datawrapper.de/wikipedia-articles-written-by-a-bot/)?*)
+
+[Ranking methodology](docs/languages-ranking.md)
 
 | Rank | Language(Local) | Language | Wiki | Coverage% | Q60 :1st_place_medal: | Q50 :2nd_place_medal: | Q40 :3rd_place_medal: | Q30 :medal_sports: | Q20 :medal_military: | WSM | Articles | Solidness% | Speakers |
 |---|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|

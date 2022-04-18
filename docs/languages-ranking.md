@@ -3,11 +3,10 @@
 The list of 320 Wikipedia langugages. 
 
 Ranking is based on numbers of [qualified Wikidata items](../README.md#Qualified-Wikidata-items) per language.
-(*wonder where's the swedish cebuano?*)
 
 #### Columns description
 
-  - **`Q60`** is the number of qualified wikipedia articles with more than *60* language versions, so as `Q50` `Q40` `Q30` `Q20`.
+  - **`Q60`** is the qualified wikipedia articles with more than *60* language versions, so as `Q50`, `Q40`, `Q30`, `Q20`... We may assume that `Q60` articles are more "important" than `Q50` articles.
   - **`WSM`**, weighted sum model, is the square root of sum of squares of language_versions_count of all qualified articles of the language.
   - **`Coverage%`**<sup>[‡](#notes)</sup> is the language WSM to English WSM ratio<sup>[†](#notes)</sup>
   - **`Articles`** is total [number of Wikipedia articles by language](https://meta.wikimedia.org/wiki/List_of_Wikipedias).
