@@ -15,7 +15,7 @@ class Query:
         sqlstr = """SELECT TOP(320) code ,name_local 
             ,label_question ,label_answer 
             ,label_difficulty ,label_gametitle 
-            ,label_m0 ,label_m1 ,label_m2 
+            ,label_mode, label_m0 ,label_m1 ,label_m2 
             ,coord_x ,coord_y 
         FROM wiki.language ORDER BY [rank]"""
         cls.conn = pyodbc.connect(cls.conn_str)
@@ -25,8 +25,8 @@ class Query:
             res.append({'value':lang[0], 'text':lang[1], 
                 'label_q':lang[2], 'label_a':lang[3],
                 'label_s':lang[4], 'label_t':lang[5],
-                'label_m0':lang[6], 'label_m1':lang[7], 'label_m2':lang[8],
-                'coord_x':lang[9], 'coord_y':lang[10]})
+                'label_m':lang[6], 'label_m0':lang[7], 'label_m1':lang[8], 'label_m2':lang[9],
+                'coord_x':lang[10], 'coord_y':lang[11]})
         return res
 
     @classmethod

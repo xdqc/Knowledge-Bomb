@@ -45,18 +45,18 @@ new Vue({
     difficulty: 4,
     difficultyLvl: 7,
     difficulties: [
-      {value: 1, icon:'1️⃣', tooltip:'Wanderer', keymap:{'7':0,'8':0,'9':0}},
-      {value: 2, icon:'2️⃣', tooltip:'Picnic', keymap:{'7':0,'8':0,'9':0,'4':1,'5':1,'6':1,'g':1,'u':1,'c':1,'i':1,'r':1,'o':1}},
-      {value: 3, icon:'3️⃣', tooltip:'Casual', keymap:{'7':0,'8':0,'9':0,'4':1,'5':1,'6':1,'g':1,'u':1,'c':1,'i':1,'r':1,'o':1,'1':2,'2':2,'3':2,'h':2,'j':2,'t':2,'k':2,'n':2,'l':2}},
-      {value: 4, icon:'4️⃣', tooltip:'Easy', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3}},
-      {value: 6, icon:'6️⃣', tooltip:'Mild', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3,'1':4,'h':4,'j':4,'2':5,'t':5,'k':5}},
-      {value: 8, icon:'8️⃣', tooltip:'Moderate', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3,'1':4,'h':4,'j':4,'2':5,'t':5,'k':5,'0':6,'m':6,'.':7,'w':7,',':7}},
-      {value: 9, icon:'9️⃣', tooltip:'Intricate', keymap:{'7':0,'8':1,'9':2,'4':3,'g':3,'u':3,'5':4,'c':4,'i':4,'6':5,'r':5,'o':5,'1':6,'h':6,'j':6,'2':7,'t':7,'k':7,'3':8,'n':8,'l':8}},
-      {value:12, icon:'1️⃣2️⃣', tooltip:'Devious', keymap:{}},
-      {value:16, icon:'1️⃣6️⃣', tooltip:'Fiendish', keymap:{}},
-      {value:24, icon:'2️⃣4️⃣', tooltip:'Mephistophelian', keymap:{}},
-      {value:36, icon:'3️⃣6️⃣', tooltip:'Diabolical', keymap:{}},
-      {value:54, icon:'5️⃣4️⃣', tooltip:'Maelstrom', keymap:{}},
+      {value: 1, tooltip:'1️⃣ choices', icon:'Wanderer', keymap:{'7':0,'8':0,'9':0}},
+      {value: 2, tooltip:'2️⃣ choices', icon:'Picnic', keymap:{'7':0,'8':0,'9':0,'4':1,'5':1,'6':1,'g':1,'u':1,'c':1,'i':1,'r':1,'o':1}},
+      {value: 3, tooltip:'3️⃣ choices', icon:'Casual', keymap:{'7':0,'8':0,'9':0,'4':1,'5':1,'6':1,'g':1,'u':1,'c':1,'i':1,'r':1,'o':1,'1':2,'2':2,'3':2,'h':2,'j':2,'t':2,'k':2,'n':2,'l':2}},
+      {value: 4, tooltip:'4️⃣ choices', icon:'Easy', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3}},
+      {value: 6, tooltip:'6️⃣ choices', icon:'Mild', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3,'1':4,'h':4,'j':4,'2':5,'t':5,'k':5}},
+      {value: 8, tooltip:'8️⃣ choices', icon:'Moderate', keymap:{'7':0,'8':1,'4':2,'g':2,'u':2,'5':3,'c':3,'i':3,'1':4,'h':4,'j':4,'2':5,'t':5,'k':5,'0':6,'m':6,'.':7,'w':7,',':7}},
+      {value: 9, tooltip:'9️⃣ choices', icon:'Intricate', keymap:{'7':0,'8':1,'9':2,'4':3,'g':3,'u':3,'5':4,'c':4,'i':4,'6':5,'r':5,'o':5,'1':6,'h':6,'j':6,'2':7,'t':7,'k':7,'3':8,'n':8,'l':8}},
+      {value:12, tooltip:'1️⃣2️⃣ choices', icon:'Devious', keymap:{}},
+      {value:16, tooltip:'1️⃣6️⃣ choices', icon:'Fiendish', keymap:{}},
+      {value:24, tooltip:'2️⃣4️⃣ choices', icon:'Mephistophelian', keymap:{}},
+      {value:36, tooltip:'3️⃣6️⃣ choices', icon:'Diabolical', keymap:{}},
+      {value:54, tooltip:'5️⃣4️⃣ choices', icon:'Maelstrom', keymap:{}},
     ],
     leximapXWheelFactor: 1,
   },
@@ -143,10 +143,10 @@ new Vue({
       return this.alang_options
     },
     alangOpt() {
-      return this.alang_options.find(l => l.value === this.alang) || { value: '', text: '', label_a: '', label_q: '', label_s: '', label_t: '', label_m0: '', label_m1: '', label_m2: ''}
+      return this.alang_options.find(l => l.value === this.alang) || { value: '', text: '', label_a: '', label_q: '', label_s: '', label_t: '', label_m: '', label_m0: '', label_m1: '', label_m2: ''}
     },
     qlangOpt() {
-      return this.qlang_options.find(l => l.value === this.qlang) || { value: '', text: '', label_a: '', label_q: '', label_s: '', label_t: '', label_m0: '', label_m1: '', label_m2: ''}
+      return this.qlang_options.find(l => l.value === this.qlang) || { value: '', text: '', label_a: '', label_q: '', label_s: '', label_t: '', label_m: '', label_m0: '', label_m1: '', label_m2: ''}
     },
     qText() {
       return this.q_title || this.q_desc
@@ -159,6 +159,9 @@ new Vue({
     },
     labelAnswer() {
       return this.alangOpt.label_a || this.alang_options[0].label_a
+    },
+    labelMatchmode() {
+      return this.alangOpt.label_m || this.alang_options[0].label_m
     },
     labelGameStart() {
       return this.alangOpt.label_s || this.alang_options[0].label_s

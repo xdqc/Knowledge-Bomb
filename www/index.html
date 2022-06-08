@@ -285,7 +285,7 @@
               v-slot="{ ariaMatchMode }"
               class="my-4"
               horizontal label-cols-sm="5" label-cols-md="4"
-              label="">
+              :label="labelMatchmode">
               <b-form-radio-group
                 id="radio-match-mode"
                 v-model="match_mode"
@@ -306,7 +306,7 @@
                 v-for="(d,i) in showDifficulties" :key="i"
                 :style="`font-size: x${d.value>=10?'':'x'}-large;display:${d.hide?'none':'initial'}`"
                 :disabled="d.disabled||startBtnDisabled"
-                :title="match_mode<0?'pick above: 👁 👁️‍🗨️ 🧠':(match_mode==0&&qlang==alang)?`¿${alangOpt.text} ${alangOpt.label_m0||alang_options[0].label_m0} ${alangOpt.text}?`:d.tooltip"
+                :title="match_mode<0?'pick one game mode above: 👁 👁️‍🗨️ 🧠':(match_mode==0&&qlang==alang)?`¿${alangOpt.text} ${alangOpt.label_m0||alang_options[0].label_m0} ${alangOpt.text}?`:d.tooltip"
                 v-b-popover.hover.bottom=""
                 @click="startGameAtDifficulty(d.value)">
                 {{ d.icon }}
