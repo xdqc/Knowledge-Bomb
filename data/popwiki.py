@@ -4,6 +4,7 @@ import requests
 import pyodbc
 import webbrowser
 import time
+import urllib
 from collections import Counter
 from datetime import datetime
 from bs4 import BeautifulSoup
@@ -22,11 +23,15 @@ def insert_by_titles():
         for l in f:
             en_titles.append(l.split('\t')[2].strip())
     for title in en_titles:
-        url = 'https://en.wikipedia.org/wiki/'
-        insert_en_title(url+title)
+        title = urllib.parse.quote_plus(title.replace(' ', '_'))
+        url = f'https://en.wikipedia.org/w/index.php?title={title}&redirect=no'
+        insert_en_title(url)
         print()
 
 def insert_en_title(titleurl, depth=1):
+    """
+    Recursively insert wikidata item by given wikipedia article title and its hypernyms (3 levels up)
+    """
     r = requests.get(titleurl)
     soup = BeautifulSoup(r.content, features='html5lib')
     link_wikidata = soup.select_one('li#t-wikibase')
@@ -44,7 +49,8 @@ def insert_en_title(titleurl, depth=1):
     text_lastedit = re.search(r'on (\d{1,2} \w+ \d{4})', soup.select_one('li#footer-info-lastmod').text).group(1)
     date_lastedit = datetime.strptime(text_lastedit, '%d %B %Y').strftime('%Y-%m-%d')
     print(('Q'+wikidata_id).ljust(12, ' '), date_lastedit, len(langs), en_title, sep='\t')
-    if len(langs) >= 20 and not en_title.startswith('Category:') and not en_title.startswith('Wikipedia:'):
+
+    if len(langs) >= 4 and not en_title.startswith('Category:') and not en_title.startswith('Wikipedia:'):
         sql_insert_wiki(wikidata_id, langs, date_lastedit, depth)
         if depth <= 2:
             depth += 1
@@ -63,7 +69,7 @@ def sql_insert_wiki(wikidata_id, langs, date_lastedit:str, depth=1):
         print(('Q'+wikidata_id).ljust(12, ' '),'Created')
         if depth > 1:
             with open('./sortitles.tsv', 'a', encoding='utf8') as f:
-                f.write(('Q'+wikidata_id).ljust(12, ' ')+'Created\t'+'https://en.wikipedia.org/wiki/'+langs['en'].replace(' ', '_')+'\n')
+                f.write(('Q'+wikidata_id).ljust(12, ' ')+'Created\t'+'https://en.wikipedia.org/wiki/'+langs['en'].replace(' ', '_').replace("''", "'")+'\n')
     elif rs[0][1] != len(langs) or str(rs[0][2])[:7] != date_lastedit[:7]:
         cursor.execute(f"UPDATE wiki.item SET lang_count={str(len(langs))}, edited_enwiki='{date_lastedit}', updated=GETDATE() WHERE id={wikidata_id};")
         cursor.commit()
@@ -121,6 +127,14 @@ def sql_update_language_articles():
             cursor.execute(sqlstr)
     cursor.commit()
 
+def sql_update_category_hexgram():
+    hexgram = '䷀䷁䷂䷃䷄䷅䷆䷇䷈䷉䷊䷋䷌䷍䷎䷏䷐䷑䷒䷓䷔䷕䷖䷗䷘䷙䷚䷛䷜䷝䷞䷟䷠䷡䷢䷣䷤䷥䷦䷧䷨䷩䷪䷫䷬䷭䷮䷯䷰䷱䷲䷳䷴䷵䷶䷷䷸䷹䷺䷻䷼䷽䷾䷿'
+    cursor = conn.cursor()
+    for i,h in enumerate(hexgram, start=1):
+        sqlstr = f"UPDATE wiki.category SET hexgram=N'{h}' WHERE place='{i}'"
+        cursor.execute(sqlstr)
+    cursor.commit()
+
 
 def sparql_get_hyperclass(qid, depth=0):
     sparql = """
@@ -168,6 +182,10 @@ def sparql_get_hyperclass(qid, depth=0):
         # sparql_get_hyperclass(qid, depth)
 
 def sparql_batch_hypernym_update(hypernym, hid, is_instance=True, n_subclass=None):
+    """
+    1. Query wikidata, select all hyponymes of the hypernym (hid), by given is_instance, n_subclass criteria, as `items_all`
+    2. Per every 2000 items batch, update wiki.item.hypernym. Items in wikidata are not necessarily in already in db
+    """
     sparql = """
     SELECT DISTINCT ?item
     WHERE {
@@ -189,9 +207,10 @@ def sparql_batch_hypernym_update(hypernym, hid, is_instance=True, n_subclass=Non
     res = r.json(strict=False)
     for b in res['results']['bindings']:
         item = b['item']['value'].split('Q')[1]
-        items_all.append(item)
-    for i in range(0,1000000,5000):
-        items = items_all[i:i+5000]
+        if item:
+            items_all.append(item)
+    for i in range(0,1000000,2000):
+        items = items_all[i:i+2000]
         if len(items) == 0:
             break
         sqlstr = f"UPDATE wiki.item SET hypernym = {hypernym} WHERE id IN ({','.join(items)[:-1]})"
@@ -201,12 +220,12 @@ def sparql_batch_hypernym_update(hypernym, hid, is_instance=True, n_subclass=Non
         sqlstr = f"SELECT id FROM wiki.item WHERE id IN ({','.join([str(i) for i in items])[:-1]})"
         cursor.execute(sqlstr)
         rs = [r[0] for r in cursor.fetchall()]
-        with open('./sortitems.tsv', 'a', encoding='utf8') as f:
-            for b in res['results']['bindings']:
-                item = int(b['item']['value'].split('Q')[1])
-                if item not in rs:
-                    f.write(f"{hypernym}\t{hid}\t{item}\n") #{b['linkCount']['value']} {b['article']['value'].replace(' ','_')}
-            f.write('\n')
+        # with open('./sortitems.tsv', 'a', encoding='utf8') as f:
+        #     for b in res['results']['bindings']:
+        #         item = int(b['item']['value'].split('Q')[1])
+        #         if item not in rs:
+        #             f.write(f"{hypernym}\t{hid}\t{item}\n") #{b['linkCount']['value']} {b['article']['value'].replace(' ','_')}
+        #     f.write('\n')
         print(f'{len(rs)} of {len(items)} items hypernym updated as {hypernym} ({hid})')
     return len(rs)
 
@@ -298,42 +317,102 @@ def delete_by_wikidata_id(item):
 
 
 tbdws = [
-'Deaths in 2021',
+'Deaths in 2022',
 '',
-'Al Imran',
 'Alcman',
+'Algerian Desert',
+'Ariarathes VII of Cappadocia',
+'Audi e-tron (brand)',
 'Aukštaitija',
 'Azad Kashmir',
 'Bayan I',
+'Cephisodotus the Elder',
 'Cichlid',
+'Cniva',
 'Coop Himmelb(l)au',
+'CoronaVac',
 'Ctesias',
 'Dattatreya',
-'Erie Canal',
+'Detention of Mark Bernstein',
+'Dicuil',
 'Ephialtes',
+'Erie Canal',
+'Erishum II',
+'Eucestoda',
+'F',
 'Fan Li',
+'Faustus of Byzantium',
+'Finland',
+'Flavon',
+'Francis Preserved Leavenworth',
 'Gan Ying',
-'Hyaluronidase',
-'Henutsen',
 'Haggai',
+'Henutsen',
+'Hezron',
+'Hiram Abiff',
+'History of County Wexford',
+'Hyaluronidase',
 'Ictinus',
 'Italy',
 'Irish Singles Chart',
 'Ivano-Fracena',
 'Las Regueras',
 'Lardaro',
+'Le Petit Nicolas',
+'Luis Corvalán',
 'Makurdi',
+'Museums of Mequinenza',
+'Mutnofret',
+'National anthem of Afghanistan',
+'One Day International',
 'Peaky Blinders',
+'Peire Vidal',
+'Peter and the Wolf',
+'Pierre Brassau',
 'Pope Joan',
 'Pleyel et Cie',
+'Puta, Azerbaijan',
 'QRIO',
+'Ramtek',
+'Reed Creek, Georgia',
+'Religion in South Korea',
+'Robonaut',
+'RTS,S',
+'São Tomé and Príncipe',
+'Sault Ste. Marie',
+"Say''s Political Economy",
 'Terpander',
 'Tehuacán',
+'Tiridates III of Parthia',
+'Titus Tatius',
 'Tonga Trench',
+'Transport in Albania',
 'Túrin Turambar',
 'Yemen',
+'Yuan Zhen',
 'Zacchaeus',
 'Zadok',
+'List of animal sounds',
+'List of characters in Ramayana',
+'List of chess players',
+'List of countries and dependencies by area',
+'List of culinary fruits',
+'List of designated terrorist groups',
+'List of elevators of the human body',
+'List of environmental organizations',
+'List of federally recognized tribes in the United States',
+'List of infectious diseases',
+'List of Latin phrases',
+'List of legal entity types by country',
+'List of literary movements',
+'List of national mottos',
+'List of particles',
+'List of pasta',
+'List of rock formations'
+'List of seas',
+'List of schools of philosophy',
+'List of tectonic plates',
+'1980s',
 ]
 
 for c in tbdws:
@@ -341,10 +420,11 @@ for c in tbdws:
     
 
 if __name__ == '__main__':
-    # build_hypernym_grid()
     insert_by_titles()
-    # order_hyperitemss()
+    # build_hypernym_grid()
     # open_sparql_item_links()
     # sparql_batch_hypernym_update(514,66394244)
     # sql_add_language_coord()
+    # sql_update_language_articles()
+    # delete_by_wikidata_id(244339)
     conn.close()
