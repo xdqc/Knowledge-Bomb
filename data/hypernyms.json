@@ -468,17 +468,6 @@
     ]
   },
   {
-    "hypernym": "Disease",
-    "queries": [
-      {
-        "label": "disease",
-        "item": 12136,
-        "or_instance": true,
-        "subclass_deep": null
-      }
-    ]
-  },
-  {
     "hypernym": "Organism",
     "queries": [
       {
@@ -602,6 +591,12 @@
       {
         "label": "service",
         "item": 7406919,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "ethics",
+        "item": 9465,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -737,11 +732,22 @@
         "label": "data",
         "item": 42848,
         "or_instance": true,
-        "subclass_deep": null
+        "subclass_deep": 5
       },
       {
         "label": "logical form",
         "item": 6667497,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
+    "hypernym": "Disease",
+    "queries": [
+      {
+        "label": "disease",
+        "item": 12136,
         "or_instance": true,
         "subclass_deep": null
       }
@@ -945,6 +951,83 @@
     ]
   },
   {
+    "hypernym": "Organization",
+    "queries": [
+      {
+        "label": "organization",
+        "item": 43229,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "organization",
+        "item": 43229,
+        "or_instance": true,
+        "subclass_deep": 1
+      },
+      {
+        "label": "social group",
+        "item": 874405,
+        "or_instance": false,
+        "subclass_deep": null
+      },
+      {
+        "label": "social group",
+        "item": 874405,
+        "or_instance": true,
+        "subclass_deep": 2
+      },
+      {
+        "label": "non-governmental organization",
+        "item": 79913,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "institution",
+        "item": 178706,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "government agency",
+        "item": 327333,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "political organization",
+        "item": 7210356,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "armed organization",
+        "item": 17149090,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "criminal organization",
+        "item": 1788992,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "type of organisation",
+        "item": 17197366,
+        "or_instance": true,
+        "subclass_deep": null
+      },
+      {
+        "label": "political concept",
+        "item": 33104069,
+        "or_instance": true,
+        "subclass_deep": null
+      }
+    ]
+  },
+  {
     "hypernym": "Knowledge",
     "queries": [
       {
@@ -1079,83 +1162,6 @@
     ]
   },
   {
-    "hypernym": "Organization",
-    "queries": [
-      {
-        "label": "organization",
-        "item": 43229,
-        "or_instance": false,
-        "subclass_deep": null
-      },
-      {
-        "label": "organization",
-        "item": 43229,
-        "or_instance": true,
-        "subclass_deep": 1
-      },
-      {
-        "label": "social group",
-        "item": 874405,
-        "or_instance": false,
-        "subclass_deep": null
-      },
-      {
-        "label": "social group",
-        "item": 874405,
-        "or_instance": true,
-        "subclass_deep": 2
-      },
-      {
-        "label": "non-governmental organization",
-        "item": 79913,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "institution",
-        "item": 178706,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "government agency",
-        "item": 327333,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "political organization",
-        "item": 7210356,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "armed organization",
-        "item": 17149090,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "criminal organization",
-        "item": 1788992,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "type of organisation",
-        "item": 17197366,
-        "or_instance": true,
-        "subclass_deep": null
-      },
-      {
-        "label": "political concept",
-        "item": 33104069,
-        "or_instance": true,
-        "subclass_deep": null
-      }
-    ]
-  },
-  {
     "hypernym": "Humanities",
     "queries": [
       {
@@ -1253,7 +1259,7 @@
         "label": "quantum particle",
         "item": 28693603,
         "or_instance": true,
-        "subclass_deep": null
+        "subclass_deep": 4
       },
       {
         "label": "subatomic particle",
