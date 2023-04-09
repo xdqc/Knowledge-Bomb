@@ -145,10 +145,10 @@ class Quiz:
     def level_up(cls, lvl, board, qid):
         if qid != 0:
             board[str(lvl)].append(qid)
-        cr,beta = cls.correct_rate(lvl, board), random.betavariate(5,10)
+        cr,beta = cls.correct_rate(lvl, board), random.betavariate(5,20)
         if cr > beta:
             sample_size = len(board[str(lvl)])
-            if lvl == len(cls.ladder) and sample_size > cls.total_sample_size(board) * 0.0618:
+            if lvl == len(cls.ladder) and sample_size > cls.total_sample_size(board) * 0.1:
                 lvl = 1 # round(random.gammavariate(len(cls.ladder), 0.2)) # rebounce back from top
             else:
                 lvl += 1

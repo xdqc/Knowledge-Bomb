@@ -19,7 +19,7 @@
 
     const langCount = document.querySelectorAll('li.interlanguage-link').length + 1;
     const isDisputed = !!document.querySelector('table.box-Disputed, table.box-More_citations_needed');
-    if (langCount < 22 ||
+    if (langCount < 20 ||
         document.querySelector('table.biography, table.geography, table.biota, table.vevent, table.ib-settlement, table.ib-country, table.ib-former-subdiv, table.sidebar-games-events') ||
         document.querySelector('span#coordinates') ||
         isDisputed
@@ -51,7 +51,7 @@
                                   'Merger of', 'Composers', 'Directed by', 'Abolished', 'Races', 'Administration', 'Performance', 'Final ruler', 'Year of creation', 'National origin', 'Original owner',
                                   'Publication', 'FIFA affiliation', 'Media type', 'Motives', 'Government', 'Distributor(s)', 'Matches played', 'Leading companies', 'Country', 'Stations',
                                   'Commissioned by', 'Key people', 'First race', 'Created by', 'President', 'Appointer', 'Trade names', 'Discovered', 'Natural abundance', 'Filename extension',
-                                  'Political position', 'Highest point', 'Periastron', 'Apastron', 'Eccentricity', 'Most titles',
+                                  'Political position', 'Highest point', 'Periastron', 'Apastron', 'Eccentricity', 'Most titles', 'Markets',
                                   'unicode', 'Unicode codepoint', 'Hexadecimal', 'Penumbral', 'Phonetic usage', 'transliteration', 'Pronunciations', 'The Cyrillic script']);
                                   //'Produced', 'Used by', 'Specifications', 'Manufacturer', 'Capacity',
                                   //'Preceded by', 'Followed by', 'Founder', 'Founded', 'Formation', 'Abolition', 'Inaugurated',
@@ -60,8 +60,9 @@
                          'Life', 'Personal life', 'Life and work', 'Early life', 'Later life', 'Biography and work', 'Biography', 'Bibliography', 'Career',
                          'Holidays and observances', 'Neighbourhoods', ];
         const cateStop = ['Disambiguation pages',
-                          'Temporary maintenance holdings',
+                          'Set index articles',
                           'All stub articles',
+                          'Temporary maintenance holdings',
                           'Living people', 'Year of birth unknown', 'Year of death unknown', 'Nonexistent people', 'People whose existence is disputed', 'Given names', 'Surnames',
                           'English masculine given names', 'English feminine given names',
                           'Days of the year',
@@ -82,22 +83,23 @@
                           'Fabulists', 'Praetorian prefects', 'Veterinarians', 'People in the Pauline epistles', 'Pauline epistles', 'Apocryphal epistles',
                           'Ancient Greek philosophers', 'Ancient Greek women philosophers', 'Ancient Greek writers', 'Ancient Greek grammarians', 'Ancient Greek sculptors', 'Ancient Greek biographers',
                           'Ancient Roman generals', 'Ancient Roman writers', 'Ancient Egyptian scribes', 'Ancient Arcadian poets', 'Sicilian tyrants', 'Roman legions',
-                          'Italian poets', 'Roman-era poets', 'French poets', 'German poets', 'Sanskrit poets', 'Russian male poets', 'German male writers', 'Anglican writers',
+                          'Italian poets', 'Roman-era poets', 'French poets', 'German poets', 'Sanskrit poets', 'Russian male poets', 'German male writers', 'Anglican writers', 'Syriac writers',
                           'Ancient Greek poets', 'Ancient Greek mathematicians', 'Early Greek historians', 'Ancient Greek statesmen', 'Ancient Ephesians', 'Ancient Milesians',
                           'Byzantine poets', 'Byzantine historians', 'Byzantine painters', 'Iranian historians', 'Gothic kings', 'Gothic warriors', 'Gothic painters',
                           'Hellenistic-era historians', 'Armenian historians', 'Ethnic Armenian historians', 'Jewish historians', 'Welsh historians', 'Frankish historians',
-                          'Greek explorers', 'Viking explorers', 'Irish explorers', 'Renaissance artists', 'Buddhist artists',
+                          'Greek explorers', 'Viking explorers', 'Irish explorers', 'Renaissance artists', 'Buddhist artists', 'Jewish philosophers',
                           'Hunnic rulers', 'Iranian rulers', 'Ancient women rulers', 'Women rulers of Egypt', 'Queens of Egypt',
+                          'Queens consort of the Fourth Dynasty of Egypt', 'Queens consort of the Nineteenth Dynasty of Egypt', 'Queens consort of the Eighteenth Dynasty of Egypt',
+                          'Queens of the Achaemenid Empire', 'Pharaohs of the Second Dynasty of Egypt',
                           'Aphorists', 'Explorers of Asia', '1st-century Romans', 'Torah people', 'People of the Quran', 'Satraps of the Alexandrian Empire',
-                          'Characters in Greek mythology', 'Kings in Greek mythology', 'Legendary Islamic people', 'Medieval legends', 'Tax collectors',
+                          'Characters in Greek mythology', 'Characters in the Odyssey', 'Kings in Greek mythology', 'Legendary Islamic people', 'Medieval legends', 'Tax collectors',
                           'Church Fathers', 'Carthaginians', 'Commentators on Aristotle', 'Trojans', 'Lines of succession', 'Grammarians of Latin',
                           'Mathematicians of medieval Islam', 'Astronomers of medieval Islam',
                           'Gnostics', 'Gnostic apocrypha', 'Psalms', 'Jewish apocrypha', 'Greek New Testament uncials', 'Vetus Latina New Testament manuscripts', 'Illuminated biblical manuscripts', 'Gospel Books',
-                          'Mythological kings', 'Regicides', 'Regnal titles', 'Angelic visionaries', 'Antipopes', 'Ulster',
-                          'Queens consort of the Fourth Dynasty of Egypt', 'Queens consort of the Nineteenth Dynasty of Egypt', 'Queens consort of the Eighteenth Dynasty of Egypt', 'Pharaohs of the Second Dynasty of Egypt',
+                          'Mythological kings', 'Regicides', 'Regnal titles', 'Angelic visionaries', 'Antipopes', 'Ulster', 'Ancient LGBT people',
                           'Male characters in literature', 'High Priests of Israel', 'Roman-era Jews', 'Patriarchs of Antioch', 'Eurypontid kings of Sparta', 'Byzantine people of Armenian descent',
                           'Nazi newspapers', 'Soviet novels','Pulp magazines', 'Operas', 'Upanishads', 'Gregorian calendar', 'Heraclius', 'Neoplatonists',
-                          '2010 censuses', '2020 censuses', '2021 deaths', '2022 deaths',
+                          '2010 censuses', '2020 censuses', '2021 deaths', '2022 deaths', '2023 deaths',
                           'Billboard charts', 'Plays set in England', 'Anime with original screenplays', 'Women satirists', 'Women astronomers', 'Vice presidents',
                           'Grammy Awards', 'Television festivals', 'Musical quartets', 'Tennis awards', 'Golden Globe Awards', 'French awards', 'British awards', 'Song contests',
                           'Music industry associations', 'Islamic terminology', 'British Academy Film Awards', 'National Basketball Association All-Star Game', 'Dakar Rally', 'World championships in chess',
@@ -109,10 +111,12 @@
                           'Medieval Italian architecture', 'German opera companies', 'Sports event promotion companies', 'Railway loop lines', 'French Roman Catholics',
                           'Intel microcontrollers', 'Nokia mobile phones', 'Motorola mobile phones', 'Canon EOS cameras', 'Defunct computer companies of the United States',
                           'Super-heavy tanks', 'Carbines',
-                          'Configuration files', 'Mars program', 'Time zones', 'International borders', 'Regions of Rajasthan',
+                          'Configuration files', 'Mars program',
+                          'Time zones', 'International borders', 'Regions of Rajasthan', 'Lost ancient cities and towns', 'Sumerian cities',
+                          'Historical regions of Transylvania', 'Historical regions in Russia', 'Historical regions in Ukraine', 'Historical regions in Romania', 'Development regions of Romania',
                           'Obsolete animal taxa', 'Obsolete gastropod taxa', 'Historically recognized angiosperm taxa', 'Individual chimpanzees',
                           'Historically recognized plant families', 'Historically recognized plant genera', 'Historically recognized angiosperm orders', 'Historically recognized angiosperm families', 'Historically recognized angiosperm genera',
-                          'Peninsulas of County Donegal', 'Deserts of China', 'Hill forts', 'Volcanic plugs of Asia', 'Former counties of Denmark (1970–2006)', 'Renaissance architecture in Germany', 'Development regions of Romania',
+                          'Peninsulas of County Donegal', 'Deserts of China', 'Hill forts', 'Volcanic plugs of Asia', 'Former counties of Denmark (1970–2006)', 'Renaissance architecture in Germany',
                           'Military trucks', ];
                        // 'Domain name stubs', 'Flag stubs', 'Greek mythology stubs', 'Explorer stubs', 'Plant stubs', 'Russia river stubs', 'Greek sportspeople stubs', 'Africa river stubs', 'European royalty stubs', 'Pelagonia Region geography stubs', 'Byzantine people stubs', 'Ancient Roman people stubs', 'Theatrical people stubs', 'Philosopher stubs', 'Greek deity stubs', 'Solomon Islands geography stubs',
         const titleStop = ['Wikipedia:', 'Category:', 'Module:', 'Help:', 'Portal:','Template:',
