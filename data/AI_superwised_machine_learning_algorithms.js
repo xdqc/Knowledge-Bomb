@@ -1,4 +1,4 @@
-// ==UserScript==K
+// ==UserScript==
 // @name         wikipedia random page filter
 // @namespace    http://tampermonkey.net/
 // @version      0.1
@@ -33,11 +33,11 @@
                                   'Full name', 'Born', 'Died', 'Burial', 'Date of birth', 'Gender', 'Spouse', 'Website', 'Web site', 'Official website', 'Government website',
                                   'Active', 'Founder(s)', 'Leaders', 'Leader', 'Author', 'Author(s)', 'Affiliations', 'Affiliation', 'Appearances', 'Adopted', 'Adoption', 'Registration', 'Engagements',
                                   'Teams', 'Members', 'Champion', 'Champions', 'Competition', 'Association', 'Production', 'Release', 'Release date', 'Repealed', 'Response', 'Membership', 'Ceased', 'Hosts',
-                                  'Coordinates', 'Speed', 'Distance', 'Height', 'Elevation', 'Discovery date', 'Inclination', 'Declination', 'Density', 'First flight', 'Disbanded', 'Founded by',
+                                  'Coordinates', 'Speed', 'Distance', 'Height', 'Elevation', 'Temperature', 'Inclination', 'Declination', 'Density', 'First flight', 'Disbanded', 'Founded by',
                                   'Medal record', 'Team colors', 'Head coach', 'General manager', 'Home stadium', 'Produced by', 'Maiden launch', 'Launched', 'Qualification', 'Athletes',
                                   'Headquarters', 'Revenues', 'Expenses', 'Developer', 'Initial release', 'Brand(s)', 'Brands', 'Brand', 'Operator(s)', 'Regnal titles', 'Defending champion',
                                   'Half-life', 'Crystal system', 'Years', 'List of years in film', 'List of years in music', 'Years in sports', 'Successor', 'Attendance', 'Defunct',
-                                  'Publication date', 'Studio albums','Composed', 'Composer(s)', 'Conductor', 'Owner', 'Published', 'Lyrics', 'Operation', 'Host', 'Feast', 'Leadership',
+                                  'Publication date', 'Studio albums','Composed', 'Composer(s)', 'Conductor', 'Owner', 'Published', 'Lyrics', 'Operation', 'Host', 'Feast', 'Leadership', 'CEO',
                                   'Salary', 'Allegiance', 'Armiger', 'In service', 'No. of words', 'No. of verses', 'Crew', 'Regime', 'Sovereign', 'Lifespan', 'Series', 'Abode', 'Source',
                                   'Organiser', 'Formed', 'Dissolved', 'Most wins', 'Venerated in', 'Population', 'Address', 'Body and chassis', 'Service history', 'Destinations', 'Rivals',
                                   'Operator', 'Opened', 'Closed', 'Settlements', 'Completed', 'Chancellor', 'Monarch(s)', 'Folded', 'Tournament', 'Volumes', 'Propulsion', 'Products',
@@ -48,16 +48,17 @@
                                   'Associated acts', 'Awards and achievements', 'First induction', 'First appearance', 'Number built', 'First issued', 'Primary user', 'Variants', 'Filling',
                                   'Cartridge', 'Transmission', 'Current champions', 'Last champions', 'Connector types', 'Shutter', 'Ballistic performance', 'Wingspan', 'Track gauge', 'Gauge',
                                   'Confluence', 'List of years in literature', 'Dissolution', 'Deposition', 'Commanders', 'Commander', 'Tributaries', 'Beginning coordinates', 'Home arena',
-                                  'Merger of', 'Composers', 'Directed by', 'Abolished', 'Races', 'Administration', 'Performance', 'Final ruler', 'Year of creation', 'National origin', 'Original owner',
+                                  'Merger of', 'Composers', 'Directed by', 'Abolished', 'Race', 'Races', 'Administration', 'Performance', 'Final ruler', 'Year of creation', 'National origin', 'Original owner',
                                   'Publication', 'FIFA affiliation', 'Media type', 'Motives', 'Government', 'Distributor(s)', 'Matches played', 'Leading companies', 'Country', 'Stations',
                                   'Commissioned by', 'Key people', 'First race', 'Created by', 'President', 'Appointer', 'Trade names', 'Discovered', 'Natural abundance', 'Filename extension',
-                                  'Political position', 'Highest point', 'Periastron', 'Apastron', 'Eccentricity', 'Most titles', 'Markets', 'Verdict', 'Designation', 'Inception',
+                                  'Political position', 'Highest point', 'Periastron', 'Apastron', 'Eccentricity', 'Most titles', 'Markets', 'Verdict', 'Designation', 'Inception', 'Runtime',
+                                  'Peerage', 'Registered',
                                   'Braille', 'unicode', 'Unicode codepoint', 'Hexadecimal', 'Penumbral', 'Phonetic usage', 'transliteration', 'Pronunciations', 'The Cyrillic script']);
                                   //'Produced', 'Used by', 'Specifications', 'Manufacturer', 'Capacity',
                                   //'Preceded by', 'Followed by', 'Founder', 'Founded', 'Formation', 'Abolition', 'Inaugurated',
         const tocStop = new Set(['Medal table', 'Medal summary', 'Qualified teams', 'Group A', 'Group 1', 'Division I', 'Matches', 'The match', 'Squads', 'Winners and nominees', 'Fixtures and results',
                          'Semi-finals', 'Championship', 'Match conditions', 'World Group', 'Final round', 'Final ranking', 'Results and standings',
-                         'Life', 'Personal life', 'Life and work', 'Early life', 'Later life', 'Biography and work', 'Biography', 'Bibliography', 'Career',
+                         'Life', 'Personal life', 'Life and work', 'Early life', 'Later life', 'Biography and work', 'Biography', 'Bibliography', 'Career', 'Debate regarding his life and works',
                          'Holidays and observances', 'Neighbourhoods']);
         const cateStop = new Set(['Disambiguation pages',
                           'All stub articles',
@@ -80,15 +81,17 @@
                           'National academies of sciences', 'National academies of arts and humanities', 'National Basketball Association lists', 'National association football supercups',
                           'Association football museums and halls of fame', 'Scheduled association football competitions', 'Defunct national association football supercups',
                           'Formula One seasons', 'Formula E seasons', 'FIA Formula 2 Championship seasons', 'Grand Prix motorcycle racing seasons',
-                          'Fabulists', 'Praetorian prefects', 'Veterinarians', 'People in the Pauline epistles', 'Pauline epistles', 'Apocryphal epistles',
+                          'Fabulists', 'Praetorian prefects', 'Veterinarians', 'People in the Pauline epistles', 'Pauline epistles', 'Apocryphal epistles', 'People in the canonical gospels',
                           'Ancient Greek philosophers', 'Ancient Greek women philosophers', 'Ancient Greek writers', 'Ancient Greek grammarians', 'Ancient Greek sculptors', 'Ancient Greek biographers',
                           'Ancient Greek poets', 'Ancient Greek mathematicians', 'Early Greek historians', 'Ancient Greek statesmen', 'Ancient Greek astronomers', 'Ancient Greek elegiac poets',
                           'Ancient Ephesians', 'Ancient Milesians', 'Ancient Roman generals', 'Ancient Roman writers', 'Ancient Egyptian scribes', 'Ancient Arcadian poets', 'Sicilian tyrants',
-                          'Ancient Roman poets', 'Ancient Roman exiles', 'Roman legions', 'Roman-era poets', 'Roman-era Jews',
+                          'Ancient Roman poets', 'Ancient Roman exiles', 'Roman legions', 'Roman-era poets', 'Roman-era Jews', 'Christian poets',
                           'Italian poets', 'French poets', 'German poets', 'Sanskrit poets', 'Russian male poets', 'German male writers', 'Anglican writers', 'Syriac writers', 'Christian writers',
-                          'Byzantine poets', 'Byzantine historians', 'Byzantine painters', 'Iranian historians', 'Gothic kings', 'Gothic warriors', 'Gothic painters', 'Germanic warriors',
+                          'Byzantine poets', 'Byzantine historians', 'Byzantine painters', 'Iranian historians',
+                          'Cubist artists', 'Renaissance artists', 'Buddhist artists', 'Dutch Golden Age painters',
+                          'Gothic kings', 'Gothic warriors', 'Gothic painters', 'Germanic warriors', 'Frankish warriors',
                           'Hellenistic-era historians', 'Armenian historians', 'Ethnic Armenian historians', 'Jewish historians', 'Welsh historians', 'Frankish historians',
-                          'Greek explorers', 'Viking explorers', 'Irish explorers', 'Renaissance artists', 'Buddhist artists', 'Jewish philosophers', 'Jewish composers',
+                          'Greek explorers', 'Viking explorers', 'Irish explorers', 'Jewish philosophers', 'Jewish composers',
                           'Hunnic rulers', 'Iranian rulers', 'Ancient women rulers', 'Women rulers of Egypt', 'Queens of Egypt',
                           'Queens consort of the Fourth Dynasty of Egypt', 'Queens consort of the Nineteenth Dynasty of Egypt', 'Queens consort of the Eighteenth Dynasty of Egypt',
                           'Queens of the Achaemenid Empire', 'Pharaohs of the Second Dynasty of Egypt', 'Torah monarchs',
@@ -105,8 +108,8 @@
                           'Grammy Awards', 'Television festivals', 'Musical quartets', 'Tennis awards', 'Golden Globe Awards', 'French awards', 'British awards', 'Song contests',
                           'Music industry associations', 'Islamic terminology', 'British Academy Film Awards', 'National Basketball Association All-Star Game', 'Dakar Rally', 'World championships in chess',
                           'Actress filmographies', 'Male actor filmographies', 'American films', 'American film awards', 'French film awards', 'European film awards', 'Spanish football trophies and awards',
-                          'Society of Authors awards', 'Retired Academy Awards', 'Animated film series',
-                          'Sufi orders',
+                          'Society of Authors awards', 'Retired Academy Awards', 'Animated film series', 'American short films', 'Comics awards',
+                          'Sufi orders', 'Euro coins by issuing country',
                           'Latin letters with diacritics', 'Letters with stroke', 'Latin-script digraphs', 'Persian letters', 'Arabic letters', 'Georgian letters', 'Arabic alphabets', 'Hangul jamo',
                           'Subdivisions of Japan', 'Comarques of Catalonia', 'General elections in the United States', 'Achaemenid princesses', 'Generals of Alexander the Great',
                           'Halloween television specials', 'International professional associations', 'Secret police', 'Tibetan Buddhists from Tibet', 'College of Cardinals',
@@ -115,7 +118,8 @@
                           'Super-heavy tanks', 'Carbines',
                           'Configuration files', 'Mars program',
                           'Time zones', 'International borders', 'Regions of Rajasthan', 'Lost ancient cities and towns', 'Sumerian cities', 'Members of the Unrepresented Nations and Peoples Organization',
-                          'Historical regions of Transylvania', 'Historical regions in Russia', 'Historical regions in Ukraine', 'Historical regions in Romania', 'Development regions of Romania', 'Geographical regions of Serbia',
+                          'Historical regions of Transylvania', 'Historical regions in Russia', 'Historical regions in Ukraine', 'Historical regions in Romania', 'Historical regions in Azerbaijan',
+                          'Development regions of Romania', 'Geographical regions of Serbia',
                           'Obsolete animal taxa', 'Obsolete gastropod taxa', 'Historically recognized angiosperm taxa', 'Individual chimpanzees',
                           'Historically recognized plant families', 'Historically recognized plant genera', 'Historically recognized angiosperm orders', 'Historically recognized angiosperm families', 'Historically recognized angiosperm genera',
                           'Peninsulas of County Donegal', 'Deserts of China', 'Hill forts', 'Volcanic plugs of Asia', 'Former counties of Denmark (1970–2006)', 'Renaissance architecture in Germany',
@@ -130,7 +134,7 @@
         if (//!dryTitle ||
             !firstPar ||
             Array.from(document.querySelectorAll('table.infobox th,table.infobox td, table.succession-box th')).some(th => infoStop.has(th.textContent.trim().replace('&nbsp;',' ').replace(/\:$/g, ''))) ||
-            Array.from(document.querySelectorAll('span.toctext')).some(t => tocStop.has(t.textContent)) ||
+            Array.from(document.querySelectorAll('span.mw-headline')).some(t => tocStop.has(t.id)) ||
             Array.from(document.querySelectorAll('a[title^=Category]')).some(a => cateStop.has(a.textContent)) ||
             titleStop.some(s => dryTitle.startsWith(s) || dryTitle.endsWith(s)) ||
             !!firstPar.textContent.replace(/(\r\n|\n|\r)/gm, '').match(/( \(?municipality\)?( located)? (in|of) | \(?district\)?( located)? (in|of) | a \(?village\)? | a \(?town\)? | \(?city\)? in | comune of | volcano in | subregion of | surname of | son of | name,? given )/gm) ||
