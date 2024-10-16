@@ -14,7 +14,7 @@ Ranking is based on numbers of [qualified Wikidata items](../README.md#Qualified
   - **`Speakers`** is L1+L2 speakers of the language in thousand (source: wikipedia of each language).
 
 | Rank | Language(Local) | Language | Wiki | WSM | Coverage% | Q60 :1st_place_medal: | Q50 :2nd_place_medal: | Q40 :3rd_place_medal: | Q30 :medal_sports: | Q20 :medal_military: | Articles | Solidness% | Speakers |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+|---|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 1 | English | English | en | 9661.31 | 99.16% | 5878 | 8817 | 13943 | 23112 | 41766 | 6896745 | 4.83% | 1348000 |
 | 2 | Español | Spanish | es | 9580.10 | 97.50% | 5868 | 8770 | 13786 | 22630 | 39736 | 1984288 | 16.50% | 586000 |
 | 3 | Français | French | fr | 9566.99 | 97.23% | 5864 | 8752 | 13730 | 22510 | 39587 | 2641672 | 12.36% | 274000 |
