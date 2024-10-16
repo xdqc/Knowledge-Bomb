@@ -12,7 +12,9 @@ BEGIN
 	DECLARE @simpleWSM AS float
 		= (SELECT TOP(1) (s.c) FROM 
 		(SELECT (SUM(lang_count*lang_count)) c FROM wiki.article a
-		JOIN wiki.item i ON i.id = a.item AND a.language = 'simple') s
+		JOIN wiki.item i ON i.id = a.item AND a.language = 'simple'
+			AND i.lang_count >= 20
+		) s
 	)
 	DECLARE @simpleArticle AS float
 		= (SELECT TOP(1) articles FROM wiki.language WHERE code = 'simple')
@@ -20,19 +22,19 @@ BEGIN
 	DROP TABLE IF EXISTS wiki.#RankTable
 
 	SELECT TOP (1000)
-		RANK() OVER (ORDER BY (ss.s) DESC, l.code) 'Rank'	 
+		RANK() OVER (ORDER BY (wsm.s) DESC, l.code) 'Rank'	 
 		,[name_local] 'Language(Local)'
 		,[name] 'Language'
 		,[code] 'Wiki'
-		,FORMAT( ss.s / @enWSM, 'P2') 'Coverage%'
-		,CONVERT(DECIMAL(10,2), SQRT(ss.s)) 'WSM'
+		,CONVERT(DECIMAL(10,2), SQRT(wsm.s)) 'WSM'
+		,FORMAT( wsm.s / @enWSM, 'P2') 'Coverage%'
 		,lc_60.c 'Q60 Diamond'
 		,lc_50.c 'Q50 Gold'
 		,lc_40.c 'Q40 Silver'
 		,lc_30.c 'Q30 Bronze'
 		,lc_20.c 'Q20 Iron'
 		,articles 'Articles'
-		,FORMAT( ss.s / @simpleWSM * @simpleArticle / CAST(articles as float), 'P2') 'Solidness%'
+		,FORMAT( wsm.s / @simpleWSM * @simpleArticle / CAST(articles as float), 'P2') 'Solidness%'
 		,speakers 'Speakers'
 	INTO wiki.#RankTable
 	FROM [wiki].[language] l
@@ -77,9 +79,10 @@ BEGIN
 		FROM wiki.article a
 		JOIN wiki.item i ON i.id = a.item
 			AND a.language = l.code
-	) ss
+			AND i.lang_count >= 20 
+	) wsm
 
-	ORDER BY ss.s DESC
+	ORDER BY wsm.s DESC
 
 
 	SELECT * from wiki.#RankTable
