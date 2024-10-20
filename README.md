@@ -85,26 +85,10 @@ The ranking is based on numbers of [qualified Wikidata items](#Qualified-Wikidat
 
 ### Qualified Wikidata items
 
-A qualified article ([examples](data/sample_titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these criteria:
+A qualified item ([examples](data/sample_titles.csv)) should be a general, universal, common concept or knowledge, which satisfies these criteria:
 
-- With more than *20* languages versions.
+- With more than *20* languages versions of Wikipedias.
 - Not an **onomatology** (anthroponymy, toponymy, hydronym, taxon etc.), which is not a particular person, place, biota, chemical, astronomical object, company, product, publication, song, team, sport match, event, year, decade, day, unicode, etc.
 - Not a disambiguation page item.
 - Can be hypernyms of items above (any level of parents of `instance_of?/subclass_of*`). Hypernyms are legitimate to have less than 20 languages versions, being small quantity of abstract philosophical terms backboning the semantic network.
 - Qualified item/article should be verified through with cross check and proofreading for quality assurance.
-
-#### Use ChatGPT to decide whether a term is an onomatology
-
-1. **Name-related**: Assess whether the term is directly related to the study of names. Onomastics focuses on names, including personal names, place names, and other types of names. If the term specifically pertains to names or their characteristics (e.g., etymology, symbolism, usage patterns), it is more likely to be associated with onomastics.
-
-2. **Research and Study**: Determine if the term is commonly used in onomastic research and academic discourse. Look for its presence in scholarly publications, such as journals, books, or conference proceedings, that discuss the study of names. If the term is frequently employed in onomastic literature, it indicates its relevance to the field.
-
-3. **Etymology and Linguistic Analysis**: Consider if the term involves the analysis of name origins, linguistic aspects, or phonetic and semantic variations. Onomastics often examines the etymology, phonetics, and semantics of names to understand their historical development and cultural significance. If the term involves such analyses, it aligns with onomastic interests.
-
-4. **Cultural and Historical Context**: Evaluate whether the term relates to the cultural and historical context of names. Onomastics explores how names are influenced by cultural, social, and historical factors. If the term is associated with the cultural, social, or historical aspects of names (e.g., naming practices, name changes over time), it is more likely to be relevant to onomastics.
-
-5. **Interdisciplinary Connections**: Consider if the term intersects with other disciplines related to names, such as linguistics, anthropology, history, sociology, or cultural studies. Onomastics often collaborates with these fields to gain insights into the study of names. If the term has connections to multiple disciplines, it strengthens its association with onomastics.
-
-6. **Consensus within the Field**: Take into account the consensus among experts and scholars in onomastics. If the term is widely accepted and recognized by the onomastic community as relevant to the field, it can be considered part of onomatology.
-
-ChatGPT's knowledge is based on pre-existing data and may not always reflect the latest developments in onomastics.
